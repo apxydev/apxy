@@ -1,0 +1,44 @@
+name: Feature Request
+description: Suggest a new feature or improvement
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        We appreciate feature suggestions! Please describe your idea below.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: "What problem does this solve? What are you trying to do?"
+      placeholder: "I'm trying to debug GraphQL subscriptions but APXY only supports queries and mutations..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: "How would you like this to work?"
+      placeholder: "Add a `search_graphql_subscriptions` tool that filters by subscription operation type..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: interface
+    attributes:
+      label: Which interface would this affect?
+      multiple: true
+      options:
+        - CLI
+        - Web GUI
+        - MCP (AI agent)
+        - Install / Setup
+        - Documentation
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: "Have you tried any workarounds?"

@@ -1,0 +1,15 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# APXY runtime files (if testing locally)
+certs/
+data/
+logs/
+*.db

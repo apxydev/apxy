@@ -1,0 +1,41 @@
+[
+  {
+    "name": "OpenAI: Chat Completion",
+    "url_pattern": "/v1/chat/completions",
+    "match_type": "exact",
+    "method": "POST",
+    "response_status": 200,
+    "response_headers": {
+      "Content-Type": "application/json"
+    },
+    "response_body": "{\"id\":\"chatcmpl-test123\",\"object\":\"chat.completion\",\"created\":1709420400,\"model\":\"gpt-4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Hello! How can I help you today?\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":10,\"completion_tokens\":8,\"total_tokens\":18}}",
+    "delay_ms": 500,
+    "priority": 0
+  },
+  {
+    "name": "OpenAI: Create Embeddings",
+    "url_pattern": "/v1/embeddings",
+    "match_type": "exact",
+    "method": "POST",
+    "response_status": 200,
+    "response_headers": {
+      "Content-Type": "application/json"
+    },
+    "response_body": "{\"object\":\"list\",\"data\":[{\"object\":\"embedding\",\"embedding\":[0.0023064255,-0.009327292,0.015797347,-0.0077780345],\"index\":0}],\"model\":\"text-embedding-ada-002\",\"usage\":{\"prompt_tokens\":5,\"total_tokens\":5}}",
+    "delay_ms": 200,
+    "priority": 0
+  },
+  {
+    "name": "OpenAI: List Models",
+    "url_pattern": "/v1/models",
+    "match_type": "exact",
+    "method": "GET",
+    "response_status": 200,
+    "response_headers": {
+      "Content-Type": "application/json"
+    },
+    "response_body": "{\"object\":\"list\",\"data\":[{\"id\":\"gpt-4\",\"object\":\"model\",\"owned_by\":\"openai\"},{\"id\":\"gpt-3.5-turbo\",\"object\":\"model\",\"owned_by\":\"openai\"},{\"id\":\"text-embedding-ada-002\",\"object\":\"model\",\"owned_by\":\"openai\"}]}",
+    "delay_ms": 50,
+    "priority": 0
+  }
+]

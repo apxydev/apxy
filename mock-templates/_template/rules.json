@@ -1,0 +1,28 @@
+[
+  {
+    "name": "Example: List items",
+    "url_pattern": "/v1/example",
+    "match_type": "exact",
+    "method": "GET",
+    "response_status": 200,
+    "response_headers": {
+      "Content-Type": "application/json"
+    },
+    "response_body": "{\"data\": [], \"has_more\": false}",
+    "delay_ms": 0,
+    "priority": 0
+  },
+  {
+    "name": "Example: Create item",
+    "url_pattern": "/v1/example",
+    "match_type": "exact",
+    "method": "POST",
+    "response_status": 201,
+    "response_headers": {
+      "Content-Type": "application/json"
+    },
+    "response_body": "{\"id\": \"ex_123\", \"created\": true}",
+    "delay_ms": 0,
+    "priority": 0
+  }
+]

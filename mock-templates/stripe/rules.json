@@ -1,0 +1,80 @@
+[
+  {
+    "name": "Stripe: Create Charge",
+    "url_pattern": "/v1/charges",
+    "match_type": "exact",
+    "method": "POST",
+    "response_status": 200,
+    "response_headers": {
+      "Content-Type": "application/json"
+    },
+    "response_body": "{\"id\":\"ch_test_123\",\"object\":\"charge\",\"amount\":2000,\"currency\":\"usd\",\"status\":\"succeeded\",\"paid\":true,\"captured\":true}",
+    "delay_ms": 100,
+    "priority": 0
+  },
+  {
+    "name": "Stripe: Retrieve Charge",
+    "url_pattern": "/v1/charges/*",
+    "match_type": "wildcard",
+    "method": "GET",
+    "response_status": 200,
+    "response_headers": {
+      "Content-Type": "application/json"
+    },
+    "response_body": "{\"id\":\"ch_test_123\",\"object\":\"charge\",\"amount\":2000,\"currency\":\"usd\",\"status\":\"succeeded\",\"paid\":true}",
+    "delay_ms": 50,
+    "priority": 0
+  },
+  {
+    "name": "Stripe: Create Payment Intent",
+    "url_pattern": "/v1/payment_intents",
+    "match_type": "exact",
+    "method": "POST",
+    "response_status": 200,
+    "response_headers": {
+      "Content-Type": "application/json"
+    },
+    "response_body": "{\"id\":\"pi_test_123\",\"object\":\"payment_intent\",\"amount\":2000,\"currency\":\"usd\",\"status\":\"requires_payment_method\",\"client_secret\":\"pi_test_123_secret_abc\"}",
+    "delay_ms": 100,
+    "priority": 0
+  },
+  {
+    "name": "Stripe: Retrieve Payment Intent",
+    "url_pattern": "/v1/payment_intents/*",
+    "match_type": "wildcard",
+    "method": "GET",
+    "response_status": 200,
+    "response_headers": {
+      "Content-Type": "application/json"
+    },
+    "response_body": "{\"id\":\"pi_test_123\",\"object\":\"payment_intent\",\"amount\":2000,\"currency\":\"usd\",\"status\":\"succeeded\"}",
+    "delay_ms": 50,
+    "priority": 0
+  },
+  {
+    "name": "Stripe: Create Customer",
+    "url_pattern": "/v1/customers",
+    "match_type": "exact",
+    "method": "POST",
+    "response_status": 200,
+    "response_headers": {
+      "Content-Type": "application/json"
+    },
+    "response_body": "{\"id\":\"cus_test_123\",\"object\":\"customer\",\"email\":\"test@example.com\",\"name\":\"Test Customer\",\"created\":1709420400}",
+    "delay_ms": 50,
+    "priority": 0
+  },
+  {
+    "name": "Stripe: Retrieve Customer",
+    "url_pattern": "/v1/customers/*",
+    "match_type": "wildcard",
+    "method": "GET",
+    "response_status": 200,
+    "response_headers": {
+      "Content-Type": "application/json"
+    },
+    "response_body": "{\"id\":\"cus_test_123\",\"object\":\"customer\",\"email\":\"test@example.com\",\"name\":\"Test Customer\"}",
+    "delay_ms": 50,
+    "priority": 0
+  }
+]
