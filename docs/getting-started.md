@@ -6,11 +6,22 @@ Get up and running with APXY in under 5 minutes.
 
 ## Step 1: Install
 
+### Option A: Homebrew (recommended)
+
+```bash
+brew tap apxydev/apxy https://github.com/apxydev/apxy
+brew install apxy
+```
+
+### Option B: Shell script
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/apxydev/apxy/main/scripts/install.sh | bash
 ```
 
-Or download manually from [GitHub Releases](https://github.com/apxydev/apxy/releases):
+### Option C: Manual download
+
+Download from [GitHub Releases](https://github.com/apxydev/apxy/releases):
 
 | Binary | Platform |
 |--------|----------|

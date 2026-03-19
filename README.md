@@ -12,6 +12,15 @@ APXY is a desktop network proxy that sits between your computer and the internet
 
 ## Install
 
+**Homebrew** (macOS / Linux):
+
+```bash
+brew tap apxydev/apxy https://github.com/apxydev/apxy
+brew install apxy
+```
+
+**Shell script**:
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/apxydev/apxy/main/scripts/install.sh | bash
 ```
