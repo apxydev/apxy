@@ -21,7 +21,7 @@ See the current release for pricing and licensing information.
 
 ### Is APXY open source?
 
-The core product is proprietary. This GitHub repository hosts the installer, documentation, community mock templates, and usage examples. See [LICENSE.md](../LICENSE.md).
+The core product is proprietary. This GitHub repository hosts the installer, documentation, community mock templates, and usage examples.
 
 ---
 

@@ -6,7 +6,7 @@ If you discover a security vulnerability in APXY, please report it responsibly.
 
 **Do NOT open a public issue.** Instead, email us at:
 
-**security@apxy.dev**
+**support@apxy.dev**
 
 Include:
 - Description of the vulnerability

@@ -90,12 +90,6 @@ Ideas for skill contributions:
 
 ---
 
-## Code of Conduct
-
-Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md).
-
----
-
 ## Questions?
 
 Open a [discussion](https://github.com/apxydev/apxy/discussions) or [issue](https://github.com/apxydev/apxy/issues).
