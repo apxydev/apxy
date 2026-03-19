@@ -8,7 +8,7 @@
 
 APXY (Agent Proxy) is a desktop tool that sits between your computer and the internet, letting you **inspect, mock, and debug** HTTP/HTTPS traffic. Think of it as a network debugger -- you can see every API call your apps make, fake server responses, replay requests, and diagnose API issues.
 
-What makes APXY unique is that it's built for both **humans and AI agents**. You can use it through a CLI, a Web GUI in your browser, or through MCP (Model Context Protocol) so AI tools like Cursor, Claude Desktop, and VS Code Copilot can inspect your network traffic and help you debug.
+What makes APXY unique is that it's built for both **humans and AI agents**. You can use it through a CLI or a Web GUI in your browser.
 
 ---
 
@@ -17,9 +17,9 @@ What makes APXY unique is that it's built for both **humans and AI agents**. You
 When the proxy starts, a Web GUI is available at `http://localhost:<proxy-port + 2>` (default: `http://localhost:8082`).
 
 ```bash
-apxy start                    # Web GUI on port 8082
-apxy start --web-port 9090    # Custom port
-apxy start --web-port 0       # Disable Web GUI
+apxy proxy start                    # Web GUI on port 8082
+apxy proxy start --web-port 9090    # Custom port
+apxy proxy start --web-port 0       # Disable Web GUI
 ```
 
 ### Pages
@@ -172,138 +172,6 @@ apxy interceptor remove --id <rule-id>
 
 ---
 
-## MCP Integration (for AI Agents)
-
-APXY includes a built-in MCP server with 30 tools, allowing AI tools to inspect traffic, create mock rules, and debug APIs.
-
-### Quick setup
-
-```bash
-apxy mcp install
-```
-
-This interactive command asks you to pick your AI client and scope, then writes the config automatically.
-
-### Supported AI clients
-
-- Cursor
-- Claude Desktop
-- Claude Code
-- VS Code / Copilot
-- Windsurf
-
-### Manual setup
-
-Add APXY to your AI client's MCP config:
-
-**Cursor** (`.cursor/mcp.json` or `~/.cursor/mcp.json`):
-```json
-{
-  "mcpServers": {
-    "apxy": {
-      "command": "/path/to/apxy",
-      "args": ["mcp", "--db", "/path/to/data/apxy.db"]
-    }
-  }
-}
-```
-
-**Claude Desktop** (`~/Library/Application Support/Claude/claude_desktop_config.json`):
-```json
-{
-  "mcpServers": {
-    "apxy": {
-      "command": "/path/to/apxy",
-      "args": ["mcp", "--db", "/path/to/data/apxy.db"]
-    }
-  }
-}
-```
-
-**Claude Code** (`.mcp.json` or `~/.claude.json`):
-```json
-{
-  "mcpServers": {
-    "apxy": {
-      "command": "/path/to/apxy",
-      "args": ["mcp", "--db", "/path/to/data/apxy.db"]
-    }
-  }
-}
-```
-
-**VS Code / Copilot** (`.vscode/mcp.json`):
-```json
-{
-  "servers": {
-    "apxy": {
-      "type": "stdio",
-      "command": "/path/to/apxy",
-      "args": ["mcp", "--db", "/path/to/data/apxy.db"]
-    }
-  }
-}
-```
-
-**Windsurf** (`~/.codeium/windsurf/mcp_config.json`):
-```json
-{
-  "mcpServers": {
-    "apxy": {
-      "command": "/path/to/apxy",
-      "args": ["mcp", "--db", "/path/to/data/apxy.db"]
-    }
-  }
-}
-```
-
-Replace `/path/to/apxy` and `/path/to/data/apxy.db` with actual paths.
-
-### How it works
-
-```
-┌──────────────┐  stdio   ┌──────────────┐  SQLite DB   ┌──────────────┐
-│  AI Client   │◄────────►│  apxy mcp    │◄────────────►│  apxy start  │
-│ (Cursor,     │          │  (MCP srv)   │              │  (proxy)     │
-│  Claude, ..) │          │              │              │              │
-└──────────────┘          └──────────────┘              └──────────────┘
-```
-
-1. Start the proxy: `apxy start`
-2. Your AI client launches `apxy mcp` as a subprocess via stdio
-3. Both processes share the same SQLite database
-
-### MCP tools (30 tools)
-
-| Category | Tools |
-|----------|-------|
-| **Traffic** | `get_traffic_logs`, `get_traffic_detail`, `search_traffic`, `get_proxy_status` |
-| **Mocking** | `set_mock_rule`, `remove_mock_rule`, `list_mock_rules` |
-| **Session** | `toggle_recording`, `clear_traffic` |
-| **Filtering** | `set_filter_rule`, `remove_filter_rule`, `list_filter_rules` |
-| **Export/Replay** | `export_as_curl`, `replay_request`, `compose_request` |
-| **Redirects** | `set_redirect_rule`, `remove_redirect_rule`, `list_redirect_rules` |
-| **SSL** | `enable_ssl_domain`, `disable_ssl_domain`, `list_ssl_domains` |
-| **Body Search** | `search_bodies`, `query_json_path` |
-| **Diff** | `diff_records` |
-| **Network** | `set_network_condition`, `clear_network_condition` |
-| **Interceptors** | `set_interceptor`, `remove_interceptor`, `list_interceptors` |
-| **Diagnosis** | `diagnose_apis`, `batch_request` |
-| **GraphQL** | `search_graphql` |
-| **Caching** | `set_no_caching` |
-| **Database** | `query_sql` |
-
-### Example AI prompts
-
-- *"Show me the last 10 API calls"*
-- *"Find all failed requests (status 4xx or 5xx)"*
-- *"Mock /api/users to return an empty array"*
-- *"Compare records abc123 and def456"*
-- *"Export that request as a curl command"*
-- *"What's wrong with the requests to api.example.com?"*
-
----
-
 ## Proxy Configuration
 
 ### Start flags
@@ -321,7 +189,7 @@ Replace `/path/to/apxy` and `/path/to/data/apxy.db` with actual paths.
 ### Linux setup
 
 ```bash
-apxy start --no-system-proxy
+apxy proxy start --no-system-proxy
 export http_proxy=http://localhost:8080
 export https_proxy=http://localhost:8080
 ```

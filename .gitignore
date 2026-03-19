@@ -13,3 +13,6 @@ certs/
 data/
 logs/
 *.db
+
+# OpenSpec
+openspec/

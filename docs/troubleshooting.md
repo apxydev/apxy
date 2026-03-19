@@ -21,7 +21,7 @@ Or go to **System Settings > Privacy & Security**, find the APXY message, and cl
 ```bash
 # Regenerate and re-trust the CA
 rm -rf certs/
-apxy start
+apxy proxy start
 # macOS will prompt for your password to trust the new CA
 ```
 
@@ -49,7 +49,7 @@ lsof -i :8080
 kill $(lsof -ti :8080)
 
 # Or use a different port
-apxy start --port 9090
+apxy proxy start --port 9090
 ```
 
 ### Proxy starts but HTTPS requests fail
@@ -61,7 +61,7 @@ apxy start --port 9090
 ### No traffic being captured
 
 1. Check the proxy is running: `curl -x http://localhost:8080 http://httpbin.org/get`
-2. Verify with verbose: `apxy start --verbose`
+2. Verify with verbose: `apxy proxy start --verbose`
 3. On Linux, ensure env vars are set: `echo $http_proxy`
 
 ### Mock rules not matching
@@ -91,25 +91,6 @@ networksetup -setsecurewebproxystate "Wi-Fi" off
 # Or run apxy stop (it disables system proxy as a safety net)
 apxy stop
 ```
-
----
-
-## MCP Issues
-
-### AI client can't find apxy
-
-Use the absolute path in your MCP config:
-
-```bash
-which apxy
-# Use this full path in your config
-```
-
-### MCP server starts but no tools appear
-
-1. Check the apxy binary is executable: `chmod +x /path/to/apxy`
-2. Test manually: `/path/to/apxy mcp --help`
-3. Ensure the `--db` path points to an existing database (start proxy first to create it)
 
 ---
 

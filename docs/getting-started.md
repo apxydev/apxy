@@ -36,7 +36,7 @@ apxy version
 ## Step 2: Start the proxy
 
 ```bash
-apxy start
+apxy proxy start
 ```
 
 On macOS, this automatically:
@@ -50,7 +50,7 @@ All traffic on your machine now flows through APXY.
 On Linux, set proxy environment variables manually:
 
 ```bash
-apxy start --no-system-proxy
+apxy proxy start --no-system-proxy
 export http_proxy=http://localhost:8080
 export https_proxy=http://localhost:8080
 ```
@@ -83,8 +83,6 @@ apxy logs search --query "httpbin"
 # View a specific record
 apxy logs show --id <record-id>
 ```
-
-**AI agent:** If you have MCP configured, ask your AI: *"Show me the last 10 requests captured by the proxy."*
 
 ---
 
@@ -120,4 +118,3 @@ This restores your original network settings automatically.
 - [User Guide](user-guide.md) — Full feature reference
 - [Troubleshooting](troubleshooting.md) — Common issues
 - [FAQ](faq.md) — Frequently asked questions
-- [AI Agent Skill](../skills/SKILL.md) — Set up MCP for your AI tool

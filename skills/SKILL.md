@@ -1,19 +1,12 @@
 # APXY CLI — Agent Network Proxy Command Line Tool
 
-Use this skill when the user asks to debug network traffic, set up mock rules, test API endpoints, or manage proxy behavior using the `apxy` binary. This skill provides the full CLI reference so you can operate APXY without MCP.
-
-## When to Use CLI vs MCP
-
-- **CLI**: Shell-only agents, CI/CD pipelines, piping output through `jq`, scripting, or when MCP is not available.
-- **MCP**: Structured agent workflows where the AI client supports Model Context Protocol.
-
-Both interfaces share the same underlying operations and produce identical results.
+Use this skill when the user asks to debug network traffic, set up mock rules, test API endpoints, or manage proxy behavior using the `apxy` binary. This skill provides the full CLI reference.
 
 ## Quick Start
 
 ```bash
 # Start proxy with control API (control API auto-starts on port+1)
-apxy start --port 8080                    # proxy on :8080, control API on :8081
+apxy proxy start --port 8080                    # proxy on :8080, control API on :8081
 
 # Inject proxy env for terminal tools (Proxyman-style)
 eval $(apxy env)
@@ -41,7 +34,7 @@ apxy sql query "SELECT host, COUNT(*) as cnt FROM traffic_logs GROUP BY host ORD
 | Type | Requires proxy? | How it works | Commands |
 |------|----------------|--------------|----------|
 | **Database-backed** | No | Connects directly to SQLite | logs, mock, sql, status, request |
-| **Runtime** | Yes (`apxy start`) | Calls the proxy's HTTP control API | filter, redirect, ssl, network, interceptor, recording, caching |
+| **Runtime** | Yes (`apxy proxy start`) | Calls the proxy's HTTP control API | filter, redirect, ssl, network, interceptor, recording, caching |
 
 Database-backed commands accept `--db` (default: `./data/apxy.db`). Runtime commands accept `--control-url` (default: `http://localhost:8081`).
 
@@ -191,7 +184,7 @@ apxy logs diff --id-a <FAIL_ID> --id-b <NEW_ID> --scope response
 
 ```bash
 # 1. Start proxy
-apxy start --port 8080
+apxy proxy start --port 8080
 
 # 2. In another terminal, inject env so cURL/Node/Python/Go use proxy
 eval $(apxy env)
@@ -221,7 +214,7 @@ apxy network clear
 - Use `--format json` and pipe through `jq` for programmatic processing
 - Use `--format toon` to minimize tokens when feeding output to an AI agent
 - Database-backed commands (logs, mock, sql, status, request) work without a running proxy
-- Runtime commands (filter, redirect, ssl, network, interceptor, recording, caching) require `apxy start`
+- Runtime commands (filter, redirect, ssl, network, interceptor, recording, caching) require `apxy proxy start`
 - The `--db` flag defaults to `./data/apxy.db`
 - The `--control-url` flag defaults to `http://localhost:8081`
 - Use `apxy env` when terminal tools must route through APXY

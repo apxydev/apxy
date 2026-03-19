@@ -12,7 +12,7 @@ Your first proxy session -- capture HTTP traffic and inspect requests.
 ### 1. Start the proxy
 
 ```bash
-apxy start
+apxy proxy start
 ```
 
 On macOS, this automatically configures the system proxy. All traffic now flows through APXY.

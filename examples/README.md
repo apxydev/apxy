@@ -8,7 +8,7 @@ Step-by-step tutorials showing how to use APXY for real-world scenarios.
 |---------|-------------|------------|
 | [Basic Debugging](basic-debugging/) | Your first proxy session: capture and inspect traffic | Beginner |
 | [API Mocking](api-mocking/) | Mock a REST API for frontend development | Beginner |
-| [AI Agent Workflow](ai-agent-workflow/) | Use an AI agent to debug network issues via MCP | Intermediate |
+| [AI Agent Workflow](ai-agent-workflow/) | Use an AI agent to debug network issues | Intermediate |
 
 ## Contributing
 

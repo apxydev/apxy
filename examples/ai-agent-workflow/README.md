@@ -1,6 +1,6 @@
 # Example: AI Agent Workflow
 
-Use an AI agent (Cursor, Claude, VS Code Copilot) to debug network issues through APXY's MCP integration.
+Use an AI agent (Cursor, Claude, VS Code Copilot) to debug network issues through APXY's CLI.
 
 ## Scenario
 
@@ -8,15 +8,14 @@ Your app is making API calls that sometimes fail. Instead of manually inspecting
 
 ## Prerequisites
 
-- APXY installed and proxy running (`apxy start`)
-- MCP configured for your AI client (`apxy mcp install`)
+- APXY installed and proxy running (`apxy proxy start`)
 
 ## Steps
 
 ### 1. Start the proxy
 
 ```bash
-apxy start
+apxy proxy start
 ```
 
 ### 2. Generate some traffic
@@ -85,7 +84,7 @@ LIMIT 10
 
 ## What you learned
 
-- How AI agents use MCP tools to inspect traffic
+- How AI agents use CLI commands to inspect traffic
 - Natural language debugging workflow
 - Using `diff_records` to compare good vs bad requests
 - Creating temporary mocks during debugging

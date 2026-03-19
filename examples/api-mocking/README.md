@@ -8,7 +8,7 @@ You're building a frontend that calls `/api/users` and `/api/users/:id`. The bac
 
 ## Prerequisites
 
-- APXY installed and proxy running (`apxy start`)
+- APXY installed and proxy running (`apxy proxy start`)
 
 ## Steps
 

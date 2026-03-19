@@ -14,7 +14,6 @@
   - Multi-language support (Node.js, Python, Ruby, Java, Go, etc.)
 - Proxyman-style app grouping in Web UI (traffic organized by process/app)
 - Mobile device setup and discovery
-- Manual MCP install option (`apxy mcp install --manual`)
 
 ### Web UI Improvements
 - Full UI refresh with Proxyman-style design
@@ -36,18 +35,16 @@
 ### API Diagnosis
 - API diagnoser with history-based analysis
 - HTTP client for live probe requests
-- MCP `diagnose_apis` and `batch_request` tools
 - Diagnosis report with actionable recommendations
 
 ### Session Control & Filtering
 - Recording toggle (pause/resume traffic capture)
-- MCP `toggle_recording` and `clear_traffic` tools
 - Filter rules (block/allow) for host-based traffic control
 
 ### Export & Replay
-- MCP `export_as_curl` tool for sharing reproducible requests
-- MCP `replay_request` tool for re-sending captured traffic
-- MCP `compose_request` tool for building requests from scratch
+- Export as cURL for sharing reproducible requests
+- Replay captured traffic
+- Compose requests from scratch
 
 ### Map Remote & SSL Management
 - Redirect rules for URL rewriting (map remote)
@@ -55,10 +52,10 @@
 
 ### Body Search & JSONPath
 - Full-text body search across request/response payloads
-- MCP `query_json_path` tool for extracting values from JSON responses
+- JSONPath extraction for JSON responses
 
 ### Diff & Network Conditions
-- MCP `diff_records` tool for comparing two traffic records
+- Compare two traffic records
 - Network condition simulation (latency, throttle, packet loss)
 
 ### Dynamic Interceptors
@@ -73,7 +70,7 @@
 
 ### GraphQL & Caching
 - GraphQL-aware traffic search by operation name/type
-- MCP `set_no_caching` tool for disabling upstream caches
+- Disable upstream caches per host
 
 ---
 
@@ -86,6 +83,5 @@
 - SQLite storage with WAL mode
 - Mock rule engine (exact, wildcard, regex matching)
 - Token optimization (trim, markdown, toon formats)
-- MCP server with 7 tools for AI agent integration
 - CLI with 30+ commands via Cobra
 - System proxy management on macOS
