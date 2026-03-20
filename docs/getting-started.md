@@ -39,7 +39,7 @@ Verify:
 
 ```bash
 apxy version
-# APXY v1.0.1
+# APXY v1.0.0
 ```
 
 ---

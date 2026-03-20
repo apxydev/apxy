@@ -1,28 +1,44 @@
 [
   {
     "name": "Example: List items",
-    "url_pattern": "/v1/example",
-    "match_type": "exact",
+    "url_pattern": "https://api.example.com/v1/example*",
+    "match_type": "wildcard",
     "method": "GET",
     "response_status": 200,
     "response_headers": {
       "Content-Type": "application/json"
     },
-    "response_body": "{\"data\": [], \"has_more\": false}",
+    "response_body": "{\"object\":\"list\",\"data\":[],\"has_more\":false,\"url\":\"/v1/example\"}",
     "delay_ms": 0,
-    "priority": 0
+    "priority": 50
   },
   {
     "name": "Example: Create item",
-    "url_pattern": "/v1/example",
+    "url_pattern": "https://api.example.com/v1/example",
     "match_type": "exact",
     "method": "POST",
     "response_status": 201,
     "response_headers": {
       "Content-Type": "application/json"
     },
-    "response_body": "{\"id\": \"ex_123\", \"created\": true}",
+    "response_body": "{\"id\":\"ex_123\",\"object\":\"example\",\"created\":true}",
     "delay_ms": 0,
-    "priority": 0
+    "priority": 50
+  },
+  {
+    "name": "Example: Error variant",
+    "url_pattern": "https://api.example.com/v1/example",
+    "match_type": "exact",
+    "method": "POST",
+    "header_conditions": {
+      "X-APXY-Scenario": "invalid_request"
+    },
+    "response_status": 400,
+    "response_headers": {
+      "Content-Type": "application/json"
+    },
+    "response_body": "{\"error\":{\"message\":\"Invalid request\",\"type\":\"invalid_request_error\"}}",
+    "delay_ms": 0,
+    "priority": 10
   }
 ]

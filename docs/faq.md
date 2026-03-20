@@ -73,14 +73,27 @@ Yes. Run `apxy proxy start --no-system-proxy` and set `http_proxy`/`https_proxy`
 # Download a template
 curl -O https://raw.githubusercontent.com/apxydev/apxy/main/mock-templates/stripe/rules.json
 
-# Import each rule (or use the Web GUI to import)
-cat rules.json | jq -c '.[]' | while read rule; do
-  apxy mock add \
-    --name "$(echo $rule | jq -r '.name')" \
-    --url "$(echo $rule | jq -r '.url_pattern')" \
-    --match "$(echo $rule | jq -r '.match_type')" \
-    --status "$(echo $rule | jq -r '.response_status')" \
-    --body "$(echo $rule | jq -r '.response_body')"
+# Import selected rules. Templates may use response headers and header conditions.
+jq -c '.[]' rules.json | while read -r rule; do
+  args=(
+    apxy mock add
+    --name "$(echo "$rule" | jq -r '.name')"
+    --url "$(echo "$rule" | jq -r '.url_pattern')"
+    --match "$(echo "$rule" | jq -r '.match_type')"
+    --status "$(echo "$rule" | jq -r '.response_status')"
+    --body "$(echo "$rule" | jq -r '.response_body')"
+  )
+
+  method="$(echo "$rule" | jq -r '.method // empty')"
+  response_headers="$(echo "$rule" | jq -c '.response_headers // {}')"
+  header_conditions="$(echo "$rule" | jq -c '.header_conditions // {}')"
+
+  if [ -n "$method" ]; then args+=(--method "$method"); fi
+  if [ "$response_headers" != "{}" ]; then args+=(--headers "$response_headers"); fi
+  if [ "$header_conditions" != "{}" ]; then args+=(--header-conditions "$header_conditions"); fi
+
+  "${args[@]}"
 done
 ```
 
+On the Free plan, only keep a few rules active at once. For provider-specific notes and scenario headers like `X-APXY-Scenario`, see [mock-templates/README.md](../mock-templates/README.md).

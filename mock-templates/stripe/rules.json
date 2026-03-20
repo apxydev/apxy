@@ -1,80 +1,241 @@
 [
   {
+    "name": "Stripe: Unauthorized",
+    "url_pattern": "^https://api\\.stripe\\.com/v1/.*$",
+    "match_type": "regex",
+    "header_conditions": {
+      "X-APXY-Scenario": "unauthorized"
+    },
+    "response_status": 401,
+    "response_headers": {
+      "Content-Type": "application/json",
+      "Request-Id": "req_test_stripe_unauthorized"
+    },
+    "response_body": "{\"error\":{\"message\":\"Invalid API Key provided: sk_test_invalid\",\"type\":\"invalid_request_error\"}}",
+    "delay_ms": 50,
+    "priority": 5
+  },
+  {
+    "name": "Stripe: Invalid Request Error",
+    "url_pattern": "^https://api\\.stripe\\.com/v1/.*$",
+    "match_type": "regex",
+    "header_conditions": {
+      "X-APXY-Scenario": "invalid_request_error"
+    },
+    "response_status": 400,
+    "response_headers": {
+      "Content-Type": "application/json",
+      "Request-Id": "req_test_stripe_invalid_request"
+    },
+    "response_body": "{\"error\":{\"message\":\"No such customer: 'cus_missing'\",\"type\":\"invalid_request_error\",\"param\":\"customer\",\"code\":\"resource_missing\",\"doc_url\":\"https://docs.stripe.com/error-codes/resource-missing\"}}",
+    "delay_ms": 50,
+    "priority": 5
+  },
+  {
+    "name": "Stripe: Rate Limited",
+    "url_pattern": "^https://api\\.stripe\\.com/v1/.*$",
+    "match_type": "regex",
+    "header_conditions": {
+      "X-APXY-Scenario": "rate_limited"
+    },
+    "response_status": 429,
+    "response_headers": {
+      "Content-Type": "application/json",
+      "Request-Id": "req_test_stripe_rate_limit",
+      "Retry-After": "60"
+    },
+    "response_body": "{\"error\":{\"message\":\"Too many requests made to the API too quickly.\",\"type\":\"rate_limit_error\"}}",
+    "delay_ms": 50,
+    "priority": 5
+  },
+  {
+    "name": "Stripe: Server Error",
+    "url_pattern": "^https://api\\.stripe\\.com/v1/.*$",
+    "match_type": "regex",
+    "header_conditions": {
+      "X-APXY-Scenario": "server_error"
+    },
+    "response_status": 500,
+    "response_headers": {
+      "Content-Type": "application/json",
+      "Request-Id": "req_test_stripe_server_error"
+    },
+    "response_body": "{\"error\":{\"message\":\"An internal error occurred.\",\"type\":\"api_error\"}}",
+    "delay_ms": 75,
+    "priority": 5
+  },
+  {
+    "name": "Stripe: Create Payment Intent (Idempotency Conflict)",
+    "url_pattern": "https://api.stripe.com/v1/payment_intents",
+    "match_type": "exact",
+    "method": "POST",
+    "header_conditions": {
+      "X-APXY-Scenario": "idempotency_conflict"
+    },
+    "response_status": 409,
+    "response_headers": {
+      "Content-Type": "application/json",
+      "Request-Id": "req_test_stripe_idempotency"
+    },
+    "response_body": "{\"error\":{\"message\":\"Keys for idempotent requests must be unique for at least 24 hours.\",\"type\":\"idempotency_error\"}}",
+    "delay_ms": 50,
+    "priority": 10
+  },
+  {
+    "name": "Stripe: Confirm Payment Intent (Card Declined)",
+    "url_pattern": "https://api.stripe.com/v1/payment_intents/*/confirm",
+    "match_type": "wildcard",
+    "method": "POST",
+    "header_conditions": {
+      "X-APXY-Scenario": "card_declined"
+    },
+    "response_status": 402,
+    "response_headers": {
+      "Content-Type": "application/json",
+      "Request-Id": "req_test_stripe_card_declined"
+    },
+    "response_body": "{\"error\":{\"message\":\"Your card was declined.\",\"type\":\"card_error\",\"code\":\"card_declined\",\"decline_code\":\"generic_decline\",\"payment_intent\":{\"id\":\"pi_test_declined\",\"object\":\"payment_intent\",\"amount\":2000,\"currency\":\"usd\",\"status\":\"requires_payment_method\"}}}",
+    "delay_ms": 75,
+    "priority": 10
+  },
+  {
     "name": "Stripe: Create Charge",
-    "url_pattern": "/v1/charges",
+    "url_pattern": "https://api.stripe.com/v1/charges",
     "match_type": "exact",
     "method": "POST",
     "response_status": 200,
     "response_headers": {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Request-Id": "req_test_stripe_charge_create"
     },
-    "response_body": "{\"id\":\"ch_test_123\",\"object\":\"charge\",\"amount\":2000,\"currency\":\"usd\",\"status\":\"succeeded\",\"paid\":true,\"captured\":true}",
+    "response_body": "{\"id\":\"ch_test_123\",\"object\":\"charge\",\"amount\":2000,\"currency\":\"usd\",\"status\":\"succeeded\",\"paid\":true,\"captured\":true,\"created\":1770000000,\"customer\":\"cus_test_123\",\"payment_intent\":\"pi_test_123\"}",
     "delay_ms": 100,
-    "priority": 0
+    "priority": 50
   },
   {
     "name": "Stripe: Retrieve Charge",
-    "url_pattern": "/v1/charges/*",
+    "url_pattern": "https://api.stripe.com/v1/charges/*",
     "match_type": "wildcard",
     "method": "GET",
     "response_status": 200,
     "response_headers": {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Request-Id": "req_test_stripe_charge_get"
     },
-    "response_body": "{\"id\":\"ch_test_123\",\"object\":\"charge\",\"amount\":2000,\"currency\":\"usd\",\"status\":\"succeeded\",\"paid\":true}",
+    "response_body": "{\"id\":\"ch_test_123\",\"object\":\"charge\",\"amount\":2000,\"currency\":\"usd\",\"status\":\"succeeded\",\"paid\":true,\"captured\":true,\"created\":1770000000,\"customer\":\"cus_test_123\",\"payment_intent\":\"pi_test_123\"}",
     "delay_ms": 50,
-    "priority": 0
+    "priority": 50
+  },
+  {
+    "name": "Stripe: List Charges",
+    "url_pattern": "https://api.stripe.com/v1/charges*",
+    "match_type": "wildcard",
+    "method": "GET",
+    "response_status": 200,
+    "response_headers": {
+      "Content-Type": "application/json",
+      "Request-Id": "req_test_stripe_charge_list"
+    },
+    "response_body": "{\"object\":\"list\",\"data\":[{\"id\":\"ch_test_124\",\"object\":\"charge\",\"amount\":3500,\"currency\":\"usd\",\"status\":\"succeeded\",\"paid\":true,\"created\":1770000100},{\"id\":\"ch_test_123\",\"object\":\"charge\",\"amount\":2000,\"currency\":\"usd\",\"status\":\"succeeded\",\"paid\":true,\"created\":1770000000}],\"has_more\":false,\"url\":\"/v1/charges\"}",
+    "delay_ms": 50,
+    "priority": 50
   },
   {
     "name": "Stripe: Create Payment Intent",
-    "url_pattern": "/v1/payment_intents",
+    "url_pattern": "https://api.stripe.com/v1/payment_intents",
     "match_type": "exact",
     "method": "POST",
     "response_status": 200,
     "response_headers": {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Request-Id": "req_test_stripe_payment_intent_create"
     },
-    "response_body": "{\"id\":\"pi_test_123\",\"object\":\"payment_intent\",\"amount\":2000,\"currency\":\"usd\",\"status\":\"requires_payment_method\",\"client_secret\":\"pi_test_123_secret_abc\"}",
+    "response_body": "{\"id\":\"pi_test_123\",\"object\":\"payment_intent\",\"amount\":2000,\"currency\":\"usd\",\"status\":\"requires_payment_method\",\"client_secret\":\"pi_test_123_secret_abc\",\"created\":1770000200,\"payment_method_types\":[\"card\"]}",
     "delay_ms": 100,
-    "priority": 0
+    "priority": 50
+  },
+  {
+    "name": "Stripe: Confirm Payment Intent",
+    "url_pattern": "https://api.stripe.com/v1/payment_intents/*/confirm",
+    "match_type": "wildcard",
+    "method": "POST",
+    "response_status": 200,
+    "response_headers": {
+      "Content-Type": "application/json",
+      "Request-Id": "req_test_stripe_payment_intent_confirm"
+    },
+    "response_body": "{\"id\":\"pi_test_123\",\"object\":\"payment_intent\",\"amount\":2000,\"currency\":\"usd\",\"status\":\"succeeded\",\"client_secret\":\"pi_test_123_secret_abc\",\"created\":1770000200,\"charges\":{\"object\":\"list\",\"data\":[{\"id\":\"ch_test_123\",\"object\":\"charge\",\"amount\":2000,\"currency\":\"usd\",\"status\":\"succeeded\",\"paid\":true}],\"has_more\":false,\"url\":\"/v1/charges?payment_intent=pi_test_123\"}}",
+    "delay_ms": 120,
+    "priority": 50
   },
   {
     "name": "Stripe: Retrieve Payment Intent",
-    "url_pattern": "/v1/payment_intents/*",
+    "url_pattern": "https://api.stripe.com/v1/payment_intents/*",
     "match_type": "wildcard",
     "method": "GET",
     "response_status": 200,
     "response_headers": {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Request-Id": "req_test_stripe_payment_intent_get"
     },
-    "response_body": "{\"id\":\"pi_test_123\",\"object\":\"payment_intent\",\"amount\":2000,\"currency\":\"usd\",\"status\":\"succeeded\"}",
+    "response_body": "{\"id\":\"pi_test_123\",\"object\":\"payment_intent\",\"amount\":2000,\"currency\":\"usd\",\"status\":\"succeeded\",\"client_secret\":\"pi_test_123_secret_abc\",\"created\":1770000200,\"payment_method_types\":[\"card\"]}",
     "delay_ms": 50,
-    "priority": 0
+    "priority": 50
+  },
+  {
+    "name": "Stripe: List Payment Intents",
+    "url_pattern": "https://api.stripe.com/v1/payment_intents*",
+    "match_type": "wildcard",
+    "method": "GET",
+    "response_status": 200,
+    "response_headers": {
+      "Content-Type": "application/json",
+      "Request-Id": "req_test_stripe_payment_intent_list"
+    },
+    "response_body": "{\"object\":\"list\",\"data\":[{\"id\":\"pi_test_124\",\"object\":\"payment_intent\",\"amount\":3500,\"currency\":\"usd\",\"status\":\"requires_capture\",\"created\":1770000300},{\"id\":\"pi_test_123\",\"object\":\"payment_intent\",\"amount\":2000,\"currency\":\"usd\",\"status\":\"succeeded\",\"created\":1770000200}],\"has_more\":false,\"url\":\"/v1/payment_intents\"}",
+    "delay_ms": 50,
+    "priority": 50
   },
   {
     "name": "Stripe: Create Customer",
-    "url_pattern": "/v1/customers",
+    "url_pattern": "https://api.stripe.com/v1/customers",
     "match_type": "exact",
     "method": "POST",
     "response_status": 200,
     "response_headers": {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Request-Id": "req_test_stripe_customer_create"
     },
-    "response_body": "{\"id\":\"cus_test_123\",\"object\":\"customer\",\"email\":\"test@example.com\",\"name\":\"Test Customer\",\"created\":1709420400}",
+    "response_body": "{\"id\":\"cus_test_123\",\"object\":\"customer\",\"email\":\"test@example.com\",\"name\":\"Test Customer\",\"created\":1770000400,\"metadata\":{}}",
     "delay_ms": 50,
-    "priority": 0
+    "priority": 50
   },
   {
     "name": "Stripe: Retrieve Customer",
-    "url_pattern": "/v1/customers/*",
+    "url_pattern": "https://api.stripe.com/v1/customers/*",
     "match_type": "wildcard",
     "method": "GET",
     "response_status": 200,
     "response_headers": {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Request-Id": "req_test_stripe_customer_get"
     },
-    "response_body": "{\"id\":\"cus_test_123\",\"object\":\"customer\",\"email\":\"test@example.com\",\"name\":\"Test Customer\"}",
+    "response_body": "{\"id\":\"cus_test_123\",\"object\":\"customer\",\"email\":\"test@example.com\",\"name\":\"Test Customer\",\"created\":1770000400,\"metadata\":{}}",
     "delay_ms": 50,
-    "priority": 0
+    "priority": 50
+  },
+  {
+    "name": "Stripe: List Customers",
+    "url_pattern": "https://api.stripe.com/v1/customers*",
+    "match_type": "wildcard",
+    "method": "GET",
+    "response_status": 200,
+    "response_headers": {
+      "Content-Type": "application/json",
+      "Request-Id": "req_test_stripe_customer_list"
+    },
+    "response_body": "{\"object\":\"list\",\"data\":[{\"id\":\"cus_test_124\",\"object\":\"customer\",\"email\":\"jane@example.com\",\"name\":\"Jane Doe\",\"created\":1770000500},{\"id\":\"cus_test_123\",\"object\":\"customer\",\"email\":\"test@example.com\",\"name\":\"Test Customer\",\"created\":1770000400}],\"has_more\":false,\"url\":\"/v1/customers\"}",
+    "delay_ms": 50,
+    "priority": 50
   }
 ]

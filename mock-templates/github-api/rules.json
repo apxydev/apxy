@@ -1,69 +1,233 @@
 [
   {
+    "name": "GitHub: Unauthorized",
+    "url_pattern": "^https://api\\.github\\.com/.*$",
+    "match_type": "regex",
+    "header_conditions": {
+      "X-APXY-Scenario": "unauthorized"
+    },
+    "response_status": 401,
+    "response_headers": {
+      "Content-Type": "application/json; charset=utf-8",
+      "X-GitHub-Api-Version-Selected": "2026-03-10",
+      "X-GitHub-Media-Type": "github.v3; format=json",
+      "X-RateLimit-Limit": "5000",
+      "X-RateLimit-Remaining": "4999",
+      "X-RateLimit-Reset": "1770003600"
+    },
+    "response_body": "{\"message\":\"Bad credentials\",\"documentation_url\":\"https://docs.github.com/rest\",\"status\":\"401\"}",
+    "delay_ms": 50,
+    "priority": 5
+  },
+  {
+    "name": "GitHub: Not Found",
+    "url_pattern": "^https://api\\.github\\.com/.*$",
+    "match_type": "regex",
+    "header_conditions": {
+      "X-APXY-Scenario": "not_found"
+    },
+    "response_status": 404,
+    "response_headers": {
+      "Content-Type": "application/json; charset=utf-8",
+      "X-GitHub-Api-Version-Selected": "2026-03-10",
+      "X-GitHub-Media-Type": "github.v3; format=json",
+      "X-RateLimit-Limit": "5000",
+      "X-RateLimit-Remaining": "4999",
+      "X-RateLimit-Reset": "1770003600"
+    },
+    "response_body": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest\",\"status\":\"404\"}",
+    "delay_ms": 50,
+    "priority": 5
+  },
+  {
+    "name": "GitHub: Rate Limited",
+    "url_pattern": "^https://api\\.github\\.com/.*$",
+    "match_type": "regex",
+    "header_conditions": {
+      "X-APXY-Scenario": "rate_limited"
+    },
+    "response_status": 403,
+    "response_headers": {
+      "Content-Type": "application/json; charset=utf-8",
+      "X-GitHub-Api-Version-Selected": "2026-03-10",
+      "X-GitHub-Media-Type": "github.v3; format=json",
+      "X-RateLimit-Limit": "5000",
+      "X-RateLimit-Remaining": "0",
+      "X-RateLimit-Reset": "1770003600",
+      "Retry-After": "60"
+    },
+    "response_body": "{\"message\":\"API rate limit exceeded for user ID 1.\",\"documentation_url\":\"https://docs.github.com/rest/using-the-rest-api/troubleshooting-the-rest-api\",\"status\":\"403\"}",
+    "delay_ms": 50,
+    "priority": 5
+  },
+  {
+    "name": "GitHub: Create Issue (Validation Failed)",
+    "url_pattern": "https://api.github.com/repos/*/*/issues",
+    "match_type": "wildcard",
+    "method": "POST",
+    "header_conditions": {
+      "X-APXY-Scenario": "validation_failed"
+    },
+    "response_status": 422,
+    "response_headers": {
+      "Content-Type": "application/json; charset=utf-8",
+      "X-GitHub-Api-Version-Selected": "2026-03-10",
+      "X-GitHub-Media-Type": "github.v3; format=json",
+      "X-RateLimit-Limit": "5000",
+      "X-RateLimit-Remaining": "4998",
+      "X-RateLimit-Reset": "1770003600"
+    },
+    "response_body": "{\"message\":\"Validation Failed\",\"errors\":[{\"resource\":\"Issue\",\"field\":\"title\",\"code\":\"missing_field\"}],\"documentation_url\":\"https://docs.github.com/rest/issues/issues#create-an-issue\",\"status\":\"422\"}",
+    "delay_ms": 75,
+    "priority": 10
+  },
+  {
+    "name": "GitHub: Create Issue (Issues Disabled)",
+    "url_pattern": "https://api.github.com/repos/*/*/issues",
+    "match_type": "wildcard",
+    "method": "POST",
+    "header_conditions": {
+      "X-APXY-Scenario": "issues_disabled"
+    },
+    "response_status": 410,
+    "response_headers": {
+      "Content-Type": "application/json; charset=utf-8",
+      "X-GitHub-Api-Version-Selected": "2026-03-10",
+      "X-GitHub-Media-Type": "github.v3; format=json",
+      "X-RateLimit-Limit": "5000",
+      "X-RateLimit-Remaining": "4998",
+      "X-RateLimit-Reset": "1770003600"
+    },
+    "response_body": "{\"message\":\"Issues are disabled for this repo\",\"documentation_url\":\"https://docs.github.com/rest/issues/issues#create-an-issue\",\"status\":\"410\"}",
+    "delay_ms": 75,
+    "priority": 10
+  },
+  {
     "name": "GitHub: Get Authenticated User",
-    "url_pattern": "/user",
+    "url_pattern": "https://api.github.com/user",
     "match_type": "exact",
     "method": "GET",
     "response_status": 200,
     "response_headers": {
-      "Content-Type": "application/json",
+      "Content-Type": "application/json; charset=utf-8",
+      "X-GitHub-Api-Version-Selected": "2026-03-10",
+      "X-GitHub-Media-Type": "github.v3; format=json",
       "X-RateLimit-Limit": "5000",
-      "X-RateLimit-Remaining": "4999"
+      "X-RateLimit-Remaining": "4999",
+      "X-RateLimit-Reset": "1770003600"
     },
-    "response_body": "{\"login\":\"testuser\",\"id\":1,\"node_id\":\"MDQ6VXNlcjE=\",\"avatar_url\":\"https://avatars.githubusercontent.com/u/1\",\"name\":\"Test User\",\"email\":\"test@example.com\",\"public_repos\":10,\"followers\":100,\"following\":50}",
+    "response_body": "{\"login\":\"testuser\",\"id\":1,\"node_id\":\"MDQ6VXNlcjE=\",\"avatar_url\":\"https://avatars.githubusercontent.com/u/1?v=4\",\"html_url\":\"https://github.com/testuser\",\"name\":\"Test User\",\"email\":\"test@example.com\",\"public_repos\":10,\"followers\":100,\"following\":50}",
     "delay_ms": 50,
-    "priority": 0
+    "priority": 50
   },
   {
     "name": "GitHub: Get User by Username",
-    "url_pattern": "/users/*",
+    "url_pattern": "https://api.github.com/users/*",
     "match_type": "wildcard",
     "method": "GET",
     "response_status": 200,
     "response_headers": {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json; charset=utf-8",
+      "X-GitHub-Api-Version-Selected": "2026-03-10",
+      "X-GitHub-Media-Type": "github.v3; format=json",
+      "X-RateLimit-Limit": "60",
+      "X-RateLimit-Remaining": "59",
+      "X-RateLimit-Reset": "1770003600"
     },
-    "response_body": "{\"login\":\"octocat\",\"id\":583231,\"name\":\"The Octocat\",\"company\":\"@github\",\"public_repos\":8,\"followers\":10000}",
+    "response_body": "{\"login\":\"octocat\",\"id\":583231,\"node_id\":\"MDQ6VXNlcjU4MzIzMQ==\",\"avatar_url\":\"https://avatars.githubusercontent.com/u/583231?v=4\",\"html_url\":\"https://github.com/octocat\",\"name\":\"The Octocat\",\"company\":\"@github\",\"public_repos\":8,\"followers\":18000,\"following\":9}",
     "delay_ms": 50,
-    "priority": 0
+    "priority": 50
+  },
+  {
+    "name": "GitHub: List User Repositories",
+    "url_pattern": "https://api.github.com/user/repos*",
+    "match_type": "wildcard",
+    "method": "GET",
+    "response_status": 200,
+    "response_headers": {
+      "Content-Type": "application/json; charset=utf-8",
+      "X-GitHub-Api-Version-Selected": "2026-03-10",
+      "X-GitHub-Media-Type": "github.v3; format=json",
+      "X-RateLimit-Limit": "5000",
+      "X-RateLimit-Remaining": "4998",
+      "X-RateLimit-Reset": "1770003600",
+      "Link": "<https://api.github.com/user/repos?page=2>; rel=\"next\", <https://api.github.com/user/repos?page=4>; rel=\"last\""
+    },
+    "response_body": "[{\"id\":1001,\"node_id\":\"R_kgDOA-test1\",\"name\":\"alpha-service\",\"full_name\":\"testuser/alpha-service\",\"private\":false,\"owner\":{\"login\":\"testuser\",\"id\":1},\"html_url\":\"https://github.com/testuser/alpha-service\",\"description\":\"Core service repo\",\"fork\":false,\"default_branch\":\"main\"},{\"id\":1002,\"node_id\":\"R_kgDOA-test2\",\"name\":\"beta-worker\",\"full_name\":\"testuser/beta-worker\",\"private\":true,\"owner\":{\"login\":\"testuser\",\"id\":1},\"html_url\":\"https://github.com/testuser/beta-worker\",\"description\":\"Worker repo\",\"fork\":false,\"default_branch\":\"main\"}]",
+    "delay_ms": 50,
+    "priority": 50
   },
   {
     "name": "GitHub: Get Repository",
-    "url_pattern": "/repos/*/*",
+    "url_pattern": "https://api.github.com/repos/*/*",
     "match_type": "wildcard",
     "method": "GET",
     "response_status": 200,
     "response_headers": {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json; charset=utf-8",
+      "X-GitHub-Api-Version-Selected": "2026-03-10",
+      "X-GitHub-Media-Type": "github.v3; format=json",
+      "X-RateLimit-Limit": "5000",
+      "X-RateLimit-Remaining": "4997",
+      "X-RateLimit-Reset": "1770003600"
     },
-    "response_body": "{\"id\":1,\"name\":\"test-repo\",\"full_name\":\"testuser/test-repo\",\"private\":false,\"description\":\"A test repository\",\"fork\":false,\"stargazers_count\":42,\"language\":\"Go\",\"default_branch\":\"main\"}",
+    "response_body": "{\"id\":1001,\"node_id\":\"R_kgDOA-test1\",\"name\":\"alpha-service\",\"full_name\":\"testuser/alpha-service\",\"private\":false,\"owner\":{\"login\":\"testuser\",\"id\":1},\"html_url\":\"https://github.com/testuser/alpha-service\",\"description\":\"Core service repo\",\"fork\":false,\"stargazers_count\":42,\"watchers_count\":42,\"language\":\"Go\",\"has_issues\":true,\"default_branch\":\"main\"}",
     "delay_ms": 50,
-    "priority": 0
+    "priority": 50
   },
   {
-    "name": "GitHub: List Issues",
-    "url_pattern": "/repos/*/*/issues",
+    "name": "GitHub: List Repository Issues",
+    "url_pattern": "https://api.github.com/repos/*/*/issues*",
     "match_type": "wildcard",
     "method": "GET",
     "response_status": 200,
     "response_headers": {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json; charset=utf-8",
+      "X-GitHub-Api-Version-Selected": "2026-03-10",
+      "X-GitHub-Media-Type": "github.v3; format=json",
+      "X-RateLimit-Limit": "5000",
+      "X-RateLimit-Remaining": "4996",
+      "X-RateLimit-Reset": "1770003600",
+      "Link": "<https://api.github.com/repos/testuser/alpha-service/issues?page=2>; rel=\"next\", <https://api.github.com/repos/testuser/alpha-service/issues?page=4>; rel=\"last\""
     },
-    "response_body": "[{\"id\":1,\"number\":1,\"title\":\"Bug: something broken\",\"state\":\"open\",\"labels\":[{\"name\":\"bug\"}],\"user\":{\"login\":\"testuser\"},\"created_at\":\"2026-01-01T00:00:00Z\"},{\"id\":2,\"number\":2,\"title\":\"Feature: add dark mode\",\"state\":\"open\",\"labels\":[{\"name\":\"enhancement\"}],\"user\":{\"login\":\"testuser\"},\"created_at\":\"2026-01-02T00:00:00Z\"}]",
+    "response_body": "[{\"id\":2001,\"node_id\":\"I_kwDOA-test1\",\"number\":1,\"title\":\"Bug: something broken\",\"state\":\"open\",\"labels\":[{\"id\":301,\"name\":\"bug\"}],\"user\":{\"login\":\"testuser\",\"id\":1},\"comments\":2,\"created_at\":\"2026-03-01T00:00:00Z\",\"updated_at\":\"2026-03-02T00:00:00Z\"},{\"id\":2002,\"node_id\":\"I_kwDOA-test2\",\"number\":2,\"title\":\"Feature request in PR form\",\"state\":\"open\",\"labels\":[{\"id\":302,\"name\":\"enhancement\"}],\"user\":{\"login\":\"testuser\",\"id\":1},\"comments\":1,\"created_at\":\"2026-03-03T00:00:00Z\",\"updated_at\":\"2026-03-04T00:00:00Z\",\"pull_request\":{\"url\":\"https://api.github.com/repos/testuser/alpha-service/pulls/2\",\"html_url\":\"https://github.com/testuser/alpha-service/pull/2\",\"diff_url\":\"https://github.com/testuser/alpha-service/pull/2.diff\"}}]",
     "delay_ms": 50,
-    "priority": 0
+    "priority": 50
+  },
+  {
+    "name": "GitHub: Get Issue",
+    "url_pattern": "https://api.github.com/repos/*/*/issues/*",
+    "match_type": "wildcard",
+    "method": "GET",
+    "response_status": 200,
+    "response_headers": {
+      "Content-Type": "application/json; charset=utf-8",
+      "X-GitHub-Api-Version-Selected": "2026-03-10",
+      "X-GitHub-Media-Type": "github.v3; format=json",
+      "X-RateLimit-Limit": "5000",
+      "X-RateLimit-Remaining": "4996",
+      "X-RateLimit-Reset": "1770003600"
+    },
+    "response_body": "{\"id\":2001,\"node_id\":\"I_kwDOA-test1\",\"number\":1,\"title\":\"Bug: something broken\",\"state\":\"open\",\"body\":\"Steps to reproduce...\",\"labels\":[{\"id\":301,\"name\":\"bug\"}],\"user\":{\"login\":\"testuser\",\"id\":1},\"comments\":2,\"created_at\":\"2026-03-01T00:00:00Z\",\"updated_at\":\"2026-03-02T00:00:00Z\"}",
+    "delay_ms": 50,
+    "priority": 50
   },
   {
     "name": "GitHub: Create Issue",
-    "url_pattern": "/repos/*/*/issues",
+    "url_pattern": "https://api.github.com/repos/*/*/issues",
     "match_type": "wildcard",
     "method": "POST",
     "response_status": 201,
     "response_headers": {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json; charset=utf-8",
+      "X-GitHub-Api-Version-Selected": "2026-03-10",
+      "X-GitHub-Media-Type": "github.v3; format=json",
+      "X-RateLimit-Limit": "5000",
+      "X-RateLimit-Remaining": "4995",
+      "X-RateLimit-Reset": "1770003600"
     },
-    "response_body": "{\"id\":3,\"number\":3,\"title\":\"New issue\",\"state\":\"open\",\"user\":{\"login\":\"testuser\"},\"created_at\":\"2026-03-01T00:00:00Z\"}",
+    "response_body": "{\"id\":2003,\"node_id\":\"I_kwDOA-test3\",\"number\":3,\"title\":\"New issue\",\"state\":\"open\",\"user\":{\"login\":\"testuser\",\"id\":1},\"comments\":0,\"created_at\":\"2026-03-05T00:00:00Z\",\"updated_at\":\"2026-03-05T00:00:00Z\"}",
     "delay_ms": 100,
-    "priority": 0
+    "priority": 50
   }
 ]

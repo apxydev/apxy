@@ -18,22 +18,32 @@ Pre-built mock rules for popular APIs that anyone can import into APXY.
 4. Write a `README.md` describing what the template covers
 5. Open a pull request
 
+High-value ideas:
+- APIs used heavily in AI products, payments, auth, or internal tooling
+- Templates paired with a concrete example or bug workflow
+- Mock kits that help frontend teams develop without live backend dependencies
+
 **MockRule JSON schema:**
 
 ```json
 [
   {
     "name": "Description of the mock",
-    "url_pattern": "/v1/endpoint",
+    "url_pattern": "https://api.example.com/v1/endpoint",
     "match_type": "exact|wildcard|regex",
     "method": "GET|POST|PUT|DELETE",
+    "header_conditions": {
+      "X-APXY-Scenario": "error_case"
+    },
     "response_status": 200,
     "response_headers": {
       "Content-Type": "application/json"
     },
     "response_body": "{\"key\": \"value\"}",
     "delay_ms": 0,
-    "priority": 0
+    "priority": 0,
+    "file_path": "",
+    "dir_path": ""
   }
 ]
 ```
@@ -43,11 +53,18 @@ Fields:
 - `url_pattern` (required): URL to match
 - `match_type` (required): `exact`, `wildcard`, or `regex`
 - `method` (optional): HTTP method filter. Empty = match all methods
+- `header_conditions` (optional): Request headers that must match for the rule to apply
 - `response_status` (required): HTTP status code to return
 - `response_headers` (optional): Response headers
 - `response_body` (required): Response body string
 - `delay_ms` (optional): Simulated response delay in milliseconds
-- `priority` (optional): Higher priority rules match first (default: 0)
+- `priority` (optional): Lower numeric values match first (default: 0)
+- `file_path` / `dir_path` (optional): Serve the response from a file or directory instead of inline `response_body`
+
+Template guidance:
+- Prefer full provider URLs instead of path-only patterns so HTTPS host sync works automatically.
+- If you need multiple outcomes on the same endpoint, prefer `header_conditions` over inventing fake URLs.
+- Keep responses structurally close to the provider’s docs, but stay honest about static-template limits such as no server-side state or request-body branching.
 
 ### 2. Usage Examples (medium barrier)
 
@@ -64,6 +81,11 @@ Step-by-step tutorials showing how to use APXY for real-world scenarios.
    - Expected output
 4. Open a pull request
 
+High-value ideas:
+- "Debug a real 4xx/5xx failure with an AI coding agent"
+- "Replay a request after a fix and diff the response"
+- "Use a mock kit to unblock frontend work"
+
 ### 3. AI Agent Skills (medium barrier)
 
 Improvements to the APXY skill file that teaches AI agents how to use the tool.
@@ -78,6 +100,7 @@ Ideas for skill contributions:
 - Better workflow recipes for specific debugging scenarios
 - Translations to other languages
 - Tips for specific AI tools (Cursor, Claude Code, Windsurf, etc.)
+- Guidance that pairs a skill prompt with a template or example from this repo
 
 ---
 
@@ -86,7 +109,7 @@ Ideas for skill contributions:
 - Keep PRs focused on a single contribution
 - Follow the existing file structure and naming conventions
 - Include a clear description of what you're adding/changing
-- For mock templates: test your rules with `apxy mock add` before submitting
+- For mock templates: test representative rules with `apxy mock add` before submitting
 
 ---
 

@@ -59,6 +59,17 @@ Once installed, your agent understands how to:
 >
 > "Set a breakpoint on POST /api/login so I can inspect the request before it's sent"
 
+## Templates And Examples
+
+APXY already ships with reusable public assets you can use as starting points or contribute to:
+
+- [Mock Templates](mock-templates/README.md) — reusable rules for Stripe, GitHub, and OpenAI
+- [Examples](examples/README.md) — debugging, mocking, and AI-agent workflow walkthroughs
+- [Website Templates](https://apxy.dev/templates) — fast install paths for public mock kits
+- [Website Examples](https://apxy.dev/examples) — artifact-style workflow pages built for discovery
+
+These assets are the fastest way to learn APXY from a real use case instead of a generic setup guide.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute.

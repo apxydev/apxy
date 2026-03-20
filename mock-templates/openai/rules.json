@@ -1,41 +1,214 @@
 [
   {
-    "name": "OpenAI: Chat Completion",
-    "url_pattern": "/v1/chat/completions",
+    "name": "OpenAI: Unauthorized",
+    "url_pattern": "^https://api\\.openai\\.com/v1/.*$",
+    "match_type": "regex",
+    "header_conditions": {
+      "X-APXY-Scenario": "unauthorized"
+    },
+    "response_status": 401,
+    "response_headers": {
+      "Content-Type": "application/json",
+      "x-request-id": "req_openai_unauthorized",
+      "openai-version": "2020-10-01",
+      "openai-processing-ms": "12",
+      "x-ratelimit-limit-requests": "5000",
+      "x-ratelimit-remaining-requests": "4999",
+      "x-ratelimit-reset-requests": "12ms"
+    },
+    "response_body": "{\"error\":{\"message\":\"Incorrect API key provided: sk-test-invalid\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_api_key\"}}",
+    "delay_ms": 50,
+    "priority": 5
+  },
+  {
+    "name": "OpenAI: Rate Limited",
+    "url_pattern": "^https://api\\.openai\\.com/v1/.*$",
+    "match_type": "regex",
+    "header_conditions": {
+      "X-APXY-Scenario": "rate_limited"
+    },
+    "response_status": 429,
+    "response_headers": {
+      "Content-Type": "application/json",
+      "x-request-id": "req_openai_rate_limit",
+      "openai-version": "2020-10-01",
+      "openai-processing-ms": "14",
+      "x-ratelimit-limit-requests": "5000",
+      "x-ratelimit-remaining-requests": "0",
+      "x-ratelimit-reset-requests": "60s",
+      "Retry-After": "60"
+    },
+    "response_body": "{\"error\":{\"message\":\"Rate limit reached for requests\",\"type\":\"rate_limit_error\",\"param\":null,\"code\":\"rate_limit_exceeded\"}}",
+    "delay_ms": 50,
+    "priority": 5
+  },
+  {
+    "name": "OpenAI: Server Error",
+    "url_pattern": "^https://api\\.openai\\.com/v1/.*$",
+    "match_type": "regex",
+    "header_conditions": {
+      "X-APXY-Scenario": "server_error"
+    },
+    "response_status": 500,
+    "response_headers": {
+      "Content-Type": "application/json",
+      "x-request-id": "req_openai_server_error",
+      "openai-version": "2020-10-01",
+      "openai-processing-ms": "20",
+      "x-ratelimit-limit-requests": "5000",
+      "x-ratelimit-remaining-requests": "4998",
+      "x-ratelimit-reset-requests": "12ms"
+    },
+    "response_body": "{\"error\":{\"message\":\"The server had an error while processing your request.\",\"type\":\"server_error\",\"param\":null,\"code\":null}}",
+    "delay_ms": 75,
+    "priority": 5
+  },
+  {
+    "name": "OpenAI: Invalid Request",
+    "url_pattern": "^https://api\\.openai\\.com/v1/(responses|chat/completions|embeddings)$",
+    "match_type": "regex",
+    "method": "POST",
+    "header_conditions": {
+      "X-APXY-Scenario": "invalid_request"
+    },
+    "response_status": 400,
+    "response_headers": {
+      "Content-Type": "application/json",
+      "x-request-id": "req_openai_invalid_request",
+      "openai-version": "2020-10-01",
+      "openai-processing-ms": "8",
+      "x-ratelimit-limit-requests": "5000",
+      "x-ratelimit-remaining-requests": "4998",
+      "x-ratelimit-reset-requests": "12ms"
+    },
+    "response_body": "{\"error\":{\"message\":\"Invalid request.\",\"type\":\"invalid_request_error\",\"param\":\"input\",\"code\":null}}",
+    "delay_ms": 50,
+    "priority": 10
+  },
+  {
+    "name": "OpenAI: Model Not Found",
+    "url_pattern": "https://api.openai.com/v1/models/*",
+    "match_type": "wildcard",
+    "method": "GET",
+    "header_conditions": {
+      "X-APXY-Scenario": "not_found"
+    },
+    "response_status": 404,
+    "response_headers": {
+      "Content-Type": "application/json",
+      "x-request-id": "req_openai_model_not_found",
+      "openai-version": "2020-10-01",
+      "openai-processing-ms": "6",
+      "x-ratelimit-limit-requests": "5000",
+      "x-ratelimit-remaining-requests": "4998",
+      "x-ratelimit-reset-requests": "12ms"
+    },
+    "response_body": "{\"error\":{\"message\":\"The model 'missing-model' does not exist\",\"type\":\"invalid_request_error\",\"param\":\"model\",\"code\":\"model_not_found\"}}",
+    "delay_ms": 50,
+    "priority": 10
+  },
+  {
+    "name": "OpenAI: Create Response",
+    "url_pattern": "https://api.openai.com/v1/responses",
     "match_type": "exact",
     "method": "POST",
     "response_status": 200,
     "response_headers": {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "x-request-id": "req_openai_response_create",
+      "openai-version": "2020-10-01",
+      "openai-processing-ms": "120",
+      "x-ratelimit-limit-requests": "5000",
+      "x-ratelimit-remaining-requests": "4999",
+      "x-ratelimit-limit-tokens": "5000000",
+      "x-ratelimit-remaining-tokens": "4999980",
+      "x-ratelimit-reset-requests": "12ms",
+      "x-ratelimit-reset-tokens": "12ms"
     },
-    "response_body": "{\"id\":\"chatcmpl-test123\",\"object\":\"chat.completion\",\"created\":1709420400,\"model\":\"gpt-4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Hello! How can I help you today?\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":10,\"completion_tokens\":8,\"total_tokens\":18}}",
-    "delay_ms": 500,
-    "priority": 0
+    "response_body": "{\"id\":\"resp_test_123\",\"object\":\"response\",\"created_at\":1770001000,\"status\":\"completed\",\"model\":\"gpt-5.4\",\"output\":[{\"id\":\"msg_test_123\",\"type\":\"message\",\"status\":\"completed\",\"role\":\"assistant\",\"content\":[{\"type\":\"output_text\",\"text\":\"Hello! How can I help today?\",\"annotations\":[]}]}],\"usage\":{\"input_tokens\":12,\"output_tokens\":8,\"total_tokens\":20},\"metadata\":{}}",
+    "delay_ms": 250,
+    "priority": 50
+  },
+  {
+    "name": "OpenAI: Chat Completion",
+    "url_pattern": "https://api.openai.com/v1/chat/completions",
+    "match_type": "exact",
+    "method": "POST",
+    "response_status": 200,
+    "response_headers": {
+      "Content-Type": "application/json",
+      "x-request-id": "req_openai_chat_completion",
+      "openai-version": "2020-10-01",
+      "openai-processing-ms": "110",
+      "x-ratelimit-limit-requests": "5000",
+      "x-ratelimit-remaining-requests": "4998",
+      "x-ratelimit-limit-tokens": "5000000",
+      "x-ratelimit-remaining-tokens": "4999962",
+      "x-ratelimit-reset-requests": "12ms",
+      "x-ratelimit-reset-tokens": "12ms"
+    },
+    "response_body": "{\"id\":\"chatcmpl_test123\",\"object\":\"chat.completion\",\"created\":1770001010,\"model\":\"gpt-5.4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Hello! How can I help you today?\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":10,\"completion_tokens\":8,\"total_tokens\":18}}",
+    "delay_ms": 220,
+    "priority": 50
   },
   {
     "name": "OpenAI: Create Embeddings",
-    "url_pattern": "/v1/embeddings",
+    "url_pattern": "https://api.openai.com/v1/embeddings",
     "match_type": "exact",
     "method": "POST",
     "response_status": 200,
     "response_headers": {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "x-request-id": "req_openai_embeddings",
+      "openai-version": "2020-10-01",
+      "openai-processing-ms": "35",
+      "x-ratelimit-limit-requests": "5000",
+      "x-ratelimit-remaining-requests": "4997",
+      "x-ratelimit-limit-tokens": "5000000",
+      "x-ratelimit-remaining-tokens": "4999957",
+      "x-ratelimit-reset-requests": "12ms",
+      "x-ratelimit-reset-tokens": "12ms"
     },
-    "response_body": "{\"object\":\"list\",\"data\":[{\"object\":\"embedding\",\"embedding\":[0.0023064255,-0.009327292,0.015797347,-0.0077780345],\"index\":0}],\"model\":\"text-embedding-ada-002\",\"usage\":{\"prompt_tokens\":5,\"total_tokens\":5}}",
-    "delay_ms": 200,
-    "priority": 0
+    "response_body": "{\"object\":\"list\",\"data\":[{\"object\":\"embedding\",\"embedding\":[0.0023064255,-0.009327292,0.015797347,-0.0077780345,0.0012345678],\"index\":0}],\"model\":\"text-embedding-3-small\",\"usage\":{\"prompt_tokens\":5,\"total_tokens\":5}}",
+    "delay_ms": 120,
+    "priority": 50
   },
   {
     "name": "OpenAI: List Models",
-    "url_pattern": "/v1/models",
+    "url_pattern": "https://api.openai.com/v1/models",
     "match_type": "exact",
     "method": "GET",
     "response_status": 200,
     "response_headers": {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "x-request-id": "req_openai_models",
+      "openai-version": "2020-10-01",
+      "openai-processing-ms": "9",
+      "x-ratelimit-limit-requests": "5000",
+      "x-ratelimit-remaining-requests": "4996",
+      "x-ratelimit-reset-requests": "12ms"
     },
-    "response_body": "{\"object\":\"list\",\"data\":[{\"id\":\"gpt-4\",\"object\":\"model\",\"owned_by\":\"openai\"},{\"id\":\"gpt-3.5-turbo\",\"object\":\"model\",\"owned_by\":\"openai\"},{\"id\":\"text-embedding-ada-002\",\"object\":\"model\",\"owned_by\":\"openai\"}]}",
+    "response_body": "{\"object\":\"list\",\"data\":[{\"id\":\"gpt-5.4\",\"object\":\"model\",\"created\":1770000000,\"owned_by\":\"openai\"},{\"id\":\"gpt-5-mini\",\"object\":\"model\",\"created\":1770000000,\"owned_by\":\"openai\"},{\"id\":\"gpt-5-nano\",\"object\":\"model\",\"created\":1770000000,\"owned_by\":\"openai\"},{\"id\":\"gpt-5\",\"object\":\"model\",\"created\":1765000000,\"owned_by\":\"openai\"},{\"id\":\"gpt-4.1\",\"object\":\"model\",\"created\":1760000000,\"owned_by\":\"openai\"},{\"id\":\"text-embedding-3-small\",\"object\":\"model\",\"created\":1750000000,\"owned_by\":\"openai\"},{\"id\":\"text-embedding-3-large\",\"object\":\"model\",\"created\":1750000000,\"owned_by\":\"openai\"}]}",
     "delay_ms": 50,
-    "priority": 0
+    "priority": 50
+  },
+  {
+    "name": "OpenAI: Retrieve Model",
+    "url_pattern": "https://api.openai.com/v1/models/*",
+    "match_type": "wildcard",
+    "method": "GET",
+    "response_status": 200,
+    "response_headers": {
+      "Content-Type": "application/json",
+      "x-request-id": "req_openai_model_get",
+      "openai-version": "2020-10-01",
+      "openai-processing-ms": "8",
+      "x-ratelimit-limit-requests": "5000",
+      "x-ratelimit-remaining-requests": "4995",
+      "x-ratelimit-reset-requests": "12ms"
+    },
+    "response_body": "{\"id\":\"gpt-5.4\",\"object\":\"model\",\"created\":1770000000,\"owned_by\":\"openai\"}",
+    "delay_ms": 50,
+    "priority": 50
   }
 ]
