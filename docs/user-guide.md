@@ -6,7 +6,7 @@
 
 ## What is APXY?
 
-APXY (Agent Proxy) is a desktop tool that sits between your computer and the internet, letting you **inspect, mock, and debug** HTTP/HTTPS traffic. Think of it as a network debugger -- you can see every API call your apps make, fake server responses, replay requests, and diagnose API issues.
+APXY is an AI agent tool that sits between your computer and the internet, letting you **inspect, mock, and debug** HTTP/HTTPS traffic. Think of it as a network debugger -- you can see every API call your apps make, fake server responses, replay requests, and diagnose API issues.
 
 What makes APXY unique is that it's built for both **humans and AI agents**. You can use it through a CLI or a Web GUI in your browser.
 

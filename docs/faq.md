@@ -4,7 +4,7 @@
 
 ### What is APXY?
 
-APXY (Agent Proxy) is a desktop network proxy for HTTPS debugging and API mocking. It's designed for both human developers and AI agents.
+APXY is an AI agent tool for HTTPS debugging and API mocking. It's a desktop network proxy designed for both human developers and AI agents.
 
 ### How is APXY different from Charles Proxy or Proxyman?
 

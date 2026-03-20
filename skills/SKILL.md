@@ -1,6 +1,6 @@
 ---
 name: apxy
-description: APXY — HTTPS debugging proxy and API mocking CLI optimized for AI agents. Captures, inspects, modifies, mocks, and validates API traffic.
+description: APXY — AI agent tools for network debugging. HTTPS proxy and API mocking CLI that captures, inspects, modifies, mocks, and validates API traffic.
 metadata:
   priority: 8
   bashPatterns:

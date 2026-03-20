@@ -1,11 +1,11 @@
-# APXY — Agent Proxy
+# APXY — Network Proxy for HTTP/HTTPS Debugging
 
 [![Version](https://img.shields.io/badge/version-1.1.2-blue.svg)](https://github.com/apxydev/apxy/releases)
 [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey.svg)]()
 
-**HTTPS debugging for humans and AI agents.**
+**Capture, inspect, mock, and replay HTTP/HTTPS traffic from a CLI or Web UI. Built for developers and AI coding agents.**
 
-APXY is a desktop network proxy that sits between your computer and the internet, letting you **inspect, mock, and debug** HTTP/HTTPS traffic. Use it through a **CLI** (100+ commands) or a **Web GUI**.
+APXY sits between your app and the network so you can see every HTTP/HTTPS request and response. Use the **CLI** (100+ commands) for scripting and AI agent workflows, or the **Web UI** for visual inspection. Mock APIs, replay requests, diff responses, and simulate bad networks — all from one tool.
 
 <!-- TODO: Add demo GIF here -->
 <!-- ![APXY Demo](assets/demo.gif) -->
