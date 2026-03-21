@@ -1,12 +1,14 @@
 ---
 name: apxy
-description: APXY — AI agent tools for network debugging. HTTPS proxy and API mocking CLI that captures, inspects, modifies, mocks, and validates API traffic.
+description: APXY — AI agent tools for network debugging. Use this skill whenever there's any HTTP/HTTPS debugging, network inspection, or API mocking needed — even if the issue seems simple. Use when debugging fetch/axios/curl errors, unexpected status codes, CORS errors, 401/403 auth failures, 502/503 upstream errors, or when a response body doesn't match the API docs. Also use when the user says "debug API", "check network request", "why is this request failing", "prod regression", "compare API responses", "mock this endpoint", "intercept traffic", or "why did this start failing after deploy". Prefer this over browser devtools or plain curl when you need to capture, replay, diff, or mock traffic — APXY logs everything automatically and lets you query history.
 metadata:
   priority: 8
   bashPatterns:
     - "apxy\\b"
     - "\\bapxy\\s+(proxy|rules|traffic|schema|setup|tools|config|license)"
-    - "\\bapxy\\s+(mock|breakpoint|script|interceptor|redirect|filter|logs|sql)"
+    - "\\bapxy\\s+rules\\s+(mock|breakpoint|script|interceptor|redirect|filter|caching|network)"
+    - "\\bapxy\\s+traffic\\s+(logs|recording|devices|sql)"
+    - "\\bapxy\\s+tools\\s+(request|protobuf|db)"
     - "\\bapxy\\s+(start|stop|status|env|browser)"
     - "eval\\s+\\$\\(apxy"
   promptSignals:
@@ -55,11 +57,11 @@ retrieval:
     - HAR file
   examples:
     - apxy proxy start --port 8080
-    - apxy mock add --name stub --url "/api/users" --match exact --status 200 --body '{"users":[]}'
-    - apxy logs search --query "api.example.com" --format json
-    - apxy breakpoint add --name "pause-login" --match "path contains /login"
+    - apxy rules mock add --name stub --url "/api/users" --match exact --status 200 --body '{"users":[]}'
+    - apxy traffic logs search --query "api.example.com" --format json
+    - apxy rules breakpoint add --name "pause-login" --match "path contains /login"
     - apxy schema import --name my-api --file ./openapi.yaml
-    - apxy script add --name rewrite --code 'response.body = response.body.replace("foo","bar")'
+    - apxy rules script add --name rewrite --code 'response.body = response.body.replace("foo","bar")'
 ---
 
 # APXY CLI — Agent Network Proxy
@@ -71,24 +73,26 @@ HTTPS proxy for capturing, inspecting, modifying, and mocking API traffic. Optim
 ```bash
 apxy proxy start --port 8080          # proxy :8080, control API :8081
 eval $(apxy env)                      # inject proxy env into shell
-apxy logs list --format json --limit 10
-apxy mock add --name "stub" --url "/api/users" --match exact --status 200 --body '{"users":[]}'
-apxy sql query "SELECT host, COUNT(*) as cnt FROM traffic_logs GROUP BY host ORDER BY cnt DESC LIMIT 10"
+apxy traffic logs list --format json --limit 10
+apxy rules mock add --name "stub" --url "/api/users" --match exact --status 200 --body '{"users":[]}'
+apxy traffic sql query "SELECT host, COUNT(*) as cnt FROM traffic_logs GROUP BY host ORDER BY cnt DESC LIMIT 10"
 ```
 
-## Environment & Globals
+## Quick Triage
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `APXY_CONTROL_URL` | `http://localhost:8081` | Running proxy control API |
-| `APXY_DB` | `./data/apxy.db` | SQLite database path |
+| Problem | First command to run |
+|---------|---------------------|
+| API returning 4xx/5xx | `apxy traffic logs search --query "host.com" --format json \| jq '.[] \| select(.status_code >= 400)'` |
+| Response body wrong | `apxy traffic logs show --id <ID> --format markdown` |
+| Compare good vs bad | `apxy traffic logs diff --id-a <GOOD_ID> --id-b <BAD_ID> --scope response` |
+| Mock a broken endpoint | `apxy rules mock add --name stub --url "/api/path" --match wildcard --status 200 --body '{}'` |
+| Add/remove request headers | `apxy rules interceptor set --name fix --match "host == api.com" --set-request-headers '{"Authorization":"Bearer test"}'` |
+| Pause and inspect a request | `apxy rules breakpoint add --name pause --match "path contains /login && method == POST" --phase request` |
+| Simulate slow network | `apxy rules network set --latency 2000` |
+| SQL query on traffic | `apxy traffic sql query "SELECT host, status_code, COUNT(*) FROM traffic_logs GROUP BY host, status_code ORDER BY COUNT(*) DESC"` |
+| Replay a failed request | `apxy traffic logs replay --id <ID>` |
+| Export for sharing | `apxy traffic logs export-har --file ./traffic.har` |
 
-**Global flags** (available on all commands, omitted from tables below):
-`--config <file>`, `--error-format text|json`, `--help-format default|agent`, `--verbose`, `--help`
-
-**Two command types:**
-- **DB-backed** (no proxy needed): logs, mock, sql, status, request, schema — use `--db`
-- **Runtime** (proxy required): filter, redirect, ssl, network, interceptor, recording, caching, breakpoint, script — use `--control-url`
 
 ## DSL Match Expressions
 
@@ -142,95 +146,100 @@ apxy proxy start --project-dir ./my-project --auto-validate                 # sc
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy mock add` | Create mock rule | `--name`, `--url`, `--match` (exact\|wildcard\|regex), `--method`, `--status` (200), `--body`, `--delay`, `--priority` |
-| `apxy mock list` | List rules | `--format`, `--quiet` |
-| `apxy mock enable` | Enable rule | `--id` or `--all` |
-| `apxy mock disable` | Disable rule | `--id` or `--all`, `--dry-run` |
-| `apxy mock remove` | Remove rule | `--id` or `--all`, `--dry-run` |
-| `apxy mock clear` | Delete all rules | `--dry-run` |
+| `apxy rules mock add` | Create mock rule | `--name`, `--url`, `--match` (exact\|wildcard\|regex), `--method`, `--status` (200), `--body`, `--delay`, `--priority` |
+| `apxy rules mock list` | List rules | `--format`, `--quiet` |
+| `apxy rules mock enable` | Enable rule | `--id` or `--all` |
+| `apxy rules mock disable` | Disable rule | `--id` or `--all`, `--dry-run` |
+| `apxy rules mock remove` | Remove rule | `--id` or `--all`, `--dry-run` |
+| `apxy rules mock clear` | Delete all rules | `--dry-run` |
 
 ## 3. Rules — Redirect (3 commands)
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy redirect set` | Add redirect rule | `--name`, `--from`, `--to`, `--match` (exact\|wildcard\|regex) |
-| `apxy redirect list` | List redirects | `--format`, `--quiet` |
-| `apxy redirect remove` | Remove redirect | `--id` or `--all`, `--dry-run` |
+| `apxy rules redirect set` | Add redirect rule | `--name`, `--from`, `--to`, `--match` (exact\|wildcard\|regex) |
+| `apxy rules redirect list` | List redirects | `--format`, `--quiet` |
+| `apxy rules redirect remove` | Remove redirect | `--id` or `--all`, `--dry-run` |
 
 ## 4. Rules — Interceptor (3 commands)
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy interceptor set` | Add interceptor | `--name`, `--match` (DSL), `--action` (mock\|modify\|observe), `--description`, `--add-request-headers`, `--set-request-headers`, `--set-response-headers`, `--remove-headers`, `--set-response-status`, `--set-response-body`, `--delay-ms` |
-| `apxy interceptor list` | List interceptors | `--format`, `--quiet` |
-| `apxy interceptor remove` | Remove interceptor | `--id` or `--all`, `--dry-run` |
+| `apxy rules interceptor set` | Add interceptor | `--name`, `--match` (DSL), `--action` (mock\|modify\|observe), `--description`, `--add-request-headers`, `--set-request-headers`, `--set-response-headers`, `--remove-headers`, `--set-response-status`, `--set-response-body`, `--delay-ms` |
+| `apxy rules interceptor list` | List interceptors | `--format`, `--quiet` |
+| `apxy rules interceptor remove` | Remove interceptor | `--id` or `--all`, `--dry-run` |
 
 ## 5. Rules — Breakpoint (7 commands)
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy breakpoint add` | Add breakpoint rule | `--name` (req), `--match` (DSL, req), `--phase` (request\|response\|both), `--timeout` (30000ms) |
-| `apxy breakpoint list` | List breakpoints | `--format`, `--quiet` |
-| `apxy breakpoint enable` | Enable breakpoint | `--id` or `--all` |
-| `apxy breakpoint disable` | Disable breakpoint | `--id` or `--all`, `--dry-run` |
-| `apxy breakpoint remove` | Remove breakpoint | `--id` or `--all`, `--dry-run` |
-| `apxy breakpoint pending` | List paused requests | `--quiet` |
-| `apxy breakpoint resolve` | Resume paused request | `--id` (req), `--status`, `--headers` (JSON), `--body`, `--drop`, `--dry-run` |
+| `apxy rules breakpoint add` | Add breakpoint rule | `--name` (req), `--match` (DSL, req), `--phase` (request\|response\|both), `--timeout` (30000ms) |
+| `apxy rules breakpoint list` | List breakpoints | `--format`, `--quiet` |
+| `apxy rules breakpoint enable` | Enable breakpoint | `--id` or `--all` |
+| `apxy rules breakpoint disable` | Disable breakpoint | `--id` or `--all`, `--dry-run` |
+| `apxy rules breakpoint remove` | Remove breakpoint | `--id` or `--all`, `--dry-run` |
+| `apxy rules breakpoint pending` | List paused requests | `--quiet` |
+| `apxy rules breakpoint resolve` | Resume paused request | `--id` (req), `--status`, `--headers` (JSON), `--body`, `--drop`, `--dry-run` |
 
 ## 6. Rules — Script (5 commands)
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy script add` | Add JS proxy script | `--name` (req), `--file` or `--code` (one req), `--hook` (onRequest\|onResponse), `--match` (DSL, default: *) |
-| `apxy script list` | List scripts | `--format`, `--quiet` |
-| `apxy script enable` | Enable script | `--id` or `--all` |
-| `apxy script disable` | Disable script | `--id` or `--all`, `--dry-run` |
-| `apxy script remove` | Remove script | `--id` or `--all`, `--dry-run` |
+| `apxy rules script add` | Add JS proxy script | `--name` (req), `--file` or `--code` (one req), `--hook` (onRequest\|onResponse), `--match` (DSL, default: *) |
+| `apxy rules script list` | List scripts | `--format`, `--quiet` |
+| `apxy rules script enable` | Enable script | `--id` or `--all` |
+| `apxy rules script disable` | Disable script | `--id` or `--all`, `--dry-run` |
+| `apxy rules script remove` | Remove script | `--id` or `--all`, `--dry-run` |
 
 ## 7. Rules — Network (2 commands)
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy network set` | Simulate network conditions | `--latency` (ms), `--bandwidth` (kbps), `--packet-loss` (0-100%) |
-| `apxy network clear` | Clear conditions | `--dry-run` |
+| `apxy rules network set` | Simulate network conditions | `--latency` (ms), `--bandwidth` (kbps), `--packet-loss` (0-100%) |
+| `apxy rules network clear` | Clear conditions | `--dry-run` |
 
 ## 8. Rules — Caching (2 commands)
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy caching disable-cache` | Strip cache headers | `--host` (empty = all) |
-| `apxy caching enable-cache` | Restore caching | |
+| `apxy rules caching disable-cache` | Strip cache headers | `--host` (empty = all) |
+| `apxy rules caching enable-cache` | Restore caching | |
+
+## 9b. Rules — Filter (3 commands)
+
+| Command | Description | Key Flags |
+|---------|-------------|-----------|
+| `apxy rules filter set` | Add block/allow rule | `--type` (block\|allow), `--target` (domain pattern, req) |
+| `apxy rules filter list` | List filter rules | `--format`, `--quiet` |
+| `apxy rules filter remove` | Remove filter | `--id` or `--all`, `--dry-run` |
 
 ## 9. Traffic — Logs (14 commands)
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy logs list` | List traffic records | `--limit` (50), `--offset`, `--format`, `--quiet` |
-| `apxy logs show` | Show record detail | `--id` (req), `--format` |
-| `apxy logs search` | Search by URL/host/method | `--query`, `--limit` (20), `--format`, `--quiet` |
-| `apxy logs search-bodies` | Full-text body search | `--pattern`, `--scope` (request\|response\|both), `--limit`, `--format` |
-| `apxy logs graphql` | Search GraphQL ops | `--operation-name`, `--operation-type` (query\|mutation\|subscription), `--limit`, `--format` |
-| `apxy logs jsonpath` | Extract JSON via gjson | `--id`, `--path`, `--scope` (request\|response) |
-| `apxy logs diff` | Compare two records | `--id-a`, `--id-b`, `--scope` (request\|response\|both) |
-| `apxy logs label` | Label a record | `--id` (req), `--color` (red\|green\|blue\|yellow\|purple), `--comment` |
-| `apxy logs replay` | Replay captured request | `--id`, `--port` (8080) |
-| `apxy logs export-curl` | Export as client snippet | `--id`, `--format` (curl\|fetch\|httpie\|python) |
-| `apxy logs export-har` | Export as HAR 1.2 | `--file`, `--limit` (10000) |
-| `apxy logs import-har` | Import from HAR file | `--file` (req) |
-| `apxy logs stats` | Traffic statistics | `--format` |
-| `apxy logs clear` | Delete all records | `--dry-run` |
+| `apxy traffic logs list` | List traffic records | `--limit` (50), `--offset`, `--format`, `--quiet` |
+| `apxy traffic logs show` | Show record detail | `--id` (req), `--format` |
+| `apxy traffic logs search` | Search by URL/host/method | `--query`, `--limit` (20), `--format`, `--quiet` |
+| `apxy traffic logs search-bodies` | Full-text body search | `--pattern`, `--scope` (request\|response\|both), `--limit`, `--format` |
+| `apxy traffic logs graphql` | Search GraphQL ops | `--operation-name`, `--operation-type` (query\|mutation\|subscription), `--limit`, `--format` |
+| `apxy traffic logs jsonpath` | Extract JSON via gjson | `--id`, `--path`, `--scope` (request\|response) |
+| `apxy traffic logs diff` | Compare two records | `--id-a`, `--id-b`, `--scope` (request\|response\|both) |
+| `apxy traffic logs label` | Label a record | `--id` (req), `--color` (red\|green\|blue\|yellow\|purple), `--comment` |
+| `apxy traffic logs replay` | Replay captured request | `--id`, `--port` (8080) |
+| `apxy traffic logs export-curl` | Export as client snippet | `--id`, `--format` (curl\|fetch\|httpie\|python) |
+| `apxy traffic logs export-har` | Export as HAR 1.2 | `--file`, `--limit` (10000) |
+| `apxy traffic logs import-har` | Import from HAR file | `--file` (req) |
+| `apxy traffic logs stats` | Traffic statistics | `--format` |
+| `apxy traffic logs clear` | Delete all records | `--dry-run` |
 
-## 10. Traffic — Filter, Recording, Devices, SQL (8 commands)
+## 10. Traffic — Recording, Devices, SQL (4 commands)
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy filter set` | Add block/allow rule | `--type` (block\|allow), `--target` (domain pattern, req) |
-| `apxy filter list` | List filter rules | `--format`, `--quiet` |
-| `apxy filter remove` | Remove filter | `--id` or `--all`, `--dry-run` |
-| `apxy recording start` | Start traffic capture | |
-| `apxy recording stop` | Stop traffic capture | |
-| `apxy devices list` | List connected devices | `--format`, `--mobile`, `--quiet`, `--web-url` |
-| `apxy sql query "<SQL>"` | Run read-only SQL | Tables: `traffic_logs`, `mock_rules` |
+| `apxy traffic recording start` | Start traffic capture | |
+| `apxy traffic recording stop` | Stop traffic capture | |
+| `apxy traffic devices list` | List connected devices | `--format`, `--mobile`, `--quiet`, `--web-url` |
+| `apxy traffic sql query "<SQL>"` | Run read-only SQL | Tables: `traffic_logs`, `mock_rules` |
 
 ## 11. Schema (6 commands)
 
@@ -267,15 +276,15 @@ apxy proxy start --project-dir ./my-project --auto-validate                 # sc
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy request compose` | Send HTTP request | `--method` (GET), `--url` (req), `--body`, `--headers` (JSON) |
-| `apxy request batch` | Batch from file | `--file` (req), `--compare-history`, `--time-range` (60), `--timeout` (10000), `--format` |
-| `apxy request diagnose` | Diagnose from history | `--file` (req), `--time-range` (60), `--match-mode` (exact\|contains\|prefix), `--format` |
-| `apxy protobuf add-schema` | Register proto schema | `--name`, `--file` or `--content` |
-| `apxy protobuf list-schemas` | List proto schemas | |
-| `apxy protobuf decode` | Decode proto body | `--id`, `--scope` (request\|response) |
-| `apxy protobuf remove-schema` | Remove proto schema | `--id` |
-| `apxy db info` | Database info | |
-| `apxy db clean` | Clean database | `--traffic`, `--rules`, `--all` |
+| `apxy tools request compose` | Send HTTP request | `--method` (GET), `--url` (req), `--body`, `--headers` (JSON) |
+| `apxy tools request batch` | Batch from file | `--file` (req), `--compare-history`, `--time-range` (60), `--timeout` (10000), `--format` |
+| `apxy tools request diagnose` | Diagnose from history | `--file` (req), `--time-range` (60), `--match-mode` (exact\|contains\|prefix), `--format` |
+| `apxy tools protobuf add-schema` | Register proto schema | `--name`, `--file` or `--content` |
+| `apxy tools protobuf list-schemas` | List proto schemas | |
+| `apxy tools protobuf decode` | Decode proto body | `--id`, `--scope` (request\|response) |
+| `apxy tools protobuf remove-schema` | Remove proto schema | `--id` |
+| `apxy tools db info` | Database info | |
+| `apxy tools db clean` | Clean database | `--traffic`, `--rules`, `--all` |
 
 ## 14. Config (2 commands)
 
@@ -306,28 +315,28 @@ All traffic/list commands accept `--format`:
 ### 1. Debug a Broken API
 
 ```bash
-apxy logs search --query "api.example.com" --format json | jq '.[] | select(.status_code >= 400)'
-apxy logs show --id <ID> --format markdown
-apxy logs jsonpath --id <ID> --path "error.message"
-apxy logs diff --id-a <GOOD_ID> --id-b <BAD_ID> --scope response
+apxy traffic logs search --query "api.example.com" --format json | jq '.[] | select(.status_code >= 400)'
+apxy traffic logs show --id <ID> --format markdown
+apxy traffic logs jsonpath --id <ID> --path "error.message"
+apxy traffic logs diff --id-a <GOOD_ID> --id-b <BAD_ID> --scope response
 ```
 
 ### 2. Mock for Testing
 
 ```bash
-apxy mock add --name "stub-payment" --url "https://api.stripe.com/v1/charges" \
+apxy rules mock add --name "stub-payment" --url "https://api.stripe.com/v1/charges" \
   --match wildcard --status 200 --body '{"id":"ch_test","status":"succeeded"}'
-apxy mock list
-apxy request compose --method POST --url "https://api.stripe.com/v1/charges" --body '{"amount":1000}'
-apxy mock remove --id <RULE_ID>
+apxy rules mock list
+apxy tools request compose --method POST --url "https://api.stripe.com/v1/charges" --body '{"amount":1000}'
+apxy rules mock remove --id <RULE_ID>
 ```
 
 ### 3. Replay and Diff
 
 ```bash
-apxy logs export-curl --id <FAIL_ID>
-apxy logs replay --id <FAIL_ID>
-apxy logs diff --id-a <FAIL_ID> --id-b <NEW_ID> --scope response
+apxy traffic logs export-curl --id <FAIL_ID>
+apxy traffic logs replay --id <FAIL_ID>
+apxy traffic logs diff --id-a <FAIL_ID> --id-b <NEW_ID> --scope response
 ```
 
 ### 4. Route Terminal Traffic
@@ -341,20 +350,20 @@ curl https://api.example.com  # captured
 ### 5. SQL Traffic Analysis
 
 ```bash
-apxy sql query "SELECT host, path, method, COUNT(*) as cnt FROM traffic_logs GROUP BY host, path, method ORDER BY cnt DESC LIMIT 20"
-apxy sql query "SELECT host, COUNT(*) as total, SUM(CASE WHEN status_code >= 400 THEN 1 ELSE 0 END) as errors FROM traffic_logs GROUP BY host"
-apxy sql query "SELECT method, url, duration_ms, status_code FROM traffic_logs WHERE duration_ms > 2000 ORDER BY duration_ms DESC LIMIT 10"
+apxy traffic sql query "SELECT host, path, method, COUNT(*) as cnt FROM traffic_logs GROUP BY host, path, method ORDER BY cnt DESC LIMIT 20"
+apxy traffic sql query "SELECT host, COUNT(*) as total, SUM(CASE WHEN status_code >= 400 THEN 1 ELSE 0 END) as errors FROM traffic_logs GROUP BY host"
+apxy traffic sql query "SELECT method, url, duration_ms, status_code FROM traffic_logs WHERE duration_ms > 2000 ORDER BY duration_ms DESC LIMIT 10"
 ```
 
 ### 6. Breakpoint Debugging
 
 ```bash
-apxy breakpoint add --name "pause-login" --match "path contains /login && method == POST" --phase request
+apxy rules breakpoint add --name "pause-login" --match "path contains /login && method == POST" --phase request
 # trigger the request from your app or curl
-apxy breakpoint pending                              # see paused request ID
-apxy breakpoint resolve --id <ID>                    # resume as-is
-apxy breakpoint resolve --id <ID> --status 200 --body '{"token":"test"}' --headers '{"X-Debug":"true"}'  # modify and resume
-apxy breakpoint remove --all
+apxy rules breakpoint pending                              # see paused request ID
+apxy rules breakpoint resolve --id <ID>                    # resume as-is
+apxy rules breakpoint resolve --id <ID> --status 200 --body '{"token":"test"}' --headers '{"X-Debug":"true"}'  # modify and resume
+apxy rules breakpoint remove --all
 ```
 
 ### 7. API Schema Validation
@@ -370,10 +379,10 @@ apxy schema validate --record-id <ID> --schema-id <SID>  # validate one record
 ### 8. Script-Based Modification
 
 ```bash
-apxy script add --name "rewrite-body" --code 'response.body = response.body.replace("foo","bar")' --match "host == api.example.com" --hook onResponse
-apxy script add --name "add-auth" --file ./scripts/inject-token.js --hook onRequest --match "path contains /api"
-apxy script list
-apxy script remove --id <ID>
+apxy rules script add --name "rewrite-body" --code 'response.body = response.body.replace("foo","bar")' --match "host == api.example.com" --hook onResponse
+apxy rules script add --name "add-auth" --file ./scripts/inject-token.js --hook onRequest --match "path contains /api"
+apxy rules script list
+apxy rules script remove --id <ID>
 ```
 
 ### 9. Mobile Device Debugging
@@ -383,23 +392,22 @@ apxy setup certs generate
 apxy setup certs trust
 apxy proxy start --port 8080
 apxy setup mobile setup --platform ios --qr          # scan QR to configure device
-apxy devices list --mobile
+apxy traffic devices list --mobile
 ```
 
 ### 10. HAR Import/Export
 
 ```bash
-apxy logs export-har --file ./traffic.har --limit 5000   # export for sharing
-apxy logs import-har --file ./colleague-traffic.har       # import in different env
+apxy traffic logs export-har --file ./traffic.har --limit 5000   # export for sharing
+apxy traffic logs import-har --file ./colleague-traffic.har       # import in different env
 ```
 
 ## Tips
 
 - Use `--help-format agent` on any command for AI-optimized help output
 - Use `--error-format json` for programmatic error handling
-- Shorthand aliases: `apxy breakpoint add` = `apxy rules breakpoint add`, `apxy mock add` = `apxy rules mock add`, `apxy logs list` = `apxy traffic logs list`
 - `apxy proxy browser` launches a pre-configured browser — no manual proxy setup needed
 - `apxy setup init` creates a project-scoped `.apxy/` directory for isolated config/data
 - `--format toon` minimizes tokens when feeding output to an AI agent
 - DB commands (logs, mock, sql, schema, request) work without a running proxy
-- Runtime commands (filter, redirect, interceptor, breakpoint, script, network, caching, recording) need `apxy proxy start`
+- Runtime commands (`rules filter`, `rules redirect`, `rules interceptor`, `rules breakpoint`, `rules script`, `rules network`, `rules caching`, `traffic recording`) need `apxy proxy start`
