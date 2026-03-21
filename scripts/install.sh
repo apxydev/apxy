@@ -160,7 +160,7 @@ do_install() {
 
     local tmp_dir
     tmp_dir=$(mktemp -d)
-    trap 'rm -rf "$tmp_dir"' EXIT
+    trap '[ -n "${tmp_dir:-}" ] && rm -rf "$tmp_dir"' EXIT
 
     local url
     url=$(download_url "$archive_name")
@@ -198,8 +198,7 @@ do_install() {
     info "Next steps:"
     echo "  1. Reload your shell:  source ~/.zshrc  (or open a new terminal)"
     echo "  2. Verify:             apxy version"
-    echo "  3. Start proxy:        apxy start"
-    echo "  4. Setup MCP:          apxy mcp install"
+    echo "  3. Start proxy:        apxy proxy start"
     echo ""
 }
 
