@@ -23,15 +23,15 @@ curl -fsSL https://raw.githubusercontent.com/apxydev/apxy/main/scripts/install.s
 
 Download from [GitHub Releases](https://github.com/apxydev/apxy/releases):
 
-| Binary | Platform |
+| Archive | Platform |
 |--------|----------|
-| `apxy-darwin-arm64` | macOS (Apple Silicon — M1/M2/M3/M4) |
-| `apxy-darwin-amd64` | macOS (Intel) |
-| `apxy-linux-amd64` | Linux (x86_64) |
+| `apxy-<version>-darwin-arm64.tar.gz` | macOS (Apple Silicon — M1/M2/M3/M4) |
+| `apxy-<version>-darwin-amd64.tar.gz` | macOS (Intel) |
+| `apxy-<version>-linux-amd64.tar.gz` | Linux (x86_64) |
+| `apxy-<version>-linux-arm64.tar.gz` | Linux (ARM64) |
 
 ```bash
-chmod +x apxy-darwin-arm64
-mv apxy-darwin-arm64 apxy
+tar -xzf apxy-<version>-darwin-arm64.tar.gz
 sudo mv apxy /usr/local/bin/
 ```
 

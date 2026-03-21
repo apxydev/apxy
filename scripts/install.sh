@@ -39,7 +39,7 @@ usage() {
 }
 
 detect_platform() {
-    local os arch binary_name
+    local os arch archive_name
 
     os="$(uname -s | tr '[:upper:]' '[:lower:]')"
     arch="$(uname -m)"
@@ -62,26 +62,34 @@ detect_platform() {
             ;;
     esac
 
-    if [ "$os" = "linux" ] && [ "$arch" = "arm64" ]; then
-        err "Linux ARM64 is not yet supported. Supported: darwin-arm64, darwin-amd64, linux-amd64"
-        exit 1
-    fi
-
-    binary_name="apxy-${os}-${arch}"
-    echo "$binary_name"
+    archive_name="apxy-${APXY_VERSION}-${os}-${arch}.tar.gz"
+    echo "$archive_name"
 }
 
 download_url() {
-    local binary_name="$1"
-    echo "https://github.com/${GITHUB_REPO}/releases/download/v${APXY_VERSION}/${binary_name}"
+    local archive_name="$1"
+    echo "https://github.com/${GITHUB_REPO}/releases/download/v${APXY_VERSION}/${archive_name}"
 }
 
 checksum_url() {
     echo "https://github.com/${GITHUB_REPO}/releases/download/v${APXY_VERSION}/checksums.txt"
 }
 
+download_file() {
+    local url="$1" output="$2"
+
+    if command -v curl &>/dev/null; then
+        curl -fSL --progress-bar -o "$output" "$url"
+    elif command -v wget &>/dev/null; then
+        wget -q --show-progress -O "$output" "$url"
+    else
+        err "Neither curl nor wget found. Please install one and try again."
+        exit 1
+    fi
+}
+
 verify_checksum() {
-    local file="$1" checksums_file="$2" binary_name="$3"
+    local file="$1" checksums_file="$2" archive_name="$3"
 
     if ! command -v shasum &>/dev/null && ! command -v sha256sum &>/dev/null; then
         warn "Neither shasum nor sha256sum found. Skipping checksum verification."
@@ -89,10 +97,10 @@ verify_checksum() {
     fi
 
     local expected
-    expected=$(grep "$binary_name" "$checksums_file" | awk '{print $1}')
+    expected=$(grep "$archive_name" "$checksums_file" | awk '{print $1}')
 
     if [ -z "$expected" ]; then
-        warn "No checksum found for $binary_name. Skipping verification."
+        warn "No checksum found for $archive_name. Skipping verification."
         return 0
     fi
 
@@ -143,10 +151,10 @@ add_to_path() {
 }
 
 do_install() {
-    local binary_name
-    binary_name=$(detect_platform)
+    local archive_name
+    archive_name=$(detect_platform)
 
-    info "Installing APXY v${APXY_VERSION} (${binary_name})..."
+    info "Installing APXY v${APXY_VERSION} (${archive_name})..."
 
     mkdir -p "$INSTALL_DIR"
 
@@ -155,30 +163,32 @@ do_install() {
     trap 'rm -rf "$tmp_dir"' EXIT
 
     local url
-    url=$(download_url "$binary_name")
+    url=$(download_url "$archive_name")
 
     info "Downloading from ${url}..."
-
-    if command -v curl &>/dev/null; then
-        curl -fSL --progress-bar -o "${tmp_dir}/${binary_name}" "$url"
-    elif command -v wget &>/dev/null; then
-        wget -q --show-progress -O "${tmp_dir}/${binary_name}" "$url"
-    else
-        err "Neither curl nor wget found. Please install one and try again."
-        exit 1
-    fi
+    download_file "$url" "${tmp_dir}/${archive_name}"
 
     # Download and verify checksums
     local checksums_url
     checksums_url=$(checksum_url)
-    if curl -fsSL -o "${tmp_dir}/checksums.txt" "$checksums_url" 2>/dev/null; then
-        verify_checksum "${tmp_dir}/${binary_name}" "${tmp_dir}/checksums.txt" "$binary_name"
+    if download_file "$checksums_url" "${tmp_dir}/checksums.txt" 2>/dev/null; then
+        verify_checksum "${tmp_dir}/${archive_name}" "${tmp_dir}/checksums.txt" "$archive_name"
     else
         warn "Could not download checksums. Skipping verification."
     fi
 
-    chmod +x "${tmp_dir}/${binary_name}"
-    mv "${tmp_dir}/${binary_name}" "${INSTALL_DIR}/apxy"
+    if ! tar -xzf "${tmp_dir}/${archive_name}" -C "$tmp_dir"; then
+        err "Failed to extract ${archive_name}"
+        exit 1
+    fi
+
+    if [ ! -f "${tmp_dir}/apxy" ]; then
+        err "Archive ${archive_name} did not contain the expected apxy binary"
+        exit 1
+    fi
+
+    chmod +x "${tmp_dir}/apxy"
+    mv "${tmp_dir}/apxy" "${INSTALL_DIR}/apxy"
 
     add_to_path
 
