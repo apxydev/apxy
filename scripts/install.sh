@@ -121,32 +121,40 @@ verify_checksum() {
     ok "Checksum verified"
 }
 
+APXY_SHELL_RC=""
+
 add_to_path() {
     local shell_rc=""
 
-    if [ -n "${ZSH_VERSION:-}" ] || [ -f "$HOME/.zshrc" ]; then
-        shell_rc="$HOME/.zshrc"
-    elif [ -n "${BASH_VERSION:-}" ] || [ -f "$HOME/.bashrc" ]; then
-        shell_rc="$HOME/.bashrc"
-    elif [ -f "$HOME/.profile" ]; then
-        shell_rc="$HOME/.profile"
-    fi
+    local shell_name="${SHELL:+${SHELL##*/}}"
 
-    if [ -z "$shell_rc" ]; then
-        warn "Could not detect shell config file. Add this to your shell profile:"
-        warn "  export PATH=\"${INSTALL_DIR}:\$PATH\""
-        return
-    fi
+    case "$shell_name" in
+        zsh)  shell_rc="$HOME/.zshrc" ;;
+        bash) shell_rc="$HOME/.bashrc" ;;
+        *)
+            if [ -f "$HOME/.zshrc" ]; then
+                shell_rc="$HOME/.zshrc"
+            elif [ -f "$HOME/.bashrc" ]; then
+                shell_rc="$HOME/.bashrc"
+            else
+                shell_rc="$HOME/.profile"
+            fi
+            ;;
+    esac
+
+    APXY_SHELL_RC="$shell_rc"
 
     local path_line="export PATH=\"${INSTALL_DIR}:\$PATH\""
 
-    if grep -qF "$INSTALL_DIR" "$shell_rc" 2>/dev/null; then
+    if grep -qF "$path_line" "$shell_rc" 2>/dev/null; then
         return
     fi
 
-    echo "" >> "$shell_rc"
-    echo "# APXY" >> "$shell_rc"
-    echo "$path_line" >> "$shell_rc"
+    {
+        echo ""
+        echo "# APXY"
+        echo "$path_line"
+    } >> "$shell_rc"
     ok "Added ${INSTALL_DIR} to PATH in ${shell_rc}"
 }
 
@@ -196,7 +204,7 @@ do_install() {
     ok "APXY v${APXY_VERSION} installed to ${INSTALL_DIR}/apxy"
     echo ""
     info "Next steps:"
-    echo "  1. Reload your shell:  source ~/.zshrc  (or open a new terminal)"
+    echo "  1. Reload your shell:  source ${APXY_SHELL_RC}  (or open a new terminal)"
     echo "  2. Verify:             apxy version"
     echo "  3. Start proxy:        apxy proxy start"
     echo ""
