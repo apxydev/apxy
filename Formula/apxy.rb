@@ -1,7 +1,7 @@
 class Apxy < Formula
   desc "Desktop network proxy for HTTPS debugging — inspect, mock, debug"
   homepage "https://github.com/apxydev/apxy"
-  version "1.0.0"
+  version "1.0.1"
   license :cannot_represent
 
   on_macos do
