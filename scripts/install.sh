@@ -8,7 +8,7 @@ set -euo pipefail
 #   curl -fsSL https://raw.githubusercontent.com/apxydev/apxy/main/scripts/install.sh | bash
 #   ./install.sh [install|uninstall|status]
 
-APXY_VERSION="${APXY_VERSION:-1.0.2}"
+APXY_VERSION="${APXY_VERSION:-1.0.3}"
 GITHUB_REPO="apxydev/apxy"
 INSTALL_DIR="${APXY_INSTALL_DIR:-$HOME/.apxy/bin}"
 
