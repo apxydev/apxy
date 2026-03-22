@@ -6,17 +6,22 @@ class Apxy < Formula
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/apxydev/apxy/releases/download/v1.0.2/apxy-1.0.2-linux-amd64.tar.gz"
-    sha256 "bd06aad78b28d4eb51d6343d3623306be8ed17718b1b1108cdf4d3d3ce84c664"
+      url "https://github.com/apxydev/apxy/releases/download/v1.0.2/apxy-1.0.2-darwin-arm64.tar.gz"
+      sha256 "9cc360b647ec2df7274dc696792a365303fed7064cf0376d8040bda33a3da31a"
     else
-      url "https://github.com/apxydev/apxy/releases/download/v1.0.0/apxy-1.0.0-darwin-amd64.tar.gz"
-      sha256 "4fd3ff31238ce57a6516a710d1bf33517112ea6783857c9d5895d12dad4f49d4"
+      url "https://github.com/apxydev/apxy/releases/download/v1.0.2/apxy-1.0.2-darwin-amd64.tar.gz"
+      sha256 "d0c8565efb099e8d9fe168748232439543518bcfbf3706d515c06ef0a0070d37"
     end
   end
 
   on_linux do
-    url "https://github.com/apxydev/apxy/releases/download/v1.0.0/apxy-1.0.0-linux-amd64.tar.gz"
-    sha256 "223e2e514a91f3f54741d530785dc2e231fee861fa0a61169f43af4e5ae002fc"
+    if Hardware::CPU.arm?
+      url "https://github.com/apxydev/apxy/releases/download/v1.0.2/apxy-1.0.2-linux-arm64.tar.gz"
+      sha256 "d7a0e9c7d1673a11a6b0286065ccb45764577cc9419f4f9a12bbdb33bce4d5a1"
+    else
+      url "https://github.com/apxydev/apxy/releases/download/v1.0.2/apxy-1.0.2-linux-amd64.tar.gz"
+      sha256 "bd06aad78b28d4eb51d6343d3623306be8ed17718b1b1108cdf4d3d3ce84c664"
+    end
   end
 
   def install
