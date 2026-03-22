@@ -129,9 +129,9 @@ apxy recording stop
 ### SSL Management
 
 ```bash
-apxy ssl enable --domain "api.example.com"    # Enable MITM for domain
-apxy ssl disable --domain "api.example.com"   # Tunnel only (no inspection)
-apxy ssl list
+apxy setup ssl enable --domain "api.example.com"    # Enable MITM for domain
+apxy setup ssl disable --domain "api.example.com"   # Tunnel only (no inspection)
+apxy setup ssl list
 ```
 
 ### SQL Queries
