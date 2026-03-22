@@ -28,8 +28,8 @@ apxy proxy start
 Or manually:
 
 ```bash
-apxy certs generate
-sudo apxy certs trust
+apxy setup certs generate
+sudo apxy setup certs trust
 ```
 
 For Linux:
@@ -54,9 +54,9 @@ apxy proxy start --port 9090
 
 ### Proxy starts but HTTPS requests fail
 
-1. Verify the CA exists: `apxy certs info`
+1. Verify the CA exists: `apxy setup certs info`
 2. Verify the cert path: `ls -la certs/`
-3. Try regenerating: `rm -rf certs/ && apxy certs generate`
+3. Try regenerating: `rm -rf certs/ && apxy setup certs generate`
 
 ### No traffic being captured
 
