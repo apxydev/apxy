@@ -6,20 +6,20 @@
 
 ## What is APXY?
 
-APXY is an AI agent tool that sits between your computer and the internet, letting you **inspect, mock, and debug** HTTP/HTTPS traffic. Think of it as a network debugger -- you can see every API call your apps make, fake server responses, replay requests, and diagnose API issues.
+APXY is a network debugging and API mocking proxy that sits between your computer and the internet, letting you **inspect, mock, and debug** HTTP/HTTPS traffic. Think of it as a local network debugger: you can see every API call your apps make, fake server responses, replay requests, and diagnose API issues.
 
-What makes APXY unique is that it's built for both **humans and AI agents**. You can use it through a CLI or a Web GUI in your browser.
+What makes APXY unique is that it's built for both **developers and AI coding agents**. You can use it through a CLI or a Web UI in your browser.
 
 ---
 
-## Web GUI
+## Web UI
 
-When the proxy starts, a Web GUI is available at `http://localhost:<proxy-port + 2>` (default: `http://localhost:8082`).
+When the proxy starts, a Web UI is available at `http://localhost:<proxy-port + 2>` (default: `http://localhost:8082`).
 
 ```bash
-apxy proxy start                    # Web GUI on port 8082
+apxy proxy start                    # Web UI on port 8082
 apxy proxy start --web-port 9090    # Custom port
-apxy proxy start --web-port 0       # Disable Web GUI
+apxy proxy start --web-port 0       # Disable Web UI
 ```
 
 ### Pages
@@ -179,7 +179,7 @@ apxy interceptor remove --id <rule-id>
 | Flag | Default | Description |
 |------|---------|-------------|
 | `--port` | `8080` | Proxy listen port |
-| `--web-port` | proxy+2 | Web GUI port (`0` to disable) |
+| `--web-port` | proxy+2 | Web UI port (`0` to disable) |
 | `--cert-dir` | `./certs` | Directory for CA and leaf certificates |
 | `--max-body` | `1048576` | Max request/response body capture (bytes) |
 | `--verbose` | `false` | Enable detailed logging |

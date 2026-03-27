@@ -19,7 +19,7 @@ We will acknowledge receipt within 48 hours and aim to provide a fix or mitigati
 ## Scope
 
 This policy covers:
-- The APXY binary (proxy, CLI, Web GUI)
+- The APXY binary (proxy, CLI, Web UI)
 - The install script (`scripts/install.sh`)
 - Any published release artifacts on GitHub Releases
 
@@ -32,7 +32,7 @@ This policy does **not** cover:
 - APXY generates a local CA certificate for HTTPS interception. The CA private key never leaves your machine.
 - HTTPS interception is opt-in (tunnel-only mode by default).
 - Telemetry is disabled by default and requires explicit user consent.
-- The Web GUI binds to localhost only.
+- The Web UI binds to localhost only.
 
 ## Supported Versions
 
