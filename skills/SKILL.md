@@ -1,6 +1,6 @@
 ---
 name: apxy
-description: APXY — AI agent tools for network debugging. Use this skill whenever there's any HTTP/HTTPS debugging, network inspection, or API mocking needed — even if the issue seems simple. Use when debugging fetch/axios/curl errors, unexpected status codes, CORS errors, 401/403 auth failures, 502/503 upstream errors, or when a response body doesn't match the API docs. Also use when the user says "debug API", "check network request", "why is this request failing", "prod regression", "compare API responses", "mock this endpoint", "intercept traffic", or "why did this start failing after deploy". Prefer this over browser devtools or plain curl when you need to capture, replay, diff, or mock traffic — APXY logs everything automatically and lets you query history.
+description: APXY — AI agent tools for network debugging and API contract validation. Use this skill whenever there's any HTTP/HTTPS debugging, network inspection, API mocking, or contract validation needed — even if the issue seems simple. Use when debugging fetch/axios/curl errors, unexpected status codes, CORS errors, 401/403 auth failures, 502/503 upstream errors, or when a response body doesn't match the API docs. Also use when the user says "debug API", "check network request", "why is this request failing", "prod regression", "compare API responses", "mock this endpoint", "intercept traffic", "why did this start failing after deploy", "frontend is blocked waiting for backend", "unblock frontend dev", "mock the backend", "validate against OpenAPI", "catch breaking changes", "API contract", "field naming changed", "response schema mismatch", "regression test API", "design-first", or "parallel frontend backend development". Prefer this over browser devtools or plain curl when you need to capture, replay, diff, mock, or validate traffic — APXY logs everything automatically and lets you query history.
 metadata:
   priority: 8
   bashPatterns:
@@ -26,6 +26,19 @@ metadata:
     - "har export"
     - "ssl interception"
     - "network throttling"
+    - "api contract"
+    - "breaking change"
+    - "openapi validation"
+    - "frontend blocked"
+    - "unblock frontend"
+    - "mock backend"
+    - "parallel development"
+    - "regression test api"
+    - "contract violation"
+    - "field naming"
+    - "response schema"
+    - "design first api"
+    - "api drift"
   docs: https://github.com/nicepkg/apxy
 retrieval:
   aliases:
@@ -44,6 +57,12 @@ retrieval:
     - replay captured requests
     - export traffic as HAR
     - run sql queries on captured traffic
+    - unblock frontend development by mocking backend endpoints
+    - detect breaking api changes between deploys
+    - validate api contract compliance against openapi spec
+    - catch field naming regressions in api responses
+    - run api regression tests with batch requests
+    - simulate error scenarios for resilience testing
   entities:
     - proxy
     - mock rule
@@ -92,6 +111,11 @@ apxy traffic sql query "SELECT host, COUNT(*) as cnt FROM traffic_logs GROUP BY 
 | SQL query on traffic | `apxy traffic sql query "SELECT host, status_code, COUNT(*) FROM traffic_logs GROUP BY host, status_code ORDER BY COUNT(*) DESC"` |
 | Replay a failed request | `apxy traffic logs replay --id <ID>` |
 | Export for sharing | `apxy traffic logs export-har --file ./traffic.har` |
+| Frontend blocked, backend not ready | `apxy rules mock add --name <endpoint> --url "/api/path" --match wildcard --status 200 --body '<contract-shape>'` |
+| Check if deploy broke the API contract | `apxy schema import --name api --file ./openapi.yaml && apxy schema validate-recent --limit 50` |
+| Field name silently changed (user_id → userId) | `apxy traffic logs search-bodies --pattern "userId" --scope response --limit 20` |
+| Simulate 3rd-party outage / 500 errors | `apxy rules mock add --name outage --url "*/api/*" --match wildcard --status 503 --body '{"error":"service unavailable"}'` |
+| API regression test after refactor | `apxy tools request batch --file ./requests.json --compare-history --time-range 60` |
 
 
 ## DSL Match Expressions
@@ -400,6 +424,88 @@ apxy traffic devices list --mobile
 ```bash
 apxy traffic logs export-har --file ./traffic.har --limit 5000   # export for sharing
 apxy traffic logs import-har --file ./colleague-traffic.har       # import in different env
+```
+
+### 11. Unblock Frontend with Backend Mocks (Design-First)
+
+Frontend teams shouldn't wait for backend — mock every endpoint from the agreed API contract so parallel development can start immediately.
+
+```bash
+apxy proxy start --port 8080
+eval $(apxy env)
+# Mock each endpoint from the OpenAPI contract
+apxy rules mock add --name "get-users" --url "/api/users" --match wildcard --status 200 \
+  --body '{"users":[{"id":1,"name":"Alice"}]}'
+apxy rules mock add --name "create-user" --url "/api/users" --match wildcard --method POST \
+  --status 201 --body '{"id":2,"name":"Bob"}'
+apxy rules mock add --name "auth-login" --url "/api/auth/login" --match wildcard --method POST \
+  --status 200 --body '{"token":"eyJ...","expires_in":3600}'
+apxy rules mock list
+# Frontend hits the proxy — gets realistic responses without any backend running
+```
+
+### 12. Catch Breaking Changes Before Deploy
+
+Compare real API responses against your OpenAPI spec — surface contract violations before users hit them.
+
+```bash
+# Import the spec that the team agreed on
+apxy schema import --name "my-api" --file ./openapi.yaml
+# Run with live validation so every request is checked as it happens
+apxy proxy start --port 8080 --auto-validate
+eval $(apxy env)
+# Exercise the app (or run your test suite) — violations are flagged automatically
+apxy schema validate-recent --limit 50
+# Validate a specific suspicious response manually
+apxy schema validate --record-id <ID> --schema-id <SCHEMA_ID>
+```
+
+### 13. API Regression Testing After Refactor
+
+Replay a known-good batch of requests through the refactored API and compare responses to history. Catches field renames, missing fields, or changed status codes that unit tests miss.
+
+```bash
+# Capture a baseline before the refactor
+apxy traffic recording start
+# ... run your test suite or manual flows ...
+apxy traffic recording stop
+apxy traffic logs export-har --file ./baseline.har
+
+# After refactor: batch replay and compare to history
+apxy tools request batch --file ./requests.json --compare-history --time-range 60 --format json
+
+# Check for field naming regressions (e.g. user_id silently became userId)
+apxy traffic logs search-bodies --pattern "userId" --scope response --limit 20
+apxy traffic logs search-bodies --pattern "user_id" --scope response --limit 20
+
+# SQL to surface any new error codes that weren't there before
+apxy traffic sql query "SELECT path, status_code, COUNT(*) as cnt FROM traffic_logs WHERE status_code >= 400 GROUP BY path, status_code ORDER BY cnt DESC"
+```
+
+### 14. Simulate Error Scenarios for Resilience Testing
+
+Test how your app handles 3rd-party outages, rate limiting, and timeout conditions — without actually breaking the real service.
+
+```bash
+# Simulate payment provider outage
+apxy rules mock add --name "stripe-down" --url "*/v1/*" --match wildcard --status 503 \
+  --body '{"error":{"message":"Service temporarily unavailable"}}'
+
+# Simulate rate limiting
+apxy rules mock add --name "rate-limit" --url "/api/*" --match wildcard --status 429 \
+  --body '{"error":"Too Many Requests","retry_after":60}'
+
+# Simulate slow upstream (2s latency) to test timeouts
+apxy rules network set --latency 2000
+
+# Simulate auth token expiry mid-session
+apxy rules interceptor set --name "expire-token" --match "path contains /api" \
+  --set-response-status 401 --set-response-body '{"error":"Token expired"}'
+
+# Clear all simulated conditions when done
+apxy rules mock clear
+apxy rules network clear
+apxy rules interceptor remove --all
 ```
 
 ## Tips
