@@ -73,7 +73,7 @@ apxy proxy start --port 9090
    - `regex`: `/api/users/\d+` matches `/api/users/123`
 3. Run with `--verbose` to see matching attempts
 
-### Web GUI not loading
+### Web UI not loading
 
 - Ensure the binary includes the embedded frontend (official releases do)
 - Check that `--web-port` is not set to `0`

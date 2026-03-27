@@ -1,6 +1,6 @@
 # Getting Started
 
-Get up and running with APXY in under 5 minutes.
+Get up and running with APXY in under 5 minutes, then choose the CLI or Web UI that fits your workflow.
 
 ---
 
@@ -54,7 +54,7 @@ On macOS, this automatically:
 1. Generates a root CA certificate (first run only)
 2. Trusts the CA in your system keychain (prompts for password once)
 3. Enables system-wide HTTP/HTTPS proxy
-4. Starts the Web GUI at `http://localhost:8082`
+4. Starts the Web UI at `http://localhost:8082`
 
 All traffic on your machine now flows through APXY.
 
@@ -80,7 +80,7 @@ curl https://httpbin.org/get
 
 ## Step 4: View captured traffic
 
-**Web GUI:** Open `http://localhost:8082` in your browser.
+**Web UI:** Open `http://localhost:8082` in your browser.
 
 **CLI:**
 

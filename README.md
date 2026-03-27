@@ -1,11 +1,11 @@
-# APXY — Network Proxy for HTTP/HTTPS Debugging
+# APXY — Network Debugging and API Mocking for Developers and AI Coding Agents
 
 [![Version](https://img.shields.io/badge/version-1.0.4-blue.svg)](https://github.com/apxydev/apxy/releases)
 [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey.svg)]()
 
-**Capture, inspect, mock, and replay HTTP/HTTPS traffic from a CLI or Web UI. Built for developers and AI coding agents.**
+**Capture, inspect, mock, replay, and diff HTTP/HTTPS traffic from a CLI and Web UI. Built for developers and AI coding agents.**
 
-APXY sits between your app and the network so you can see every HTTP/HTTPS request and response. Use the **CLI** (100+ commands) for scripting and AI agent workflows, or the **Web UI** for visual inspection. Mock APIs, replay requests, diff responses, and simulate bad networks — all from one tool.
+APXY sits between your app and the network so you can see every HTTP/HTTPS request and response. Use the **CLI** for scripting, automation, and AI-assisted debugging, or the **Web UI** for visual inspection and rule management. Mock APIs, replay requests, diff responses, and simulate bad networks from one local proxy.
 
 <!-- TODO: Add demo GIF here -->
 <!-- ![APXY Demo](assets/demo.gif) -->
@@ -25,9 +25,9 @@ brew install apxy
 curl -fsSL https://raw.githubusercontent.com/apxydev/apxy/main/scripts/install.sh | bash
 ```
 
-## AI Agent Skill
+## AI Coding Agent Skill
 
-Give your AI coding agent full knowledge of APXY's CLI — every command, flag, and workflow — so it can debug traffic, mock APIs, and validate schemas on your behalf.
+Give your AI coding agent full knowledge of APXY's CLI so it can debug traffic, mock APIs, and validate schemas with real network evidence instead of guesswork.
 
 Works with **Claude Code**, **Cursor**, **Codex**, **Gemini CLI**, **GitHub Copilot**, and other agents that support the [skills](https://github.com/vercel-labs/skills) ecosystem.
 
