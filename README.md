@@ -1,6 +1,6 @@
 # APXY — Network Proxy for HTTP/HTTPS Debugging
 
-[![Version](https://img.shields.io/badge/version-1.0.3-blue.svg)](https://github.com/apxydev/apxy/releases)
+[![Version](https://img.shields.io/badge/version-1.0.4-blue.svg)](https://github.com/apxydev/apxy/releases)
 [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey.svg)]()
 
 **Capture, inspect, mock, and replay HTTP/HTTPS traffic from a CLI or Web UI. Built for developers and AI coding agents.**
