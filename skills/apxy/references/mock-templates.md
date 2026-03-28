@@ -2,7 +2,7 @@
 
 ## Vendors with Pre-built Templates
 
-These vendors have complete `rules.json` files. Read the file and create each rule using `apxy rules mock add`, or import the whole file at once with `apxy rules mock import --file <path>`.
+These vendors have complete `rules.json` files bundled with the APXY CLI. After installation, find them at `~/.apxy/mock-templates/<vendor>/rules.json` (or the path shown by `apxy tools db info`). Read the file and create each rule using `apxy rules mock add`, or import the whole file at once with `apxy rules mock import --file <path>`.
 
 ### Stripe (api.stripe.com)
 

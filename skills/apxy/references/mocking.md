@@ -1,20 +1,6 @@
-# Mocking -- API Stubs, Interceptors & Schema Validation
+# Mocking — API Stubs & Schema Validation
 
-## Prerequisites
-
-Ensure proxy is running:
-
-```bash
-apxy proxy status
-```
-
-If not running:
-
-```bash
-apxy proxy start --port 8080 --ssl-domains <target-domain>
-```
-
-SSL is required for HTTPS endpoints (Stripe, GitHub, OpenAI, etc.). Add comma-separated domains: `--ssl-domains api.stripe.com,api.github.com`.
+Ensure proxy is running: `apxy proxy status`. If not: `apxy proxy start --port 8080 --ssl-domains <target-domain>`.
 
 ## Mock Rule Commands
 
@@ -27,6 +13,8 @@ SSL is required for HTTPS endpoints (Stripe, GitHub, OpenAI, etc.). Add comma-se
 | `apxy rules mock remove` | Remove rule | `--id` or `--all`, `--dry-run` |
 | `apxy rules mock clear` | Delete all rules | `--dry-run` |
 | `apxy rules mock import` | Import rules from JSON template | `--file`, `--control-url` |
+
+> **Free tier:** Maximum 3 active mock rules. To rotate: `apxy rules mock disable --id <OLD>` then add the new rule.
 
 ## Mock Rule Key Flags (Detailed)
 
@@ -91,49 +79,6 @@ SSL is required for HTTPS endpoints (Stripe, GitHub, OpenAI, etc.). Add comma-se
 --priority 50   # default rules (checked after scenario rules)
 ```
 
-## Interceptor Commands
-
-| Command | Description | Key Flags |
-|---------|-------------|-----------|
-| `apxy rules interceptor set` | Add interceptor | `--name`, `--match` (DSL), `--action` (mock\|modify\|observe), `--description`, `--add-request-headers`, `--set-request-headers`, `--set-response-headers`, `--remove-headers`, `--set-response-status`, `--set-response-body`, `--delay-ms` |
-| `apxy rules interceptor list` | List interceptors | `--format` (json\|toon), `--quiet` |
-| `apxy rules interceptor remove` | Remove interceptor | `--id` or `--all`, `--dry-run` |
-
-**--action values:**
-
-- `observe` (default) -- Pass-through; can add delay or log headers without changing the request/response.
-- `modify` -- Alter headers, status, or body on requests or responses in transit.
-- `mock` -- Short-circuit the request entirely and return a synthetic response (similar to mock rules but with DSL matching).
-
-**Header manipulation flags:**
-
-```bash
-# Add a header to the request if not already present
---add-request-headers Authorization="Bearer tok"
-
-# Overwrite request headers unconditionally
---set-request-headers X-Debug=true
-
-# Set or overwrite response headers
---set-response-headers Cache-Control=no-store
-
-# Remove headers from request or response
---remove-headers X-Powered-By,Server
-```
-
-**Examples:**
-
-```bash
-# Inject auth header into all requests to a host
-apxy rules interceptor set --name "add-auth" \
-  --match "host == api.example.com" --action modify \
-  --add-request-headers Authorization="Bearer tok"
-
-# Simulate slow search responses
-apxy rules interceptor set --name "slow-search" \
-  --match "path contains /search" --action observe --delay-ms 500
-```
-
 ## Schema Validation Commands
 
 | Command | Description | Key Flags |
@@ -187,16 +132,6 @@ eval $(apxy proxy env)
 apxy schema validate-recent --limit 50
 # Validate a specific suspicious response manually
 apxy schema validate --record-id <ID> --schema-id <SCHEMA_ID>
-```
-
-## Agent Workflow: API Schema Validation
-
-```bash
-apxy schema import --name "my-api" --file ./openapi.yaml
-apxy schema list
-apxy proxy start --port 8080 --auto-validate         # live validation
-apxy schema validate-recent --limit 50               # check recent traffic
-apxy schema validate --record-id <ID> --schema-id <SID>  # validate one record
 ```
 
 ## Agent Workflow: Mock While Fixing
@@ -253,18 +188,6 @@ apxy traffic logs search --query "inventory"
 ```
 
 Confirm the response is live data, not the static mock.
-
-## Free Tier Limits
-
-- Maximum 3 active mock rules on Free tier
-- Rotate rules: disable old then add new, or remove then add
-
-```bash
-# Disable an old rule to make room
-apxy rules mock disable --id <OLD_RULE_ID>
-# Add the new rule
-apxy rules mock add --name "new-rule" --url "..." --status 200 --body '...'
-```
 
 ## See Also
 

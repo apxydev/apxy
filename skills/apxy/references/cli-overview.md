@@ -2,7 +2,7 @@
 
 Complete flag reference for 93 core commands across 15 groups.
 
-Global flags available on every command: `--config`, `--error-format` (text|json), `--help-format` (default|agent), `--verbose`.
+Global flags available on every command: `--config`, `--error-format` (text\|json), `--help-format` (default\|agent), `--verbose`.
 
 ---
 
@@ -42,17 +42,7 @@ Global flags available on every command: `--config`, `--error-format` (text|json
 
 ---
 
-## 4. Rules — Interceptor (3 commands)
-
-| Command | Description | Key Flags |
-|---------|-------------|-----------|
-| `apxy rules interceptor set` | Add dynamic interceptor | `--name`, `--match` (DSL), `--action` (mock\|modify\|observe), `--description`, `--add-request-headers` (k=v), `--set-request-headers` (k=v), `--set-response-headers` (k=v), `--remove-headers`, `--set-response-status`, `--set-response-body`, `--delay-ms`, `--control-url` |
-| `apxy rules interceptor list` | List interceptors | `--format` (json\|toon), `--quiet`, `--control-url` |
-| `apxy rules interceptor remove` | Remove interceptor | `--id` or `--all`, `--dry-run`, `--control-url` |
-
----
-
-## 5. Rules — Breakpoint (7 commands)
+## 4. Rules — Breakpoint (7 commands) *(Pro)*
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
@@ -66,7 +56,7 @@ Global flags available on every command: `--config`, `--error-format` (text|json
 
 ---
 
-## 6. Rules — Script (5 commands)
+## 5. Rules — Script (5 commands) *(Pro)*
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
@@ -78,7 +68,7 @@ Global flags available on every command: `--config`, `--error-format` (text|json
 
 ---
 
-## 7. Rules — Network (2 commands)
+## 6. Rules — Network (2 commands) *(Pro)*
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
@@ -87,7 +77,7 @@ Global flags available on every command: `--config`, `--error-format` (text|json
 
 ---
 
-## 8. Rules — Caching (2 commands)
+## 7. Rules — Caching (2 commands)
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
@@ -96,7 +86,7 @@ Global flags available on every command: `--config`, `--error-format` (text|json
 
 ---
 
-## 9. Rules — Filter (3 commands)
+## 8. Rules — Filter (3 commands)
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
@@ -106,7 +96,7 @@ Global flags available on every command: `--config`, `--error-format` (text|json
 
 ---
 
-## 10. Traffic — Logs (17 commands)
+## 9. Traffic — Logs (17 commands)
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
@@ -130,7 +120,7 @@ Global flags available on every command: `--config`, `--error-format` (text|json
 
 ---
 
-## 11. Traffic — Recording, Devices, SQL (4 commands)
+## 10. Traffic — Recording, Devices, SQL (4 commands) *(SQL requires Pro)*
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
@@ -141,7 +131,7 @@ Global flags available on every command: `--config`, `--error-format` (text|json
 
 ---
 
-## 12. Schema (6 commands)
+## 11. Schema (6 commands)
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
@@ -154,7 +144,7 @@ Global flags available on every command: `--config`, `--error-format` (text|json
 
 ---
 
-## 13. Setup (15 commands)
+## 12. Setup (15 commands)
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
@@ -176,7 +166,7 @@ Global flags available on every command: `--config`, `--error-format` (text|json
 
 ---
 
-## 14. Tools (9 commands)
+## 13. Tools (9 commands)
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
@@ -192,7 +182,7 @@ Global flags available on every command: `--config`, `--error-format` (text|json
 
 ---
 
-## 15. Config (2) + License (3)
+## 14. Config (2) + License (3)
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|

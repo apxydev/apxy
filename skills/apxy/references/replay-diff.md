@@ -1,9 +1,6 @@
 # Replay & Diff -- Verify Fixes, Export, Regression Test
 
-## Prerequisites
-
-Ensure proxy is running: `apxy proxy status`
-Need existing captured traffic (at least 1 record). Use `apxy traffic logs list --limit 1` to confirm.
+Ensure proxy is running: `apxy proxy status`. Need existing captured traffic (at least 1 record): `apxy traffic logs list --limit 1`.
 
 ## Core Loop
 
@@ -127,48 +124,11 @@ The `--file` flag for `request batch` and `request diagnose` expects a JSON arra
 ]
 ```
 
-## Agent Workflow: Replay and Diff (Verify a Fix)
-
-```bash
-apxy traffic logs export-curl --id <FAIL_ID>
-apxy traffic logs replay --id <FAIL_ID>
-apxy traffic logs diff --id-a <FAIL_ID> --id-b <NEW_ID> --scope response
-```
-
-## Agent Workflow: API Regression Testing After Refactor
-
-Replay a known-good batch of requests through the refactored API and compare responses to history. Catches field renames, missing fields, or changed status codes that unit tests miss.
-
-```bash
-# Capture a baseline before the refactor
-apxy traffic recording start
-# ... run your test suite or manual flows ...
-apxy traffic recording stop
-apxy traffic logs export-har --file ./baseline.har
-
-# After refactor: batch replay and compare to history
-apxy tools request batch --file ./requests.json --compare-history --time-range 60 --format json
-
-# Check for field naming regressions (e.g. user_id silently became userId)
-apxy traffic logs search-bodies --pattern "userId" --scope response --limit 20
-apxy traffic logs search-bodies --pattern "user_id" --scope response --limit 20
-
-# SQL to surface any new error codes that weren't there before
-apxy traffic sql query "SELECT path, status_code, COUNT(*) as cnt FROM traffic_logs WHERE status_code >= 400 GROUP BY path, status_code ORDER BY cnt DESC"
-```
-
-## Agent Workflow: HAR Import/Export
-
-```bash
-apxy traffic logs export-har --file ./traffic.har --limit 5000   # export for sharing
-apxy traffic logs import-har --file ./colleague-traffic.har       # import in different env
-```
-
 ## Common Patterns
 
 ### Prove a bug fix before pushing
 
-1. Find the failing record: `apxy traffic logs search --query "500"`
+1. Find the failing record: `apxy traffic logs search --query "api.myapp.com" --format json | jq '.[] | select(.status_code >= 500)'`
 2. Note the record ID (e.g., 7).
 3. Fix the code, restart the server.
 4. Replay: `apxy traffic logs replay --id 7` -- note new ID (e.g., 12).
@@ -190,8 +150,6 @@ apxy traffic logs import-har --file ./colleague-traffic.har       # import in di
 
 ## Tips
 
-- Use `--help-format agent` on any command for AI-optimized help output.
-- Use `--error-format json` for programmatic error handling.
 - Always diff with `--scope response` when proving a bug fix -- the request did not change.
 - Export HAR files to share full traffic context with teammates who have APXY installed.
 - The `request batch` JSON file format matches the output of `export-har` endpoint entries, so you can round-trip between them.
