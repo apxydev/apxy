@@ -86,13 +86,13 @@ curl https://httpbin.org/get
 
 ```bash
 # List recent traffic
-apxy logs list --limit 10
+apxy traffic logs list --limit 10
 
 # Search for specific requests
-apxy logs search --query "httpbin"
+apxy traffic logs search --query "httpbin"
 
 # View a specific record
-apxy logs show --id <record-id>
+apxy traffic logs show --id <record-id>
 ```
 
 ---
@@ -100,7 +100,7 @@ apxy logs show --id <record-id>
 ## Step 5: Mock an API
 
 ```bash
-apxy mock add \
+apxy rules mock add \
   --name "Mock Users" \
   --url "/api/users" \
   --match exact \
@@ -117,7 +117,7 @@ Now any request to `/api/users` returns your fake response instead of hitting th
 Press `Ctrl+C` in the terminal, or from another terminal:
 
 ```bash
-apxy stop
+apxy proxy stop
 ```
 
 This restores your original network settings automatically.

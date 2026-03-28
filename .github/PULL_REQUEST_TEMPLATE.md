@@ -14,5 +14,5 @@
 
 - [ ] I've read [CONTRIBUTING.md](CONTRIBUTING.md)
 - [ ] My changes follow the existing file structure
-- [ ] I've tested my mock rules with `apxy mock add` (if applicable)
+- [ ] I've tested my mock rules with `apxy rules mock add` (if applicable)
 - [ ] My example includes clear step-by-step instructions (if applicable)

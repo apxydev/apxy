@@ -16,14 +16,14 @@ Mock rules for the [OpenAI API](https://developers.openai.com/api/reference/over
 
 ```bash
 # Add the current Responses API success case
-apxy mock add --name "OpenAI: Create Response" \
+apxy rules mock add --name "OpenAI: Create Response" \
   --url "https://api.openai.com/v1/responses" --match exact --method POST \
   --headers "Content-Type=application/json,x-request-id=req_openai_test_123,openai-version=2020-10-01" \
   --status 200 \
   --body '{"id":"resp_test_123","object":"response","status":"completed"}'
 
 # Add a scenario rule for rate limiting
-apxy mock add --name "OpenAI: Rate Limited" \
+apxy rules mock add --name "OpenAI: Rate Limited" \
   --url "https://api.openai.com/v1/responses" --match exact --method POST \
   --header-conditions "X-APXY-Scenario=rate_limited" \
   --headers "Content-Type=application/json,x-request-id=req_openai_rate_limit,x-ratelimit-remaining-requests=0,Retry-After=60" \
