@@ -20,12 +20,13 @@ SSL is required for HTTPS endpoints (Stripe, GitHub, OpenAI, etc.). Add comma-se
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy rules mock add` | Create mock rule | `--name`, `--url`, `--match` (exact\|wildcard\|regex), `--method`, `--status` (200), `--body`, `--delay`, `--priority` |
+| `apxy rules mock add` | Create mock rule | `--name`, `--url`, `--match` (exact\|wildcard\|regex), `--method`, `--header-conditions`, `--headers`, `--status` (200), `--body`, `--delay`, `--priority` |
 | `apxy rules mock list` | List rules | `--format` (json\|toon), `--quiet` |
 | `apxy rules mock enable` | Enable rule | `--id` or `--all`, `--dry-run` |
 | `apxy rules mock disable` | Disable rule | `--id` or `--all`, `--dry-run` |
 | `apxy rules mock remove` | Remove rule | `--id` or `--all`, `--dry-run` |
 | `apxy rules mock clear` | Delete all rules | `--dry-run` |
+| `apxy rules mock import` | Import rules from JSON template | `--file`, `--control-url` |
 
 ## Mock Rule Key Flags (Detailed)
 
@@ -49,6 +50,20 @@ SSL is required for HTTPS endpoints (Stripe, GitHub, OpenAI, etc.). Add comma-se
 --method POST
 ```
 
+**--header-conditions** -- Request header matchers as JSON or `k=v` pairs. Useful for scenario-specific mocks.
+
+```bash
+--header-conditions 'X-APXY-Scenario=card_declined'
+--header-conditions '{"X-APXY-Scenario":"rate_limited"}'
+```
+
+**--headers** -- Response headers as JSON or `k=v` pairs.
+
+```bash
+--headers 'Content-Type=application/json,Cache-Control=no-store'
+--headers '{"Access-Control-Allow-Origin":"http://localhost:3000"}'
+```
+
 **--status** -- Response status code. Defaults to 200.
 
 ```bash
@@ -69,11 +84,11 @@ SSL is required for HTTPS endpoints (Stripe, GitHub, OpenAI, etc.). Add comma-se
 --delay 2000    # 2-second delay
 ```
 
-**--priority** -- Higher values match first. Use to layer scenario-specific rules above default happy-path rules.
+**--priority** -- Lower values match first. Use to layer scenario-specific rules above default happy-path rules.
 
 ```bash
 --priority 10   # scenario rules (checked first)
---priority 50   # default rules (checked if no scenario matches)
+--priority 50   # default rules (checked after scenario rules)
 ```
 
 ## Interceptor Commands
@@ -146,7 +161,7 @@ Frontend teams shouldn't wait for backend -- mock every endpoint from the agreed
 
 ```bash
 apxy proxy start --port 8080
-eval $(apxy env)
+eval $(apxy proxy env)
 # Mock each endpoint from the OpenAPI contract
 apxy rules mock add --name "get-users" --url "/api/users" --match wildcard --status 200 \
   --body '{"users":[{"id":1,"name":"Alice"}]}'
@@ -167,7 +182,7 @@ Compare real API responses against your OpenAPI spec -- surface contract violati
 apxy schema import --name "my-api" --file ./openapi.yaml
 # Run with live validation so every request is checked as it happens
 apxy proxy start --port 8080 --auto-validate
-eval $(apxy env)
+eval $(apxy proxy env)
 # Exercise the app (or run your test suite) -- violations are flagged automatically
 apxy schema validate-recent --limit 50
 # Validate a specific suspicious response manually

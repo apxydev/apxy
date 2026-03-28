@@ -9,8 +9,8 @@ metadata:
     - "\\bapxy\\s+rules\\s+(mock|breakpoint|script|interceptor|redirect|filter|caching|network)"
     - "\\bapxy\\s+traffic\\s+(logs|recording|devices|sql)"
     - "\\bapxy\\s+tools\\s+(request|protobuf|db)"
-    - "\\bapxy\\s+(start|stop|status|env|browser)"
-    - "eval\\s+\\$\\(apxy"
+    - "\\bapxy\\s+proxy\\s+(start|stop|status|env|browser)"
+    - "eval\\s+\\$\\(apxy\\s+proxy\\s+env"
   promptSignals:
     - "network proxy"
     - "mock api"
@@ -108,7 +108,7 @@ For vendor mock templates: [mock-templates.md](references/mock-templates.md)
 
 ```bash
 apxy proxy start --port 8080          # proxy :8080, control API :8081
-eval $(apxy env)                      # inject proxy env into shell
+eval $(apxy proxy env)                # inject proxy env into shell
 apxy traffic logs list --format json --limit 10
 apxy rules mock add --name "stub" --url "/api/users" --match exact --status 200 --body '{"users":[]}'
 apxy traffic sql query "SELECT host, COUNT(*) as cnt FROM traffic_logs GROUP BY host ORDER BY cnt DESC LIMIT 10"
@@ -122,7 +122,7 @@ apxy traffic sql query "SELECT host, COUNT(*) as cnt FROM traffic_logs GROUP BY 
 | Response body wrong | `apxy traffic logs show --id <ID> --format markdown` |
 | Compare good vs bad | `apxy traffic logs diff --id-a <GOOD_ID> --id-b <BAD_ID> --scope response` |
 | Mock a broken endpoint | `apxy rules mock add --name stub --url "/api/path" --match wildcard --status 200 --body '{}'` |
-| Add/remove request headers | `apxy rules interceptor set --name fix --match "host == api.com" --set-request-headers '{"Authorization":"Bearer test"}'` |
+| Add/remove request headers | `apxy rules interceptor set --name fix --match "host == api.com" --action modify --set-request-headers Authorization="Bearer test"` |
 | Pause and inspect a request | `apxy rules breakpoint add --name pause --match "path contains /login && method == POST" --phase request` |
 | Simulate slow network | `apxy rules network set --latency 2000` |
 | SQL query on traffic | `apxy traffic sql query "SELECT host, status_code, COUNT(*) FROM traffic_logs GROUP BY host, status_code ORDER BY COUNT(*) DESC"` |

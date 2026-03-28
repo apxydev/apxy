@@ -90,4 +90,4 @@ Used by breakpoint `--match`, script `--match`, interceptor `--match`, and filte
 | `apxy rules breakpoint add` | `--match` (required) | — |
 | `apxy rules script add` | `--match` | `*` (all traffic) |
 | `apxy rules interceptor set` | `--match` | — |
-| `apxy traffic filter set` | `--target` | — |
+| `apxy rules filter set` | `--target` | — |

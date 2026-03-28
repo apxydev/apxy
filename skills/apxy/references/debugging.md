@@ -29,7 +29,7 @@ search  ->  inspect  ->  extract  ->  correlate
 
 ## Traffic Commands
 
-### Logs (14 commands)
+### Logs (17 commands)
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
@@ -45,6 +45,9 @@ search  ->  inspect  ->  extract  ->  correlate
 | `apxy traffic logs export-curl` | Export as client snippet | `--id`, `--format` (curl\|fetch\|httpie\|python) |
 | `apxy traffic logs export-har` | Export captured traffic as HAR 1.2 | `--file`, `--limit` (10000) |
 | `apxy traffic logs import-har` | Import traffic from a HAR file | `--file` (required) |
+| `apxy traffic logs tail` | Live-tail traffic from a running instance | `--format` (text\|json), `--host`, `--port`, `--sse` |
+| `apxy traffic logs sse-events` | List parsed SSE events for a traffic record | `--id`, `--limit`, `--format` (text\|json) |
+| `apxy traffic logs sse-merge` | Merge AI streaming SSE events into one response | `--id`, `--format` (text\|json) |
 | `apxy traffic logs stats` | Show aggregate traffic statistics | `--format` (json\|toon) |
 | `apxy traffic logs clear` | Delete all captured records | `--dry-run` |
 

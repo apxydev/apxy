@@ -109,22 +109,22 @@ Block or allow traffic by domain pattern. Use `--type block` to drop matching re
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy traffic filter set` | Add a block/allow rule | `--type` (block\|allow), `--target` (domain pattern, req) |
-| `apxy traffic filter list` | List all filter rules | `--format` (json\|toon), `--quiet` |
-| `apxy traffic filter remove` | Remove a filter | `--id` or `--all`, `--dry-run` |
+| `apxy rules filter set` | Add a block/allow rule | `--type` (block\|allow), `--target` (domain pattern, req) |
+| `apxy rules filter list` | List all filter rules | `--format` (json\|toon), `--quiet` |
+| `apxy rules filter remove` | Remove a filter | `--id` or `--all`, `--dry-run` |
 
 Examples:
 
 ```bash
 # Block ad tracking domains
-apxy traffic filter set --type block --target "ads.example.com"
+apxy rules filter set --type block --target "ads.example.com"
 
 # Allow only internal traffic
-apxy traffic filter set --type allow --target "*.internal.corp"
+apxy rules filter set --type allow --target "*.internal.corp"
 
 # List and remove
-apxy traffic filter list
-apxy traffic filter remove --all
+apxy rules filter list
+apxy rules filter remove --all
 ```
 
 ## Caching Rules
@@ -227,8 +227,8 @@ apxy rules redirect remove --all   # restore production routing
 ### Block noisy third-party domains during debugging
 
 ```bash
-apxy traffic filter set --type block --target "analytics.example.com"
-apxy traffic filter set --type block --target "ads.tracker.io"
+apxy rules filter set --type block --target "analytics.example.com"
+apxy rules filter set --type block --target "ads.tracker.io"
 # Now your traffic logs only show your API calls
 ```
 
@@ -260,7 +260,7 @@ Always remove rules when done debugging to avoid unexpected behavior:
 apxy rules breakpoint remove --all
 apxy rules script remove --all
 apxy rules redirect remove --all
-apxy traffic filter remove --all
+apxy rules filter remove --all
 apxy rules network clear
 apxy rules caching enable-cache
 ```

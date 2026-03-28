@@ -1,6 +1,6 @@
 # APXY CLI Command Reference
 
-Complete flag reference for all 99 commands across 15 groups.
+Complete flag reference for 93 core commands across 15 groups.
 
 Global flags available on every command: `--config`, `--error-format` (text|json), `--help-format` (default|agent), `--verbose`.
 
@@ -18,16 +18,17 @@ Global flags available on every command: `--config`, `--error-format` (text|json
 
 ---
 
-## 2. Rules — Mock (6 commands)
+## 2. Rules — Mock (7 commands)
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy rules mock add` | Create mock response rule | `--name`, `--url`, `--match` (exact\|wildcard\|regex), `--method`, `--status` (200), `--body`, `--delay` (ms), `--priority`, `--control-url` |
+| `apxy rules mock add` | Create mock response rule | `--name`, `--url`, `--match` (exact\|wildcard\|regex), `--method`, `--header-conditions`, `--headers`, `--status` (200), `--body`, `--delay` (ms), `--priority`, `--control-url` |
 | `apxy rules mock list` | List mock rules | `--format` (json\|toon), `--quiet`, `--control-url` |
 | `apxy rules mock enable` | Enable a mock rule | `--id` or `--all`, `--dry-run`, `--control-url` |
 | `apxy rules mock disable` | Disable a mock rule | `--id` or `--all`, `--dry-run`, `--control-url` |
 | `apxy rules mock remove` | Remove a mock rule | `--id` or `--all`, `--dry-run`, `--control-url` |
 | `apxy rules mock clear` | Delete all mock rules | `--dry-run`, `--control-url` |
+| `apxy rules mock import` | Import mock rules from JSON template | `--file`, `--control-url` |
 
 ---
 
@@ -95,17 +96,17 @@ Global flags available on every command: `--config`, `--error-format` (text|json
 
 ---
 
-## 9. Traffic — Filter (3 commands)
+## 9. Rules — Filter (3 commands)
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy traffic filter set` | Add block/allow filter rule | `--type` (block\|allow), `--target` (domain pattern), `--control-url` |
-| `apxy traffic filter list` | List filter rules | `--format` (json\|toon), `--quiet`, `--control-url` |
-| `apxy traffic filter remove` | Remove filter rule | `--id` or `--all`, `--dry-run`, `--control-url` |
+| `apxy rules filter set` | Add block/allow filter rule | `--type` (block\|allow), `--target` (domain pattern), `--control-url` |
+| `apxy rules filter list` | List filter rules | `--format` (json\|toon), `--quiet`, `--control-url` |
+| `apxy rules filter remove` | Remove filter rule | `--id` or `--all`, `--dry-run`, `--control-url` |
 
 ---
 
-## 10. Traffic — Logs (14 commands)
+## 10. Traffic — Logs (17 commands)
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
@@ -121,6 +122,9 @@ Global flags available on every command: `--config`, `--error-format` (text|json
 | `apxy traffic logs export-curl` | Export as client snippet | `--id`, `--format` (curl\|fetch\|httpie\|python) |
 | `apxy traffic logs export-har` | Export traffic as HAR 1.2 | `--file`, `--limit` (10000) |
 | `apxy traffic logs import-har` | Import from HAR file | `--file` (req) |
+| `apxy traffic logs tail` | Live-tail traffic from a running instance | `--format` (text\|json), `--host`, `--port`, `--sse` |
+| `apxy traffic logs sse-events` | List parsed SSE events for a traffic record | `--id`, `--limit`, `--format` (text\|json) |
+| `apxy traffic logs sse-merge` | Merge AI streaming SSE events into one response | `--id`, `--format` (text\|json) |
 | `apxy traffic logs stats` | Show traffic statistics | `--format` (json\|toon) |
 | `apxy traffic logs clear` | Delete all traffic records | `--dry-run` |
 
@@ -177,8 +181,8 @@ Global flags available on every command: `--config`, `--error-format` (text|json
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
 | `apxy tools request compose` | Send one-off HTTP request | `--method` (GET), `--url` (req), `--body`, `--headers` (JSON) |
-| `apxy tools request batch` | Batch requests from file | `--file` (req), `--compare-history`, `--time-range` (60), `--timeout` (10000ms), `--format` (markdown) |
-| `apxy tools request diagnose` | Diagnose from traffic history | `--file` (req), `--time-range` (60), `--match-mode` (exact\|contains\|prefix), `--format` (markdown) |
+| `apxy tools request batch` | Batch requests from file | `--file` (req), `--compare-history`, `--time-range` (60), `--timeout` (10000ms), `--format` (json\|markdown\|toon) |
+| `apxy tools request diagnose` | Diagnose from traffic history | `--file` (req), `--time-range` (60), `--match-mode` (exact\|contains\|prefix), `--format` (json\|markdown\|toon) |
 | `apxy tools protobuf add-schema` | Register proto schema | `--name`, `--file` or `--content` |
 | `apxy tools protobuf list-schemas` | List proto schemas | |
 | `apxy tools protobuf decode` | Decode proto body | `--id`, `--scope` (request\|response) |
