@@ -17,3 +17,6 @@ firebase-debug.log
 
 # OpenSpec
 openspec/
+
+# Test results (generated per run)
+tests/results/

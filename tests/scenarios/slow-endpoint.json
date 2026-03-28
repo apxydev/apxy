@@ -1,0 +1,40 @@
+{
+  "name": "slow-endpoint",
+  "description": "Agent investigates slow API endpoint using traffic analysis",
+
+  "setup": {
+    "fixture_server": {
+      "port": 9092,
+      "routes": [
+        { "path": "/api/search", "method": "GET", "status": 200, "body": "{\"results\":[]}", "delay_ms": 3000 },
+        { "path": "/api/health", "method": "GET", "status": 200, "body": "{\"status\":\"ok\"}" }
+      ]
+    },
+    "apxy": { "port": 8082 },
+    "seed_traffic": [
+      { "method": "GET", "url": "http://127.0.0.1:9092/api/search?q=test", "repeat": 5 },
+      { "method": "GET", "url": "http://127.0.0.1:9092/api/health", "repeat": 3 }
+    ]
+  },
+
+  "prompt": "Users are complaining that our search feature is very slow. The API is at localhost:9092. The proxy is running on port 8082 and traffic has been captured. Can you analyze the traffic with apxy to find which endpoint is slow?",
+
+  "checkpoints": [
+    {
+      "id": "list-traffic",
+      "description": "Agent lists or searches traffic to see captured requests",
+      "match": { "command_contains_any": ["apxy traffic logs list", "apxy traffic logs search", "apxy traffic sql query", "apxy traffic logs stats"] }
+    },
+    {
+      "id": "identify-slow",
+      "description": "Agent identifies slow endpoint via inspection or SQL",
+      "match": { "command_contains_any": ["apxy traffic logs show", "apxy traffic sql query", "apxy traffic logs stats"] },
+      "after": "list-traffic"
+    }
+  ],
+
+  "outcome": {
+    "transcript_contains_any": ["/api/search", "search", "slow", "latency", "duration"],
+    "description": "Agent identifies /api/search as the slow endpoint"
+  }
+}
