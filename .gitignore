@@ -12,6 +12,7 @@ Thumbs.db
 certs/
 data/
 logs/
+firebase-debug.log
 *.db
 
 # OpenSpec
