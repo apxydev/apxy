@@ -112,7 +112,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy stop
+apxy proxy stop
 apxy proxy start --mitm-all
 ```
 
@@ -131,7 +131,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy stop
+apxy proxy stop
 ```
 
 ---

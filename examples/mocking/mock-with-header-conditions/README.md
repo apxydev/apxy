@@ -159,7 +159,7 @@ If your Web UI offers **Compose** or a replay tool, send two requests differing 
 ### Step 5: Cleanup
 
 ```bash
-apxy stop
+apxy proxy stop
 ```
 
 ---
@@ -175,7 +175,7 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 ## What You Learned
 
-- How `--header-conditions` uses `Name=value` pairs (comma-separated for multiple headers, or JSON)
+- How `--header-conditions` uses `Name=value` pairs (comma-separated for multiple headers)
 - Why **priority** matters when several rules share the same URL
 - How to validate **control vs experiment** with simple `curl -H` variants
 - How the same model maps to **Mock Rules** in the Web UI

@@ -98,7 +98,7 @@ After **`apxy proxy start --ssl-domains api.example.com`** and a few requests th
 **Your agent runs:**
 
 ```bash
-apxy logs search --query "error"
+apxy traffic logs search --query "error"
 ```
 
 ### Step 6: Example interaction -- inspect one record
@@ -110,7 +110,7 @@ apxy logs search --query "error"
 **Your agent runs:**
 
 ```bash
-apxy logs show --id 3
+apxy traffic logs show --id 3
 ```
 
 ### Step 7: Example interaction -- temporary mock
@@ -159,7 +159,7 @@ The Web UI is optional for skill setup. After the agent can run CLI commands, op
 Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 - Dropping the skill into Cursor / Claude Code
-- `apxy version` and first `apxy logs search` from natural language
+- `apxy version` and first `apxy traffic logs search` from natural language
 
 ---
 

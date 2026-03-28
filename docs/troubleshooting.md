@@ -66,7 +66,7 @@ apxy proxy start --port 9090
 
 ### Mock rules not matching
 
-1. Check `apxy mock list` to verify the rule exists and is enabled
+1. Check `apxy rules mock list` to verify the rule exists and is enabled
 2. Verify the URL pattern. Match type matters:
    - `exact`: `/api/users` matches only `/api/users`
    - `wildcard`: `/api/*` matches `/api/users`, `/api/posts`
@@ -88,8 +88,8 @@ If APXY crashes without cleanup, the system proxy may remain configured:
 networksetup -setwebproxystate "Wi-Fi" off
 networksetup -setsecurewebproxystate "Wi-Fi" off
 
-# Or run apxy stop (it disables system proxy as a safety net)
-apxy stop
+# Or run apxy proxy stop (it disables system proxy as a safety net)
+apxy proxy stop
 ```
 
 ---

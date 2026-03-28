@@ -61,7 +61,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy logs list --limit 10
+apxy traffic logs list --limit 10
 ```
 
 Agent shows you something like:
@@ -82,7 +82,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy logs show --id 2
+apxy traffic logs show --id 2
 ```
 
 Agent reports the complete request and response -- method, URL, headers, request body `{"hello":"world"}`, response body with the echoed data, status 200, timing, and more.
@@ -96,7 +96,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy logs export-curl --id 2
+apxy traffic logs export-curl --id 2
 ```
 
 Agent gives you a ready-to-paste cURL command:
@@ -116,7 +116,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy stop
+apxy proxy stop
 ```
 
 ---
@@ -175,7 +175,7 @@ The cURL command is copied to your clipboard, ready to share.
 Go back to your terminal and run:
 
 ```bash
-apxy stop
+apxy proxy stop
 ```
 
 Or close the Web UI -- the proxy continues running until explicitly stopped.

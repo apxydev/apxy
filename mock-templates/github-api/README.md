@@ -18,13 +18,13 @@ Mock rules for the [GitHub REST API](https://docs.github.com/en/rest).
 
 ```bash
 # Add the default authenticated-user rule
-apxy mock add --name "GitHub: Get Authenticated User" \
+apxy rules mock add --name "GitHub: Get Authenticated User" \
   --url "https://api.github.com/user" --match exact --method GET \
   --headers "Content-Type=application/json; charset=utf-8,X-GitHub-Api-Version-Selected=2026-03-10" \
   --status 200 --body '{"login":"testuser","id":1,"name":"Test User"}'
 
 # Add a scenario rule for rate limiting
-apxy mock add --name "GitHub: Rate Limited" \
+apxy rules mock add --name "GitHub: Rate Limited" \
   --url "https://api.github.com/repos/*/*/issues" --match wildcard --method POST \
   --header-conditions "X-APXY-Scenario=rate_limited" \
   --headers "Content-Type=application/json; charset=utf-8,X-RateLimit-Remaining=0,Retry-After=60" \

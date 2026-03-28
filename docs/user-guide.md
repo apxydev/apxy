@@ -47,15 +47,15 @@ Supports dark/light theme toggle and a command palette for quick navigation.
 ### Traffic Capture & Inspection
 
 ```bash
-apxy logs list --limit 20
-apxy logs show --id <record-id>
-apxy logs search --query "api.example.com"
-apxy logs stats
+apxy traffic logs list --limit 20
+apxy traffic logs show --id <record-id>
+apxy traffic logs search --query "api.example.com"
+apxy traffic logs stats
 
 # Output formats
-apxy logs list --format markdown    # Human-readable tables
-apxy logs list --format json        # For piping to jq
-apxy logs list --format toon        # Ultra-compact for AI agents
+apxy traffic logs list --format markdown    # Human-readable tables
+apxy traffic logs list --format json        # For piping to jq
+apxy traffic logs list --format toon        # Ultra-compact for AI agents
 ```
 
 ### Mock Rules
@@ -64,66 +64,66 @@ Intercept matching requests and return fake responses.
 
 ```bash
 # Exact match
-apxy mock add --name "Mock Users" --url "/api/users" --match exact \
+apxy rules mock add --name "Mock Users" --url "/api/users" --match exact \
   --status 200 --body '{"users": [{"id": 1, "name": "Test"}]}'
 
 # Wildcard
-apxy mock add --name "Mock All API" --url "/api/*" --match wildcard \
+apxy rules mock add --name "Mock All API" --url "/api/*" --match wildcard \
   --status 200 --body '{"mocked": true}'
 
 # Regex
-apxy mock add --name "Mock User by ID" --url "/api/users/\\d+" --match regex \
+apxy rules mock add --name "Mock User by ID" --url "/api/users/\\d+" --match regex \
   --status 200 --body '{"id": 42}'
 
 # With delay (simulate slow API)
-apxy mock add --name "Slow" --url "/api/slow" --match exact \
+apxy rules mock add --name "Slow" --url "/api/slow" --match exact \
   --status 200 --body '{"data": "delayed"}' --delay 2000
 
-apxy mock list
-apxy mock remove --id <rule-id>
-apxy mock clear
+apxy rules mock list
+apxy rules mock remove --id <rule-id>
+apxy rules mock clear
 ```
 
 ### Traffic Filtering
 
 ```bash
-apxy filter set --type block --target "analytics.google.com"
-apxy filter set --type allow --target "api.myapp.com"
-apxy filter list
-apxy filter remove --id <rule-id>
+apxy rules filter set --type block --target "analytics.google.com"
+apxy rules filter set --type allow --target "api.myapp.com"
+apxy rules filter list
+apxy rules filter remove --id <rule-id>
 ```
 
 ### URL Redirects (Map Remote)
 
 ```bash
-apxy redirect set --name "Prod to Staging" \
+apxy rules redirect set --name "Prod to Staging" \
   --from "https://api.production.com" --to "https://api.staging.com"
-apxy redirect list
-apxy redirect remove --id <rule-id>
+apxy rules redirect list
+apxy rules redirect remove --id <rule-id>
 ```
 
 ### Export & Replay
 
 ```bash
-apxy logs export-curl --id <record-id>    # Export as cURL
-apxy logs replay --id <record-id>         # Re-send the request
-apxy request compose --method POST --url "https://api.example.com/data" \
+apxy traffic logs export-curl --id <record-id>    # Export as cURL
+apxy traffic logs replay --id <record-id>         # Re-send the request
+apxy tools request compose --method POST --url "https://api.example.com/data" \
   --body '{"key": "value"}'
 ```
 
 ### Network Conditions
 
 ```bash
-apxy network set --latency 500         # 500ms delay
-apxy network set --bandwidth 50000     # Throttle bandwidth
-apxy network clear
+apxy rules network set --latency 500         # 500ms delay
+apxy rules network set --bandwidth 50000     # Throttle bandwidth
+apxy rules network clear
 ```
 
 ### Recording Control
 
 ```bash
-apxy recording start
-apxy recording stop
+apxy traffic recording start
+apxy traffic recording stop
 ```
 
 ### SSL Management
@@ -137,37 +137,37 @@ apxy setup ssl list
 ### SQL Queries
 
 ```bash
-apxy sql query "SELECT host, COUNT(*) as cnt FROM traffic_logs GROUP BY host ORDER BY cnt DESC"
-apxy sql query "SELECT method, url, duration_ms FROM traffic_logs WHERE duration_ms > 1000"
+apxy traffic sql query "SELECT host, COUNT(*) as cnt FROM traffic_logs GROUP BY host ORDER BY cnt DESC"
+apxy traffic sql query "SELECT method, url, duration_ms FROM traffic_logs WHERE duration_ms > 1000"
 ```
 
 ### Body Search & JSONPath
 
 ```bash
-apxy logs search-bodies --pattern "error" --scope response
-apxy logs jsonpath --id <record-id> --path "data.users.#.name"
+apxy traffic logs search-bodies --pattern "error" --scope response
+apxy traffic logs jsonpath --id <record-id> --path "data.users.#.name"
 ```
 
 ### Diff
 
 ```bash
-apxy logs diff --id-a <record-1> --id-b <record-2> --scope response
+apxy traffic logs diff --id-a <record-1> --id-b <record-2> --scope response
 ```
 
 ### GraphQL
 
 ```bash
-apxy logs graphql --operation-name "GetUser" --limit 10
+apxy traffic logs graphql --operation-name "GetUser" --limit 10
 ```
 
 ### Dynamic Interceptors
 
 ```bash
-apxy interceptor set --name "Add header" \
+apxy rules interceptor set --name "Add header" \
   --match 'host == "api.example.com"' \
   --action modify --description "Add auth header"
-apxy interceptor list
-apxy interceptor remove --id <rule-id>
+apxy rules interceptor list
+apxy rules interceptor remove --id <rule-id>
 ```
 
 ---
@@ -197,10 +197,10 @@ export https_proxy=http://localhost:8080
 ### Proxy environment injection
 
 ```bash
-eval $(apxy env)                    # Inject into current shell
-apxy env --open                     # Open new terminal with env set
-eval $(apxy env --lang node)        # Node.js only
-apxy env --script ./proxy-env.sh    # Write to file
+eval $(apxy proxy env)                    # Inject into current shell
+apxy proxy env --open                     # Open new terminal with env set
+eval $(apxy proxy env --lang node)        # Node.js only
+apxy proxy env --script ./proxy-env.sh    # Write to file
 ```
 
 ---

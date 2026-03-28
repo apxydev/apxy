@@ -38,7 +38,7 @@ Your app has been making requests through the proxy. Now ask your agent:
 Your agent runs:
 
 ```bash
-apxy logs search --query "500"
+apxy traffic logs search --query "500"
 ```
 
 Agent finds:
@@ -57,7 +57,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy logs show --id 7
+apxy traffic logs show --id 7
 ```
 
 Agent reports the response body:
@@ -77,7 +77,7 @@ You can also ask your agent to extract just the error message:
 Your agent runs:
 
 ```bash
-apxy logs jsonpath --id 7 --path "message"
+apxy traffic logs jsonpath --id 7 --path "message"
 ```
 
 Agent returns: `nil pointer dereference: shipping_address is nil`
@@ -124,7 +124,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy logs diff --id-a 7 --id-b 12 --scope response
+apxy traffic logs diff --id-a 7 --id-b 12 --scope response
 ```
 
 Agent shows you the diff:
@@ -158,8 +158,8 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy logs export-curl --id 7
-apxy logs export-curl --id 12
+apxy traffic logs export-curl --id 7
+apxy traffic logs export-curl --id 12
 ```
 
 You now have reproducible cURL commands to paste into your pull request showing

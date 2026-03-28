@@ -156,7 +156,7 @@ When finished, disable the Wi‑Fi manual proxy on the device so normal browsing
 Your agent runs:
 
 ```bash
-apxy stop
+apxy proxy stop
 ```
 
 ---
@@ -188,7 +188,7 @@ On the device, exercise the app. In the Web UI, go to **Traffic** and filter by 
 Use the UI status control or terminal:
 
 ```bash
-apxy stop
+apxy proxy stop
 ```
 
 Remember to clear the device Wi‑Fi proxy.

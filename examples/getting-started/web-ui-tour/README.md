@@ -67,7 +67,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy logs list --limit 20
+apxy traffic logs list --limit 20
 ```
 
 Agent shows rows with method, URL, status, and duration for each captured request.
@@ -125,7 +125,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy stop
+apxy proxy stop
 ```
 
 ---
@@ -223,7 +223,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy stop
+apxy proxy stop
 ```
 
 ---

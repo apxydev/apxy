@@ -121,7 +121,7 @@ curl -sS "https://api.myapp.com/api/users"
 curl -sS "https://api.myapp.com/api/users/42"
 ```
 
-Agent shows JSON matching your rules and may show traffic in `apxy logs list` if logging is enabled.
+Agent shows JSON matching your rules and may show traffic in `apxy traffic logs list` if logging is enabled.
 
 ### Step 7 (Free tier): Rotate active rules
 
@@ -198,7 +198,7 @@ Open **Traffic**, perform requests from your app or from **Compose** if availabl
 In the terminal:
 
 ```bash
-apxy stop
+apxy proxy stop
 ```
 
 ---

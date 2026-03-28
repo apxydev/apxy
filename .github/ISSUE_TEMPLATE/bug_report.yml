@@ -44,7 +44,7 @@ body:
     attributes:
       label: What happened?
       description: Describe the bug clearly
-      placeholder: "When I run `apxy mock add ...`, I get the following error..."
+      placeholder: "When I run `apxy rules mock add ...`, I get the following error..."
     validations:
       required: true
 
@@ -62,8 +62,8 @@ body:
       label: Steps to reproduce
       description: "Step-by-step instructions to reproduce the issue"
       placeholder: |
-        1. Run `apxy start`
-        2. Run `apxy mock add --name "test" --url "/api" --match exact --status 200 --body '{}'`
+        1. Run `apxy proxy start`
+        2. Run `apxy rules mock add --name "test" --url "/api" --match exact --status 200 --body '{}'`
         3. See error
     validations:
       required: true

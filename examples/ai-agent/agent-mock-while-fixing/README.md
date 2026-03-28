@@ -47,7 +47,7 @@ Reproduce the broken call at least once through the proxy so the agent has somet
 **Your agent runs:**
 
 ```bash
-apxy logs search --query "inventory"
+apxy traffic logs search --query "inventory"
 ```
 
 The agent records the traffic **id** of a representative failure (timeout, 500, or wrong shape).
@@ -61,7 +61,7 @@ The agent records the traffic **id** of a representative failure (timeout, 500, 
 **Your agent runs:**
 
 ```bash
-apxy logs show --id 15
+apxy traffic logs show --id 15
 ```
 
 (Replace `15` with the id from Step 1.) Together you decide what the **correct** successful response should look like (for example `{ "items": [...], "updated_at": "..." }`).
@@ -115,7 +115,7 @@ curl -x http://127.0.0.1:8080 https://api.myapp.com/api/inventory
 (Adjust proxy address/port to match your `apxy proxy start` settings.) Then:
 
 ```bash
-apxy logs search --query "inventory"
+apxy traffic logs search --query "inventory"
 ```
 
 The newest row should show success and reflect the canned payload.
@@ -148,16 +148,16 @@ Use the id from Step 4. If multiple temp rules exist, the agent removes by expli
 
 ```bash
 curl -x http://127.0.0.1:8080 https://api.myapp.com/api/inventory
-apxy logs search --query "inventory"
+apxy traffic logs search --query "inventory"
 ```
 
-Optionally the agent runs **`apxy logs show --id ...`** on the newest id to prove the response matches production data, not the static mock.
+Optionally the agent runs **`apxy traffic logs show --id ...`** on the newest id to prove the response matches production data, not the static mock.
 
 ---
 
 ## Track B: Web UI Workflow
 
-You can follow along in the Web UI: open the dashboard, use **Traffic** to find `/api/inventory` the same way the agent used `apxy logs search`. The detail panel matches **`apxy logs show`**. Mock rules created on the CLI appear in the rules section of the UI; you can confirm names, URLs, and priority there instead of only running **`apxy rules mock list`**. After your backend fix, disable or delete the rule in the UI if you prefer not to use **`apxy rules mock remove`** from the terminal.
+You can follow along in the Web UI: open the dashboard, use **Traffic** to find `/api/inventory` the same way the agent used `apxy traffic logs search`. The detail panel matches **`apxy traffic logs show`**. Mock rules created on the CLI appear in the rules section of the UI; you can confirm names, URLs, and priority there instead of only running **`apxy rules mock list`**. After your backend fix, disable or delete the rule in the UI if you prefer not to use **`apxy rules mock remove`** from the terminal.
 
 ---
 
@@ -172,7 +172,7 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 ## What You Learned
 
-- How **`apxy logs search`** and **`apxy logs show`** ground mocks in real failing traffic
+- How **`apxy traffic logs search`** and **`apxy traffic logs show`** ground mocks in real failing traffic
 - How **`apxy rules mock add`** supplies a **named** temporary contract for the frontend
 - How **`apxy rules mock list`** and **`apxy rules mock remove --id`** keep cleanup explicit and safe
 - How to verify behavior end-to-end with a proxied **`curl`** plus a fresh log search

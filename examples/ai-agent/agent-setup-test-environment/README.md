@@ -17,7 +17,7 @@ You are starting a feature that depends on **Stripe**, **GitHub**, and **api.mya
 
 ### Plan note
 
-**`apxy rules mock import`** is a **Pro** feature in licensed builds. On **Free**, open the same JSON under **`mock-templates/`** and have your agent create each rule with **`apxy rules mock add --name ... --url ...`** using the URL, method, status, and body from each template entry. **`apxy traffic sql`** (if used for verification) is also **Pro**; use **`apxy logs search`** on Free.
+**`apxy rules mock import`** is a **Pro** feature in licensed builds. On **Free**, open the same JSON under **`mock-templates/`** and have your agent create each rule with **`apxy rules mock add --name ... --url ...`** using the URL, method, status, and body from each template entry. **`apxy traffic sql`** (if used for verification) is also **Pro**; use **`apxy traffic logs search`** on Free.
 
 ## Before You Start
 
@@ -134,7 +134,7 @@ curl -x http://127.0.0.1:8080 https://api.stripe.com/v1/customers/cus_mock
 (Adjust path to a route your imported rules actually match.) Then:
 
 ```bash
-apxy logs search --query "stripe"
+apxy traffic logs search --query "stripe"
 ```
 
 ### Step 7: Verify GitHub and internal mocks
@@ -148,8 +148,8 @@ apxy logs search --query "stripe"
 ```bash
 curl -x http://127.0.0.1:8080 https://api.github.com/user
 curl -x http://127.0.0.1:8080 https://api.myapp.com/api/users
-apxy logs search --query "github"
-apxy logs search --query "users"
+apxy traffic logs search --query "github"
+apxy traffic logs search --query "users"
 ```
 
 Optional SQL sanity check when licensed:

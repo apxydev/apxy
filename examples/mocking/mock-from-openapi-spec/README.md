@@ -104,7 +104,7 @@ curl -sS -X POST "https://api.myapp.com/api/orders" -H "Content-Type: applicatio
 **Your agent runs:**
 
 ```bash
-apxy logs list --limit 10
+apxy traffic logs list --limit 10
 ```
 
 Agent reports an **id** column value to use as `<record-id>`.
@@ -200,7 +200,7 @@ Open **Traffic**, select a captured **GET** or **POST** to `/api/orders`, and us
 ### Step 5: Stop
 
 ```bash
-apxy stop
+apxy proxy stop
 ```
 
 ---

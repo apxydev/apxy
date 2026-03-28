@@ -47,7 +47,7 @@ Identify the traffic **id** of the failing **POST /api/orders** (or capture one 
 **Your agent runs:**
 
 ```bash
-apxy logs show --id 7
+apxy traffic logs show --id 7
 ```
 
 (Replace `7` with your failing record id.) The agent extracts the JSON body and any auth headers you must preserve for a fair replay.
@@ -80,7 +80,7 @@ Use the exact body from Step 1. If the original used headers (for example `Autho
 **Your agent runs:**
 
 ```bash
-apxy logs diff --id-a 7 --id-b 12 --scope response
+apxy traffic logs diff --id-a 7 --id-b 12 --scope response
 ```
 
 ### Step 5: Agent summarizes what changed
@@ -100,8 +100,8 @@ The agent reads the CLI diff output and reports whether the fix removes the fail
 **Your agent runs:**
 
 ```bash
-apxy logs export-curl --id 7
-apxy logs export-curl --id 12
+apxy traffic logs export-curl --id 7
+apxy traffic logs export-curl --id 12
 ```
 
 ### Step 7 (optional): Re-run diff if you iterate
@@ -117,7 +117,7 @@ If a second fix is needed, replay again to get a new id and diff `7` vs the new 
 ```bash
 apxy tools request compose --method POST --url https://api.myapp.com/api/orders \
   --body '{"customer_id":"cust_42","items":[{"sku":"WIDGET-1","qty":2}]}'
-apxy logs diff --id-a 7 --id-b <new-id> --scope response
+apxy traffic logs diff --id-a 7 --id-b <new-id> --scope response
 ```
 
 ### Common pitfalls
@@ -131,7 +131,7 @@ apxy logs diff --id-a 7 --id-b <new-id> --scope response
 
 ## Track B: Web UI Workflow
 
-You can follow along in the Web UI: locate the failing row under **Traffic**, open it for the same detail you get from **`apxy logs show`**. After deploying your fix, open **Compose**, import from the original failing request, send it, then open **Diff** and select the old and new rows with **response** scope -- equivalent to **`apxy logs diff --scope response`**. This is useful when you want a visual side-by-side while the agent still runs CLI commands for scripting or PR artifacts.
+You can follow along in the Web UI: locate the failing row under **Traffic**, open it for the same detail you get from **`apxy traffic logs show`**. After deploying your fix, open **Compose**, import from the original failing request, send it, then open **Diff** and select the old and new rows with **response** scope -- equivalent to **`apxy traffic logs diff --scope response`**. This is useful when you want a visual side-by-side while the agent still runs CLI commands for scripting or PR artifacts.
 
 ---
 
@@ -146,10 +146,10 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 ## What You Learned
 
-- How **`apxy logs show`** pins the canonical failing request for replay
+- How **`apxy traffic logs show`** pins the canonical failing request for replay
 - How **`apxy tools request compose`** reproduces the call after your fix
-- How **`apxy logs diff --id-a ... --id-b ... --scope response`** turns subjective "fixed" into a concrete comparison
-- How optional **`apxy logs export-curl`** shares evidence with reviewers
+- How **`apxy traffic logs diff --id-a ... --id-b ... --scope response`** turns subjective "fixed" into a concrete comparison
+- How optional **`apxy traffic logs export-curl`** shares evidence with reviewers
 
 ---
 

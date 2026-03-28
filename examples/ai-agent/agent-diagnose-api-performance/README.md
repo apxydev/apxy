@@ -17,7 +17,7 @@ Your app is slow but you are not sure which API calls dominate wall time. Ask yo
 
 ### Plan note
 
-In licensed APXY builds, **`apxy traffic sql`** is a **Pro** feature. If you are on **Free**, have the agent use **`apxy logs search`** plus **`apxy logs show`** for spot checks, or upgrade per [apxy.dev pricing](https://apxy.dev/#pricing). The queries below are still the canonical shape when SQL is available.
+In licensed APXY builds, **`apxy traffic sql`** is a **Pro** feature. If you are on **Free**, have the agent use **`apxy traffic logs search`** plus **`apxy traffic logs show`** for spot checks, or upgrade per [apxy.dev pricing](https://apxy.dev/#pricing). The queries below are still the canonical shape when SQL is available.
 
 ## Before You Start
 
@@ -132,7 +132,7 @@ apxy traffic sql query "SELECT id, method, url, duration_ms, status_code FROM tr
 **Your agent runs:**
 
 ```bash
-apxy logs show --id 88
+apxy traffic logs show --id 88
 ```
 
 ### Step 8: Turn analysis into recommendations
@@ -147,7 +147,7 @@ No new APXY command is required; the agent synthesizes Steps 1--7 into engineeri
 
 ## Track B: Web UI Workflow
 
-You can follow along in the Web UI: the **Traffic** table shows duration and status per row, which matches the per-request slice of what SQL aggregates. Sort by duration or filter by path to approximate Steps 1 and 4 without the terminal. For percentile intuition, sort slowest-first and eyeball the tail; the CLI query in Step 5 formalizes that when SQL is enabled. Use the record detail view as the counterpart to **`apxy logs show`** when you click a slow row.
+You can follow along in the Web UI: the **Traffic** table shows duration and status per row, which matches the per-request slice of what SQL aggregates. Sort by duration or filter by path to approximate Steps 1 and 4 without the terminal. For percentile intuition, sort slowest-first and eyeball the tail; the CLI query in Step 5 formalizes that when SQL is enabled. Use the record detail view as the counterpart to **`apxy traffic logs show`** when you click a slow row.
 
 ---
 
@@ -164,7 +164,7 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 - How to profile APIs with **`GROUP BY url`** on **`duration_ms`** and **`status_code`**
 - How a **DESC + LIMIT + OFFSET** pattern approximates tail latency without native **`percentile_cont`**
-- How to pivot from aggregate SQL to **`apxy logs show`** on a specific **id**
+- How to pivot from aggregate SQL to **`apxy traffic logs show`** on a specific **id**
 - Where the Web UI gives a visual parallel to the same data
 
 ---
