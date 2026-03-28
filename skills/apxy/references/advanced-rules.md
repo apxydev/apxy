@@ -1,11 +1,8 @@
 # Advanced Rules -- Network, Scripts, Breakpoints, Redirects, Filters
 
-## Prerequisites
+Ensure proxy is running: `apxy proxy status`. Most features in this section require a Pro license.
 
-Ensure proxy is running: `apxy proxy status`
-Most features in this section require a Pro license.
-
-## Network Simulation
+## Network Simulation *(Pro)*
 
 Simulate degraded network conditions globally for all proxied traffic.
 
@@ -27,7 +24,7 @@ apxy rules network set --latency 500 --bandwidth 256 --packet-loss 5
 apxy rules network clear
 ```
 
-## Script Rules
+## Script Rules *(Pro)*
 
 Run JavaScript on matching requests or responses. Provide code inline (`--code`) or from a file (`--file`). Scripts execute at a hook point: `onRequest` (before forwarding) or `onResponse` (before returning to client). The `--match` flag accepts a DSL expression to scope which traffic the script applies to (default: `*` matches all).
 
@@ -57,7 +54,7 @@ apxy rules script list
 apxy rules script remove --id <ID>
 ```
 
-## Breakpoint Rules
+## Breakpoint Rules *(Pro)*
 
 Pause matching requests or responses for manual inspection before forwarding. Use `--phase` to control when the breakpoint fires: `request` (before upstream), `response` (before client), or `both`. Paused traffic auto-resumes after `--timeout` milliseconds (default 30000). Use `pending` to see what is paused, and `resolve` to resume (optionally modifying status, headers, or body).
 
@@ -149,24 +146,6 @@ apxy rules caching disable-cache
 apxy rules caching enable-cache
 ```
 
-## DSL Match Expressions (Quick Reference)
-
-Fields: `host`, `path`, `url`, `method`, `status`, `header:<Name>`
-Operators: `==`, `!=`, `contains`, `startswith`, `endswith`, `matches`
-Combinators: `&&`, `||`, `()`
-
-Examples:
-
-```
-path contains /api && method == POST
-host == api.example.com || host == staging.example.com
-status >= 400
-header:Content-Type contains json
-(path startswith /v2 || path startswith /v3) && method != OPTIONS
-```
-
-Full reference: [dsl-reference.md](dsl-reference.md)
-
 ## Agent Workflow: Breakpoint Debugging
 
 ```bash
@@ -204,13 +183,12 @@ apxy rules mock add --name "rate-limit" --url "/api/*" --match wildcard --status
 apxy rules network set --latency 2000
 
 # Simulate auth token expiry mid-session
-apxy rules interceptor set --name "expire-token" --match "path contains /api" \
-  --set-response-status 401 --set-response-body '{"error":"Token expired"}'
+apxy rules mock add --name "expire-token" --url "/api/*" --match wildcard \
+  --status 401 --body '{"error":"Token expired"}'
 
 # Clear all simulated conditions when done
 apxy rules mock clear
 apxy rules network clear
-apxy rules interceptor remove --all
 ```
 
 ## Common Patterns
@@ -265,7 +243,13 @@ apxy rules network clear
 apxy rules caching enable-cache
 ```
 
-## Paid Features
+## Free Alternatives
 
-Breakpoints, network simulation, and scripts require a Pro license.
-Redirect and filter rules are available on the Free tier.
+If the user is on Free tier:
+- **Instead of breakpoints** → use `apxy rules mock add` to return a synthetic response for the matching path
+- **Instead of network simulation** → use `--delay <ms>` on a mock rule to slow specific endpoints
+- **Instead of scripts** → use `apxy rules mock add --headers / --status / --body` for static response overrides (mock rules are Free)
+
+## See Also
+
+- For DSL match expression syntax used by `--match` flags: [dsl-reference.md](dsl-reference.md)

@@ -1,6 +1,6 @@
 # DSL Match Expressions
 
-Used by breakpoint `--match`, script `--match`, interceptor `--match`, and filter `--target`.
+Used by breakpoint `--match`, script `--match`, and filter `--target`.
 
 ## Fields
 
@@ -79,8 +79,8 @@ Used by breakpoint `--match`, script `--match`, interceptor `--match`, and filte
 # Match requests with a specific auth header
 "header:Authorization startswith Bearer"
 
-# Match slow responses (use with breakpoint on response phase)
-"host == api.example.com && status >= 200"
+# Match error responses on a specific host (use with breakpoint on response phase)
+"host == api.example.com && status >= 500"
 ```
 
 ## Usage by Command
@@ -89,5 +89,4 @@ Used by breakpoint `--match`, script `--match`, interceptor `--match`, and filte
 |---------|------|---------|
 | `apxy rules breakpoint add` | `--match` (required) | — |
 | `apxy rules script add` | `--match` | `*` (all traffic) |
-| `apxy rules interceptor set` | `--match` | — |
 | `apxy rules filter set` | `--target` | — |
