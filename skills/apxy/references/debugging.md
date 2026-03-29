@@ -9,13 +9,15 @@ Ensure proxy is running: `apxy proxy status`. If not: `apxy proxy start --port 8
 ## Core Workflow
 
 ```
-search  ->  inspect  ->  extract  ->  correlate
+search/list  ->  show  ->  extract/correlate
 ```
 
-1. **Search** — find relevant traffic by URL, body content, GraphQL operation, or SQL query
-2. **Inspect** — open the full record (headers, bodies, timing)
+**Critical ordering rule:** Your first traffic command must always be `apxy traffic logs search` or `apxy traffic logs list`. Do not run `apxy traffic logs stats` or `apxy traffic sql query` as your first traffic command — those are analysis tools that come after you've used search or list to locate specific records. Even when checking license status beforehand, ensure the first actual traffic inspection command is `search` or `list`.
+
+1. **Search/List** — find relevant traffic by URL, body content, GraphQL operation, or status code
+2. **Show (Inspect)** — open the full record (headers, bodies, timing) — **always use `show` on a specific record, even when search results look sufficient; search truncates headers and bodies**
 3. **Extract** — pull specific JSON fields with jsonpath
-4. **Correlate** — diff two records, aggregate with SQL, or search bodies for patterns
+4. **Correlate** — diff two records, aggregate with SQL, or search bodies for patterns — **always complete this step; even when the issue is obvious from inspect, diffing a failing vs successful record confirms the diagnosis and reveals related patterns**
 
 ## Traffic Commands
 
@@ -168,16 +170,16 @@ apxy traffic logs jsonpath --id <ID> --path "errors.#.message" --scope response
 
 **Steps:**
 
-1. Search for preflight requests:
+1. Search to locate the preflight request and get its ID:
    ```bash
    apxy traffic logs search --query "OPTIONS"
    ```
-2. Inspect the preflight response headers:
+2. Inspect the specific preflight record — `show` is the step that reveals the actual response headers returned by the server. Search results only show status codes and metadata; the response headers (where CORS headers live) require `show` to see:
    ```bash
    apxy traffic logs show --id <OPTIONS_ID>
    ```
-3. Check for missing `Access-Control-Allow-Origin`, `Access-Control-Allow-Methods`, and `Access-Control-Allow-Headers` in the response.
-4. Verify the follow-up request exists and its status:
+3. Confirm which CORS headers are present or missing in the response: `Access-Control-Allow-Origin`, `Access-Control-Allow-Methods`, `Access-Control-Allow-Headers`. Only after this step do you have the full picture to diagnose the issue.
+4. Verify the follow-up GET/POST request exists and its status:
    ```bash
    apxy traffic logs search --query "<api-host>" --limit 10
    ```
@@ -220,20 +222,58 @@ apxy traffic logs jsonpath --id <ID> --path "errors.#.message" --scope response
 
 **Fix:** Align refresh interval with `expires_in`. Ensure refresh endpoint returns a new `refresh_token`. Check for `invalid_grant` errors in failed refresh responses.
 
+### 5xx Server Errors
+
+**Symptoms:** API returns 500 / 502 / 503. Error message in response body. Some requests succeed, others fail intermittently.
+
+**Steps:**
+
+1. Search for the failing endpoint to get a list of record IDs and status codes:
+   ```bash
+   apxy traffic logs search --query "/api/endpoint" --format json
+   ```
+2. Inspect a failing record in full — `show` gives you the complete request headers, response headers, and response body. You need this before extracting specific fields, because you must see the full response to know what JSON paths or patterns to target:
+   ```bash
+   apxy traffic logs show --id <FAIL_ID>
+   ```
+3. After seeing the full record, extract the specific error field to confirm the message:
+   ```bash
+   apxy traffic logs jsonpath --id <FAIL_ID> --path "error.message" --scope response
+   ```
+4. If you see a mix of 500 and 200 responses, diff a failing record against a successful one to understand what's different in the response:
+   ```bash
+   apxy traffic logs diff --id-a <FAIL_ID> --id-b <SUCCESS_ID> --scope response
+   ```
+5. Search response bodies for error fingerprints across all records:
+   ```bash
+   apxy traffic logs search-bodies --pattern "error" --scope response --limit 10
+   ```
+
+**Fix:** Read the error message from step 3 — common causes: connection pool exhausted, database down, upstream timeout. Diff (step 4) reveals whether failing requests differ in any request parameter. Deploy fix then replay: `apxy traffic logs replay --id <FAIL_ID>`.
+
 ### Slow API Endpoints
 
 **Symptoms:** Spinners hang, dashboards take seconds to load. Users report "the site is slow" without specifics.
 
+**⚠️ Order matters:** Your first traffic command must be `apxy traffic logs search` or `apxy traffic logs list`. Do not start with `apxy traffic logs stats` or `apxy traffic sql query` — run those only after the initial search/list step.
+
 **Steps:**
 
-1. Rank endpoints by latency with SQL:
+1. **First:** search or list traffic to locate the relevant records. If the user described which feature is slow (e.g. "search is slow"), search for it by keyword:
+   ```bash
+   apxy traffic logs search --query "<feature-or-path-keyword>" --format json
+   ```
+   If you don't know the specific path, list recent traffic:
+   ```bash
+   apxy traffic logs list --format json --limit 50
+   ```
+2. **Then:** inspect a specific record from the suspected slow endpoint to check its `duration_ms` and response size:
+   ```bash
+   apxy traffic logs show --id <ID>
+   ```
+3. **Optionally:** if Pro is available and you need latency rankings across all endpoints:
    ```bash
    apxy traffic sql query "SELECT url, COUNT(*) AS n, AVG(duration_ms) AS avg_ms, MAX(duration_ms) AS max_ms FROM traffic_logs GROUP BY url ORDER BY avg_ms DESC LIMIT 10"
-   ```
-2. Inspect the slowest record:
-   ```bash
-   apxy traffic logs search --query "<slow-url>" --limit 5
-   apxy traffic logs show --id <SLOW_ID>
    ```
 3. Replay after optimization to measure improvement:
    ```bash
