@@ -1,0 +1,30 @@
+openapi: "3.0.3"
+info:
+  title: Test API
+  version: "1.0.0"
+paths:
+  /api/users:
+    get:
+      summary: List users
+      responses:
+        "200":
+          description: User list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        user_id:
+                          type: integer
+                        name:
+                          type: string
+                      required:
+                        - user_id
+                        - name
+                required:
+                  - users

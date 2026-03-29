@@ -1,0 +1,44 @@
+{
+  "name": "mock-broken-backend",
+  "description": "Agent creates a mock rule to unblock frontend when backend returns 503",
+
+  "setup": {
+    "fixture_server": {
+      "port": 9093,
+      "routes": [
+        { "path": "/api/inventory", "method": "GET", "status": 503, "body": "{\"error\":\"service unavailable\"}" }
+      ]
+    },
+    "apxy": { "port": 8083 },
+    "seed_traffic": [
+      { "method": "GET", "url": "http://127.0.0.1:9093/api/inventory", "repeat": 3 }
+    ]
+  },
+
+  "prompt": "Our inventory API at localhost:9093/api/inventory is returning 503 and the frontend team is blocked. The proxy is running on port 8083 and traffic has been captured. Can you use apxy to mock the endpoint so the frontend can keep working?",
+
+  "checkpoints": [
+    {
+      "id": "investigate",
+      "description": "Agent searches or inspects the failing traffic",
+      "match": { "command_contains_any": ["apxy traffic logs search", "apxy traffic logs list", "apxy traffic logs show"] }
+    },
+    {
+      "id": "create-mock",
+      "description": "Agent creates a mock rule for the broken endpoint",
+      "match": { "command_contains": "apxy rules mock add" },
+      "after": "investigate"
+    },
+    {
+      "id": "verify-mock",
+      "description": "Agent verifies the mock is active",
+      "match": { "command_contains_any": ["apxy rules mock list", "curl"] },
+      "after": "create-mock"
+    }
+  ],
+
+  "outcome": {
+    "transcript_contains_any": ["mock", "200", "inventory", "unblock"],
+    "description": "Agent creates a working mock returning 200"
+  }
+}

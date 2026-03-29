@@ -1,0 +1,47 @@
+{
+  "name": "debug-500-errors",
+  "description": "Agent debugs an API returning 500s on /api/users",
+
+  "setup": {
+    "fixture_server": {
+      "port": 9090,
+      "routes": [
+        { "path": "/api/users", "method": "GET", "status": 500, "body": "{\"error\":\"internal server error\",\"message\":\"connection pool exhausted\"}" },
+        { "path": "/api/users", "method": "GET", "status": 200, "body": "{\"users\":[{\"id\":1,\"name\":\"Alice\"}]}", "after_request": 3 },
+        { "path": "/api/health", "method": "GET", "status": 200, "body": "{\"status\":\"ok\"}" }
+      ]
+    },
+    "apxy": { "port": 8080 },
+    "seed_traffic": [
+      { "method": "GET", "url": "http://127.0.0.1:9090/api/users", "repeat": 5 },
+      { "method": "GET", "url": "http://127.0.0.1:9090/api/health", "repeat": 2 }
+    ]
+  },
+
+  "prompt": "My API at localhost:9090 is returning 500 errors on /api/users. The proxy is already running on port 8080 and traffic has been captured. Can you help me debug what's going on using apxy?",
+
+  "checkpoints": [
+    {
+      "id": "search-traffic",
+      "description": "Agent searches traffic for the failing endpoint",
+      "match": { "command_contains_any": ["apxy traffic logs search", "apxy traffic logs list"] }
+    },
+    {
+      "id": "inspect-record",
+      "description": "Agent inspects a specific traffic record",
+      "match": { "command_contains": "apxy traffic logs show" },
+      "after": "search-traffic"
+    },
+    {
+      "id": "extract-or-correlate",
+      "description": "Agent extracts error details or diffs/correlates records",
+      "match": { "command_contains_any": ["apxy traffic logs jsonpath", "apxy traffic logs diff", "apxy traffic logs search-bodies"] },
+      "after": "inspect-record"
+    }
+  ],
+
+  "outcome": {
+    "transcript_contains_any": ["connection pool", "500", "internal server error"],
+    "description": "Agent identifies the error cause from the response body"
+  }
+}
