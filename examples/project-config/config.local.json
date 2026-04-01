@@ -1,0 +1,23 @@
+{
+  "version": "1.0",
+
+  "proxy": {
+    "port": 9090,
+    "no_system_proxy": true
+  },
+
+  "ssl_domains": [
+    "api.example.com",
+    "*.stripe.com",
+    "api.openai.com",
+    "api.anthropic.com",
+    "*.internal.dev",
+    "localhost:3001"
+  ],
+
+  "network_condition": {
+    "latency_ms": 200,
+    "bandwidth_kbps": 1024,
+    "packet_loss_pct": 2
+  }
+}

@@ -17,6 +17,7 @@ Based on the user's request, read the appropriate reference file for detailed wo
 | Mock APIs, stub endpoints, unblock frontend, schema validation, catch breaking changes | [mocking.md](references/mocking.md) |
 | Replay requests, diff responses, export cURL/HAR, regression testing, batch requests | [replay-diff.md](references/replay-diff.md) |
 | Network simulation, breakpoints, scripts, redirects, filters, caching | [advanced-rules.md](references/advanced-rules.md) |
+| Generate or validate a `.apxy/config.json` project config | [project-config.md](references/project-config.md) |
 
 For detailed command flags: [cli-overview.md](references/cli-overview.md)
 For DSL match expression syntax: [dsl-reference.md](references/dsl-reference.md)
@@ -73,11 +74,87 @@ apxy rules mock add --name "stub" --url "/api/users" --match exact --status 200 
 | Empty search results | Wrong query term or traffic cleared | Try `apxy traffic logs list --limit 10` to see what's captured |
 | Mock rule not matching | URL pattern or match type mismatch | Check `apxy rules mock list` and verify `--url` pattern and `--match` type |
 
+## Project Configuration (`.apxy/config.json`)
+
+> Read [project-config.md](references/project-config.md) for the full schema reference.
+
+APXY supports team-shared configurations committed to Git. When `apxy proxy start` runs inside a
+project, it auto-discovers `.apxy/config.json` and loads rules into the global database.
+
+### Quick Setup
+
+```bash
+apxy init                          # scaffold .apxy/ in current project
+# edit .apxy/config.json
+apxy config validate               # validate before committing
+apxy proxy start                   # auto-discovers and loads the config
+```
+
+### Minimal `config.json` Template
+
+```json
+{
+  "version": 1,
+  "proxy_defaults": {
+    "port": 8080,
+    "mitm_all": false
+  },
+  "ssl_domains": ["api.example.com"],
+  "mock_rules": [],
+  "breakpoint_rules": []
+}
+```
+
+### Full Schema Summary
+
+| Field | Type | Purpose |
+|-------|------|---------|
+| `version` | `int` (must be `1`) | Schema version |
+| `proxy_defaults.port` | `int` | Override listen port |
+| `proxy_defaults.mitm_all` | `bool` | MITM all HTTPS |
+| `proxy_defaults.max_body_bytes` | `int` | Max body capture size |
+| `proxy_defaults.upstream_proxy` | `string` | Corporate proxy URL |
+| `ssl_domains` | `string[]` | SSL decrypt domains |
+| `bypass_domains` | `string[]` | Tunneled (no MITM) domains |
+| `mock_rules` | `MockRule[]` | Mock/stub rules |
+| `breakpoint_rules` | `BreakpointRule[]` | Pause-and-edit rules (Pro) |
+| `filter_rules` | `FilterRule[]` | Traffic filter rules |
+| `redirect_rules` | `RedirectRule[]` | Traffic redirect rules |
+| `network_condition` | `NetworkConditionConfig` | Simulate latency/packet loss (Pro) |
+| `no_caching` | `NoCachingConfig` | Strip cache headers |
+| `custom_cas` | `CustomCA[]` | Inject custom CA certificates |
+
+### Config Precedence (highest to lowest)
+
+1. CLI flags (e.g. `--port 9090`)
+2. `.apxy/config.local.json` (personal overrides, not in Git)
+3. `.apxy/config.json` (team shared, in Git)
+4. `~/.apxy/config.json` (global personal defaults)
+5. Built-in defaults
+
+### Validation
+
+```bash
+# Human-readable validation output
+apxy config validate
+
+# Machine-readable (for CI)
+apxy config validate --format json
+```
+
+Exit code 0 = valid, 1 = errors found.
+
+### Export Runtime State to File
+
+```bash
+apxy config export --project      # overwrites .apxy/config.json with current DB state
+```
+
 ## Tips
 
 - Use `--format toon` to minimize tokens when feeding output to an AI agent
 - Use `--help-format agent` on any command for AI-optimized help output
 - `apxy proxy browser` launches a pre-configured browser — no manual proxy setup needed
-- `apxy setup init` creates a project-scoped `.apxy/` directory for isolated config/data
+- `apxy init` creates a `.apxy/` project config directory (replaces `apxy setup init`)
 - DB commands (logs, mock, sql, schema, request) work without a running proxy
 - Runtime commands (`rules filter`, `rules redirect`, `rules breakpoint`, `rules script`, `rules network`, `rules caching`, `traffic recording`) need `apxy proxy start`

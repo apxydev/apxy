@@ -1,0 +1,267 @@
+{
+  "version": "1.0",
+
+  "proxy": {
+    "port": 8080,
+    "control_port": 8081,
+    "web_port": 8082,
+    "max_body": 2097152,
+    "mitm_all": false,
+    "bypass_domains": [
+      "*.apple.com",
+      "*.icloud.com",
+      "*.mzstatic.com",
+      "ocsp.digicert.com",
+      "*.crashlytics.com"
+    ],
+    "upstream_proxy": "",
+    "auto_validate": true,
+    "no_system_proxy": false,
+    "no_mdns": false
+  },
+
+  "ssl_domains": [
+    "api.example.com",
+    "*.stripe.com",
+    "api.openai.com",
+    "api.anthropic.com",
+    "*.internal.dev"
+  ],
+
+  "mock_rules": [
+    {
+      "id": "health-check",
+      "name": "Health Check Endpoint",
+      "priority": 100,
+      "active": true,
+      "url_pattern": "*/api/health",
+      "match_type": "wildcard",
+      "method": "GET",
+      "response_status": 200,
+      "response_headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache"
+      },
+      "response_body": "{\"status\":\"healthy\",\"version\":\"1.0.0\",\"timestamp\":\"2026-01-01T00:00:00Z\"}",
+      "delay_ms": 0
+    },
+    {
+      "id": "auth-unauthorized",
+      "name": "Mock Unauthorized Response",
+      "priority": 10,
+      "active": true,
+      "url_pattern": "^https://api\\.example\\.com/v1/.*$",
+      "match_type": "regex",
+      "method": "",
+      "header_conditions": {
+        "X-APXY-Scenario": "unauthorized"
+      },
+      "response_status": 401,
+      "response_headers": {
+        "Content-Type": "application/json",
+        "WWW-Authenticate": "Bearer"
+      },
+      "response_body": "{\"error\":{\"code\":\"UNAUTHORIZED\",\"message\":\"Invalid or expired token\"}}",
+      "delay_ms": 50
+    },
+    {
+      "id": "api-rate-limit",
+      "name": "Mock Rate Limit (429)",
+      "priority": 10,
+      "active": true,
+      "url_pattern": "^https://api\\.example\\.com/v1/.*$",
+      "match_type": "regex",
+      "method": "",
+      "header_conditions": {
+        "X-APXY-Scenario": "rate_limited"
+      },
+      "response_status": 429,
+      "response_headers": {
+        "Content-Type": "application/json",
+        "Retry-After": "60",
+        "X-RateLimit-Limit": "100",
+        "X-RateLimit-Remaining": "0"
+      },
+      "response_body": "{\"error\":{\"code\":\"RATE_LIMITED\",\"message\":\"Too many requests. Retry after 60 seconds.\"}}",
+      "delay_ms": 50
+    },
+    {
+      "id": "api-server-error",
+      "name": "Mock Server Error (500)",
+      "priority": 10,
+      "active": true,
+      "url_pattern": "^https://api\\.example\\.com/v1/.*$",
+      "match_type": "regex",
+      "method": "",
+      "header_conditions": {
+        "X-APXY-Scenario": "server_error"
+      },
+      "response_status": 500,
+      "response_headers": {
+        "Content-Type": "application/json"
+      },
+      "response_body": "{\"error\":{\"code\":\"INTERNAL_ERROR\",\"message\":\"An unexpected error occurred\"}}",
+      "delay_ms": 100
+    },
+    {
+      "id": "users-list",
+      "name": "Mock GET /users",
+      "priority": 50,
+      "active": true,
+      "url_pattern": "https://api.example.com/v1/users",
+      "match_type": "exact",
+      "method": "GET",
+      "response_status": 200,
+      "response_headers": {
+        "Content-Type": "application/json",
+        "X-Total-Count": "2"
+      },
+      "response_body": "{\"data\":[{\"id\":\"usr_001\",\"name\":\"Alice\",\"email\":\"alice@example.com\"},{\"id\":\"usr_002\",\"name\":\"Bob\",\"email\":\"bob@example.com\"}],\"pagination\":{\"total\":2,\"page\":1,\"per_page\":20}}",
+      "delay_ms": 80
+    },
+    {
+      "id": "user-create",
+      "name": "Mock POST /users",
+      "priority": 50,
+      "active": true,
+      "url_pattern": "https://api.example.com/v1/users",
+      "match_type": "exact",
+      "method": "POST",
+      "response_status": 201,
+      "response_headers": {
+        "Content-Type": "application/json",
+        "Location": "/v1/users/usr_003"
+      },
+      "response_body": "{\"id\":\"usr_003\",\"name\":\"New User\",\"email\":\"new@example.com\",\"created_at\":\"2026-01-01T00:00:00Z\"}",
+      "delay_ms": 120
+    },
+    {
+      "id": "user-detail",
+      "name": "Mock GET /users/:id",
+      "priority": 50,
+      "active": true,
+      "url_pattern": "https://api.example.com/v1/users/*",
+      "match_type": "wildcard",
+      "method": "GET",
+      "response_status": 200,
+      "response_headers": {
+        "Content-Type": "application/json"
+      },
+      "response_body": "{\"id\":\"usr_001\",\"name\":\"Alice\",\"email\":\"alice@example.com\",\"role\":\"admin\",\"created_at\":\"2025-06-15T10:30:00Z\"}",
+      "delay_ms": 50
+    }
+  ],
+
+  "filter_rules": [
+    {
+      "id": "filter-allow-api",
+      "type": "allow",
+      "target": "api.example.com",
+      "active": true
+    },
+    {
+      "id": "filter-allow-stripe",
+      "type": "allow",
+      "target": "*.stripe.com",
+      "active": true
+    },
+    {
+      "id": "filter-block-analytics",
+      "type": "block",
+      "target": "*.google-analytics.com",
+      "active": true
+    },
+    {
+      "id": "filter-block-ads",
+      "type": "block",
+      "target": "*.doubleclick.net",
+      "active": true
+    }
+  ],
+
+  "redirect_rules": [
+    {
+      "id": "redirect-staging-to-local",
+      "name": "Staging API to localhost",
+      "from_url": "https://staging-api.example.com/v1/*",
+      "to_url": "http://localhost:3000/v1/*",
+      "match_type": "wildcard",
+      "active": true
+    },
+    {
+      "id": "redirect-prod-to-staging",
+      "name": "Production to staging (for debugging)",
+      "from_url": "https://api.example.com/v1/*",
+      "to_url": "https://staging-api.example.com/v1/*",
+      "match_type": "wildcard",
+      "active": false
+    }
+  ],
+
+  "scripts": [
+    {
+      "id": "script-add-debug-header",
+      "name": "Add debug header to all API requests",
+      "active": true,
+      "code": "if (request.url.includes('api.example.com')) { request.headers['X-Debug'] = 'true'; request.headers['X-Request-Source'] = 'apxy-proxy'; }",
+      "match_expr": "*.example.com",
+      "hook": "onRequest"
+    },
+    {
+      "id": "script-log-slow-responses",
+      "name": "Tag slow responses",
+      "active": true,
+      "code": "if (response.duration > 1000) { response.headers['X-Slow-Response'] = 'true'; }",
+      "match_expr": "*",
+      "hook": "onResponse"
+    },
+    {
+      "id": "script-inject-auth",
+      "name": "Inject auth token for local dev",
+      "active": false,
+      "code": "if (request.url.includes('/v1/') && !request.headers['Authorization']) { request.headers['Authorization'] = 'Bearer dev-token-placeholder'; }",
+      "match_expr": "api.example.com",
+      "hook": "onRequest"
+    }
+  ],
+
+  "breakpoint_rules": [
+    {
+      "id": "bp-checkout-request",
+      "name": "Pause on checkout requests",
+      "active": true,
+      "match_expr": "*/checkout*",
+      "phase": "request",
+      "timeout_ms": 30000
+    },
+    {
+      "id": "bp-payment-response",
+      "name": "Pause on payment responses",
+      "active": false,
+      "match_expr": "*/payment*",
+      "phase": "response",
+      "timeout_ms": 60000
+    },
+    {
+      "id": "bp-errors",
+      "name": "Pause on 5xx errors",
+      "active": false,
+      "match_expr": "*",
+      "phase": "response",
+      "timeout_ms": 30000
+    }
+  ],
+
+  "network_condition": {
+    "latency_ms": 0,
+    "bandwidth_kbps": 0,
+    "packet_loss_pct": 0
+  },
+
+  "no_caching": {
+    "enabled": false,
+    "host": ""
+  },
+
+  "custom_cas": []
+}
