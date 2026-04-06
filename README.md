@@ -3,26 +3,27 @@
 [![Version](https://img.shields.io/badge/version-1.1.1-blue.svg)](https://github.com/apxydev/apxy/releases)
 [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey.svg)]()
 
+![APXY Console live traffic view](assets/live-traffic.png)
+
 **Capture, inspect, mock, replay, and diff HTTP/HTTPS traffic from a CLI and Web UI. Built for developers and AI coding agents.**
 
 APXY sits between your app and the network so you can see every HTTP/HTTPS request and response. Use the **CLI** for scripting, automation, and AI-assisted debugging, or the **Web UI** for visual inspection and rule management. Mock APIs, replay requests, diff responses, and simulate bad networks from one local proxy.
 
-<!-- TODO: Add demo GIF here -->
-<!-- ![APXY Demo](assets/demo.gif) -->
+Website: [apxy.dev](https://apxy.dev)
 
 ## Install
+
+**Shell script**:
+
+```bash
+curl -fsSL https://apxy.dev/install.sh | bash
+```
 
 **Homebrew** (macOS / Linux):
 
 ```bash
 brew tap apxydev/apxy https://github.com/apxydev/apxy
 brew install apxy
-```
-
-**Shell script**:
-
-```bash
-curl -fsSL https://apxy.dev/install.sh | bash
 ```
 
 ## AI Coding Agent Skill
