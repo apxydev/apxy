@@ -22,7 +22,7 @@ brew install apxy
 **Shell script**:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/apxydev/apxy/main/scripts/install.sh | bash
+curl -fsSL https://apxy.dev/install.sh | bash
 ```
 
 ## AI Coding Agent Skill

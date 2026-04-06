@@ -209,7 +209,7 @@ apxy proxy env --script ./proxy-env.sh    # Write to file
 
 ```bash
 # If installed via install.sh
-~/.apxy/bin/install.sh uninstall
+curl -fsSL https://apxy.dev/install.sh | bash -s -- uninstall
 
 # Or manually
 rm $(which apxy)

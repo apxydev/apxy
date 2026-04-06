@@ -16,7 +16,7 @@ brew install apxy
 ### Option B: Shell script
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/apxydev/apxy/main/scripts/install.sh | bash
+curl -fsSL https://apxy.dev/install.sh | bash
 ```
 
 ### Option C: Manual download

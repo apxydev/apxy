@@ -5,11 +5,12 @@ set -euo pipefail
 # Downloads and installs the APXY binary from GitHub Releases.
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/apxydev/apxy/main/scripts/install.sh | bash
+#   curl -fsSL https://apxy.dev/install.sh | bash
 #   ./install.sh [install|uninstall|status]
 
-APXY_VERSION="${APXY_VERSION:-1.0.5}"
+APXY_VERSION="${APXY_VERSION:-}"
 GITHUB_REPO="apxydev/apxy"
+GITHUB_API_URL="https://api.github.com/repos/${GITHUB_REPO}"
 INSTALL_DIR="${APXY_INSTALL_DIR:-$HOME/.apxy/bin}"
 
 RED='\033[0;31m'
@@ -24,7 +25,7 @@ warn()  { echo -e "${YELLOW}[WARN]${NC} $*"; }
 err()   { echo -e "${RED}[ERROR]${NC} $*" >&2; }
 
 usage() {
-    echo "APXY Installer v${APXY_VERSION}"
+    echo "APXY Installer"
     echo ""
     echo "Usage: $0 [command]"
     echo ""
@@ -34,7 +35,7 @@ usage() {
     echo "  status      Check installation status"
     echo ""
     echo "Environment variables:"
-    echo "  APXY_VERSION       Version to install (default: ${APXY_VERSION})"
+    echo "  APXY_VERSION       Version to install (default: latest release)"
     echo "  APXY_INSTALL_DIR   Install directory (default: ${INSTALL_DIR})"
 }
 
@@ -86,6 +87,48 @@ download_file() {
         err "Neither curl nor wget found. Please install one and try again."
         exit 1
     fi
+}
+
+fetch_url() {
+    local url="$1"
+
+    if command -v curl &>/dev/null; then
+        curl -fsSL "$url"
+    elif command -v wget &>/dev/null; then
+        wget -qO- "$url"
+    else
+        err "Neither curl nor wget found. Please install one and try again."
+        exit 1
+    fi
+}
+
+resolve_version() {
+    if [ -n "${APXY_VERSION}" ]; then
+        APXY_VERSION="${APXY_VERSION#v}"
+        return
+    fi
+
+    info "Resolving latest APXY release..."
+
+    local latest_url response resolved_version
+    latest_url="${GITHUB_API_URL}/releases/latest"
+
+    if ! response="$(fetch_url "$latest_url")"; then
+        err "Failed to resolve the latest APXY release from GitHub."
+        err "Set APXY_VERSION explicitly and try again."
+        exit 1
+    fi
+
+    resolved_version="$(printf '%s\n' "$response" | sed -n -E 's/.*"tag_name"[[:space:]]*:[[:space:]]*"v?([^"]+)".*/\1/p' | head -n 1)"
+
+    if [ -z "$resolved_version" ]; then
+        err "Could not determine the latest APXY release version."
+        err "Set APXY_VERSION explicitly and try again."
+        exit 1
+    fi
+
+    APXY_VERSION="$resolved_version"
+    ok "Resolved latest APXY release: v${APXY_VERSION}"
 }
 
 verify_checksum() {
@@ -159,6 +202,8 @@ add_to_path() {
 }
 
 do_install() {
+    resolve_version
+
     local archive_name
     archive_name=$(detect_platform)
 
