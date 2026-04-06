@@ -30,7 +30,7 @@ The core product is proprietary. This GitHub repository hosts the installer, doc
 ### How do I install APXY?
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/apxydev/apxy/main/scripts/install.sh | bash
+curl -fsSL https://apxy.dev/install.sh | bash
 ```
 
 Or download from [GitHub Releases](https://github.com/apxydev/apxy/releases).
@@ -46,7 +46,7 @@ Run the install script again -- it will replace the existing binary.
 ### How do I uninstall APXY?
 
 ```bash
-~/.apxy/bin/install.sh uninstall
+curl -fsSL https://apxy.dev/install.sh | bash -s -- uninstall
 ```
 
 Or manually: `rm $(which apxy) && rm -rf ~/.apxy`
