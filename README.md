@@ -1,6 +1,6 @@
 # APXY — Network Debugging and API Mocking for Developers and AI Coding Agents
 
-[![Version](https://img.shields.io/badge/version-1.1.2-blue.svg)](https://github.com/apxydev/apxy/releases)
+[![Version](https://img.shields.io/badge/version-1.1.3-blue.svg)](https://github.com/apxydev/apxy/releases)
 [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey.svg)]()
 
 ![APXY Console live traffic view](assets/live-traffic.png)
