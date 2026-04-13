@@ -6,7 +6,7 @@ Return multi-hundred-line JSON from files on disk instead of pasting megabytes i
 
 ## Scenario
 
-Your product catalog and remote-config endpoints return **large JSON** documents. Pasting them into `--body` is fragile and blows up shell history. You will store fixtures under `./fixtures/`, then point APXY at a **file path** for each heavy endpoint (for example `GET /api/products` and `GET /api/config/bundle`). The CLI command `apxy rules mock add` supports **inline** bodies only; **file** (and **directory**) response sources are available from the **Web UI** and the **HTTP API**, so Track A uses `curl` against the local Web UI API for file-backed rules.
+Your product catalog and remote-config endpoints return **large JSON** documents. Pasting them into `--body` is fragile and blows up shell history. You will store fixtures under `./fixtures/`, then point APXY at a **file path** for each heavy endpoint (for example `GET /api/products` and `GET /api/config/bundle`). The CLI command `apxy mock add` supports **inline** bodies only; **file** (and **directory**) response sources are available from the **Web UI** and the **HTTP API**, so Track A uses `curl` against the local Web UI API for file-backed rules.
 
 ## Prerequisites
 
@@ -28,7 +28,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -117,7 +117,7 @@ Agent shows the start of each file-backed JSON body.
 **Your agent runs:**
 
 ```bash
-apxy rules mock list
+apxy mock list
 ```
 
 Agent finds rules listing `file_path` (and `dir_path` if you add directory-backed rules) in the JSON output.
@@ -128,7 +128,7 @@ If you only need a one-off and the payload fits in argv limits, your agent can s
 
 ```bash
 BODY=$(cat ./fixtures/products.json)
-apxy rules mock add --name "products-inline" --url "https://api.myapp.com/api/products" --method GET --match exact --status 200 --body "$BODY"
+apxy mock add --name "products-inline" --url "https://api.myapp.com/api/products" --method GET --match exact --status 200 --body "$BODY"
 ```
 
 Prefer **file_path** via the API or Web UI when the document is large or shared with other tools.
@@ -142,7 +142,7 @@ Prefer **file_path** via the API or Web UI when the document is large or shared 
 ### Step 1: Open Mock Rules
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 Go to **http://localhost:8082** → **Rules → Mock Rules**.

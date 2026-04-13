@@ -30,7 +30,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -54,7 +54,7 @@ more than ten items, and wait until the failing response appears in traffic.
 **Your agent runs:**
 
 ```bash
-apxy traffic logs search --query "checkout"
+apxy logs search --query "checkout"
 ```
 
 Scan the results for `POST` (or the method you use) to
@@ -64,7 +64,7 @@ Scan the results for `POST` (or the method you use) to
 If search returns too much noise, narrow with a path fragment or status:
 
 ```bash
-apxy traffic logs search --query "api.myapp.com checkout 500"
+apxy logs search --query "api.myapp.com checkout 500"
 ```
 
 ### Step 2: Inspect the record
@@ -77,7 +77,7 @@ apxy traffic logs search --query "api.myapp.com checkout 500"
 **Your agent runs:**
 
 ```bash
-apxy traffic logs show --id 42
+apxy logs show --id 42
 ```
 
 Confirm the cart payload shows more than ten items and the response body
@@ -92,7 +92,7 @@ contains the server error you saw in the app.
 **Your agent runs:**
 
 ```bash
-apxy traffic logs export-curl --id 42 --format curl
+apxy logs export-curl --id 42 --format curl
 ```
 
 `export-curl` accepts a `--format` flag; `curl` is the default and matches what
@@ -107,7 +107,7 @@ most backend engineers expect.
 **Your agent runs:**
 
 ```bash
-apxy traffic logs export-curl --id 42 --format fetch
+apxy logs export-curl --id 42 --format fetch
 ```
 
 ### Step 5: Export as Python (scripts / data team)
@@ -119,7 +119,7 @@ apxy traffic logs export-curl --id 42 --format fetch
 **Your agent runs:**
 
 ```bash
-apxy traffic logs export-curl --id 42 --format python
+apxy logs export-curl --id 42 --format python
 ```
 
 ### Step 6: Package the bug report
@@ -138,7 +138,7 @@ Paste into your issue tracker:
 **Your agent runs:**
 
 ```bash
-apxy traffic logs replay --id 42
+apxy logs replay --id 42
 ```
 
 ---

@@ -8,14 +8,14 @@ Your app is making API calls that sometimes fail. Instead of manually inspecting
 
 ## Prerequisites
 
-- APXY installed and proxy running (`apxy proxy start`)
+- APXY installed and proxy running (`apxy start`)
 
 ## Steps
 
 ### 1. Start the proxy
 
 ```bash
-apxy proxy start
+apxy start
 ```
 
 ### 2. Generate some traffic

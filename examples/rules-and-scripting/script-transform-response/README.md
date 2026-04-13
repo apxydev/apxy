@@ -29,7 +29,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -73,7 +73,7 @@ function onResponse(response) {
 **Your agent runs:**
 
 ```bash
-apxy rules script add \
+apxy script add \
   --name "redact-user-pii" \
   --file ./mask-pii.js \
   --hook onResponse \
@@ -93,7 +93,7 @@ A narrower match avoids running JSON logic on binary downloads or HTML error pag
 **Your agent runs:**
 
 ```bash
-apxy rules script list
+apxy script list
 ```
 
 ### Step 4: Issue a request that returns PII
@@ -119,8 +119,8 @@ You should see masked `email` / `phone` values in the curl output because the sc
 **Your agent runs:**
 
 ```bash
-apxy traffic logs search --query "/api/users" --limit 5
-apxy traffic logs show --id LOG_ID
+apxy logs search --query "/api/users" --limit 5
+apxy logs show --id LOG_ID
 ```
 
 Confirm the **response** section in the log shows redacted values. If you still see raw PII, check: script disabled, match expression too narrow/wide, or response not JSON.
@@ -134,9 +134,9 @@ Confirm the **response** section in the log shows redacted values. If you still 
 **Your agent runs:**
 
 ```bash
-apxy rules script disable --id SCRIPT_ID
+apxy script disable --id SCRIPT_ID
 # repeat curl
-apxy rules script enable --id SCRIPT_ID
+apxy script enable --id SCRIPT_ID
 ```
 
 The before/after diff proves the script is responsible for the transformation, not the backend.
@@ -150,7 +150,7 @@ The before/after diff proves the script is responsible for the transformation, n
 **Your agent runs:**
 
 ```bash
-apxy rules script remove --id SCRIPT_ID
+apxy script remove --id SCRIPT_ID
 ```
 
 ---

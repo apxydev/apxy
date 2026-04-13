@@ -16,7 +16,7 @@ Backend published `openapi.yaml` for the new **Orders** API under `https://api.m
 - An OpenAPI 3 file in this folder or nearby, for example `./openapi.yaml`, describing `https://api.myapp.com` paths
 - Optional: `/etc/hosts` mapping for `api.myapp.com`
 
-**Note:** `apxy rules mock import` from a JSON template is a **Pro** feature. On Free, add mocks with `apxy rules mock add` as shown below.
+**Note:** `apxy mock import` from a JSON template is a **Pro** feature. On Free, add mocks with `apxy mock add` as shown below.
 
 ## Before You Start
 
@@ -29,7 +29,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -89,8 +89,8 @@ Use that **id** as `<schema-id>` below.
 **Your agent runs:**
 
 ```bash
-apxy rules mock add --name "orders-list" --url "https://api.myapp.com/api/orders" --method GET --match exact --status 200 --body '{"orders":[{"id":"ord_1","status":"open","total_cents":4999}],"next_cursor":null}'
-apxy rules mock add --name "orders-create" --url "https://api.myapp.com/api/orders" --method POST --match exact --status 201 --body '{"id":"ord_new","status":"open","total_cents":0}'
+apxy mock add --name "orders-list" --url "https://api.myapp.com/api/orders" --method GET --match exact --status 200 --body '{"orders":[{"id":"ord_1","status":"open","total_cents":4999}],"next_cursor":null}'
+apxy mock add --name "orders-create" --url "https://api.myapp.com/api/orders" --method POST --match exact --status 201 --body '{"id":"ord_new","status":"open","total_cents":0}'
 curl -sS "https://api.myapp.com/api/orders"
 curl -sS -X POST "https://api.myapp.com/api/orders" -H "Content-Type: application/json" -d '{"customer_id":"cus_123"}'
 ```
@@ -104,7 +104,7 @@ curl -sS -X POST "https://api.myapp.com/api/orders" -H "Content-Type: applicatio
 **Your agent runs:**
 
 ```bash
-apxy traffic logs list --limit 10
+apxy logs list --limit 10
 ```
 
 Agent reports an **id** column value to use as `<record-id>`.
@@ -148,7 +148,7 @@ Align the JSON fields with your spec's `Order` schema.
 **Your agent runs:**
 
 ```bash
-apxy rules mock add --name "orders-by-id" --url "https://api.myapp.com/api/orders/*" --method GET --match wildcard --priority 0 --status 200 --body '{"id":"ord_1","status":"shipped","line_items":[{"sku":"SKU-1","qty":2}],"total_cents":4999}'
+apxy mock add --name "orders-by-id" --url "https://api.myapp.com/api/orders/*" --method GET --match wildcard --priority 0 --status 200 --body '{"id":"ord_1","status":"shipped","line_items":[{"sku":"SKU-1","qty":2}],"total_cents":4999}'
 ```
 
 ### Step 8: List mocks
@@ -160,7 +160,7 @@ apxy rules mock add --name "orders-by-id" --url "https://api.myapp.com/api/order
 **Your agent runs:**
 
 ```bash
-apxy rules mock list
+apxy mock list
 ```
 
 ---
@@ -172,7 +172,7 @@ apxy rules mock list
 ### Step 1: Proxy + dashboard
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 Open **http://localhost:8082**.
@@ -200,7 +200,7 @@ Open **Traffic**, select a captured **GET** or **POST** to `/api/orders`, and us
 ### Step 5: Stop
 
 ```bash
-apxy proxy stop
+apxy stop
 ```
 
 ---
@@ -219,7 +219,7 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 - `apxy schema import --file` / `--url` registers OpenAPI for offline validation
 - `apxy schema list` and `apxy schema show --id` discover **schema-id**
 - `apxy schema validate --record-id --schema-id` checks one capture; `validate-recent` batches
-- Mocks are still created with `apxy rules mock add` on Free (import-from-template is Pro)
+- Mocks are still created with `apxy mock add` on Free (import-from-template is Pro)
 - Wildcard URLs model `{id}` path segments the same way as other mocking guides
 
 ## Next Steps

@@ -17,7 +17,7 @@ Your app is slow but you are not sure which API calls dominate wall time. Ask yo
 
 ### Plan note
 
-In licensed APXY builds, **`apxy traffic sql`** is a **Pro** feature. If you are on **Free**, have the agent use **`apxy traffic logs search`** plus **`apxy traffic logs show`** for spot checks, or upgrade per [apxy.dev pricing](https://apxy.dev/#pricing). The queries below are still the canonical shape when SQL is available.
+In licensed APXY builds, **`apxy sql`** is a **Pro** feature. If you are on **Free**, have the agent use **`apxy logs search`** plus **`apxy logs show`** for spot checks, or upgrade per [apxy.dev pricing](https://apxy.dev/#pricing). The queries below are still the canonical shape when SQL is available.
 
 ## Before You Start
 
@@ -30,7 +30,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -50,7 +50,7 @@ If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../get
 **Your agent runs:**
 
 ```bash
-apxy traffic sql query "SELECT url, COUNT(*) AS n, AVG(duration_ms) AS avg_ms, MAX(duration_ms) AS max_ms FROM traffic_logs GROUP BY url ORDER BY avg_ms DESC LIMIT 10"
+apxy sql query "SELECT url, COUNT(*) AS n, AVG(duration_ms) AS avg_ms, MAX(duration_ms) AS max_ms FROM traffic_logs GROUP BY url ORDER BY avg_ms DESC LIMIT 10"
 ```
 
 The agent interprets results: high **`avg_ms`** with large **`n`** is a priority; high **`max_ms`** with low **`n`** may be cold start or rare timeouts.
@@ -64,7 +64,7 @@ The agent interprets results: high **`avg_ms`** with large **`n`** is a priority
 **Your agent runs:**
 
 ```bash
-apxy traffic sql query "SELECT url, status_code, COUNT(*) AS n FROM traffic_logs WHERE status_code >= 400 GROUP BY url, status_code ORDER BY n DESC LIMIT 20"
+apxy sql query "SELECT url, status_code, COUNT(*) AS n FROM traffic_logs WHERE status_code >= 400 GROUP BY url, status_code ORDER BY n DESC LIMIT 20"
 ```
 
 The agent connects slow endpoints from Step 1 with error-heavy URLs here (retries, cascading failures).
@@ -78,7 +78,7 @@ The agent connects slow endpoints from Step 1 with error-heavy URLs here (retrie
 **Your agent runs:**
 
 ```bash
-apxy traffic sql query "SELECT host, COUNT(*) AS n, AVG(duration_ms) AS avg_ms, MAX(duration_ms) AS max_ms FROM traffic_logs GROUP BY host ORDER BY avg_ms DESC LIMIT 15"
+apxy sql query "SELECT host, COUNT(*) AS n, AVG(duration_ms) AS avg_ms, MAX(duration_ms) AS max_ms FROM traffic_logs GROUP BY host ORDER BY avg_ms DESC LIMIT 15"
 ```
 
 Useful when the browser or mobile app hits both your API and CDNs or third parties through the same proxy.
@@ -92,7 +92,7 @@ Useful when the browser or mobile app hits both your API and CDNs or third parti
 **Your agent runs:**
 
 ```bash
-apxy traffic sql query "SELECT COUNT(*) AS n, AVG(duration_ms) AS avg_ms, MAX(duration_ms) AS max_ms FROM traffic_logs WHERE url LIKE '%/api/search%'"
+apxy sql query "SELECT COUNT(*) AS n, AVG(duration_ms) AS avg_ms, MAX(duration_ms) AS max_ms FROM traffic_logs WHERE url LIKE '%/api/search%'"
 ```
 
 ### Step 5: Approximate P95 latency for /api/search
@@ -106,7 +106,7 @@ SQLite does not ship a built-in percentile function in all environments; a pract
 **Your agent runs:**
 
 ```bash
-apxy traffic sql query "SELECT duration_ms FROM traffic_logs WHERE url LIKE '%/api/search%' ORDER BY duration_ms DESC LIMIT 1 OFFSET (SELECT COUNT(*) / 20 FROM traffic_logs WHERE url LIKE '%/api/search%')"
+apxy sql query "SELECT duration_ms FROM traffic_logs WHERE url LIKE '%/api/search%' ORDER BY duration_ms DESC LIMIT 1 OFFSET (SELECT COUNT(*) / 20 FROM traffic_logs WHERE url LIKE '%/api/search%')"
 ```
 
 The agent explains caveats: small **`n`** makes this unstable; for tiny samples, report min/max/mean instead of pretending P95 is precise.
@@ -120,7 +120,7 @@ The agent explains caveats: small **`n`** makes this unstable; for tiny samples,
 **Your agent runs:**
 
 ```bash
-apxy traffic sql query "SELECT id, method, url, duration_ms, status_code FROM traffic_logs ORDER BY duration_ms DESC LIMIT 5"
+apxy sql query "SELECT id, method, url, duration_ms, status_code FROM traffic_logs ORDER BY duration_ms DESC LIMIT 5"
 ```
 
 ### Step 7: Deep inspect a suspect record
@@ -132,7 +132,7 @@ apxy traffic sql query "SELECT id, method, url, duration_ms, status_code FROM tr
 **Your agent runs:**
 
 ```bash
-apxy traffic logs show --id 88
+apxy logs show --id 88
 ```
 
 ### Step 8: Turn analysis into recommendations
@@ -147,7 +147,7 @@ No new APXY command is required; the agent synthesizes Steps 1--7 into engineeri
 
 ## Track B: Web UI Workflow
 
-You can follow along in the Web UI: the **Traffic** table shows duration and status per row, which matches the per-request slice of what SQL aggregates. Sort by duration or filter by path to approximate Steps 1 and 4 without the terminal. For percentile intuition, sort slowest-first and eyeball the tail; the CLI query in Step 5 formalizes that when SQL is enabled. Use the record detail view as the counterpart to **`apxy traffic logs show`** when you click a slow row.
+You can follow along in the Web UI: the **Traffic** table shows duration and status per row, which matches the per-request slice of what SQL aggregates. Sort by duration or filter by path to approximate Steps 1 and 4 without the terminal. For percentile intuition, sort slowest-first and eyeball the tail; the CLI query in Step 5 formalizes that when SQL is enabled. Use the record detail view as the counterpart to **`apxy logs show`** when you click a slow row.
 
 ---
 
@@ -164,7 +164,7 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 - How to profile APIs with **`GROUP BY url`** on **`duration_ms`** and **`status_code`**
 - How a **DESC + LIMIT + OFFSET** pattern approximates tail latency without native **`percentile_cont`**
-- How to pivot from aggregate SQL to **`apxy traffic logs show`** on a specific **id**
+- How to pivot from aggregate SQL to **`apxy logs show`** on a specific **id**
 - Where the Web UI gives a visual parallel to the same data
 
 ---

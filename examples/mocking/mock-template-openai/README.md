@@ -25,7 +25,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.openai.com
+apxy start --ssl-domains api.openai.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -56,7 +56,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock import --file mock-templates/openai/rules.json
+apxy mock import --file mock-templates/openai/rules.json
 ```
 
 ### Step 2: List rules
@@ -68,7 +68,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock list
+apxy mock list
 ```
 
 ### Step 3: Chat completion
@@ -144,11 +144,11 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock list
-apxy rules mock remove --id <RULE_ID>
+apxy mock list
+apxy mock remove --id <RULE_ID>
 ```
 
-Add new branches with `apxy rules mock add` if you need tool-calls or streaming-specific test doubles.
+Add new branches with `apxy mock add` if you need tool-calls or streaming-specific test doubles.
 
 ---
 

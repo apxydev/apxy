@@ -25,7 +25,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -45,7 +45,7 @@ Filter rules use **type** (`block` or `allow`) and a **target** domain pattern. 
 **Your agent runs:**
 
 ```bash
-apxy rules filter set --type block --target "*.google-analytics.com"
+apxy filter set --type block --target "*.google-analytics.com"
 ```
 
 Reload your app; confirm fewer rows in traffic logs and that your first-party flows still work.
@@ -59,8 +59,8 @@ Reload your app; confirm fewer rows in traffic logs and that your first-party fl
 **Your agent runs:**
 
 ```bash
-apxy rules filter set --type block --target "*.facebook.com"
-apxy rules filter set --type block --target "*.sentry.io"
+apxy filter set --type block --target "*.facebook.com"
+apxy filter set --type block --target "*.sentry.io"
 ```
 
 If your SDKs use region-specific subdomains, add another `--target` line per pattern (e.g. `o123.ingest.sentry.io`).
@@ -74,19 +74,19 @@ If your SDKs use region-specific subdomains, add another `--target` line per pat
 **Your agent runs:**
 
 ```bash
-apxy rules filter list
+apxy filter list
 ```
 
 Remove one rule by ID:
 
 ```bash
-apxy rules filter remove --id <FILTER_RULE_ID>
+apxy filter remove --id <FILTER_RULE_ID>
 ```
 
 Or clear every filter:
 
 ```bash
-apxy rules filter remove --all
+apxy filter remove --all
 ```
 
 ### Step 4 (optional): Allow-list only your API
@@ -98,8 +98,8 @@ apxy rules filter remove --all
 **Your agent runs:**
 
 ```bash
-apxy rules filter remove --all
-apxy rules filter set --type allow --target "api.myapp.com"
+apxy filter remove --all
+apxy filter set --type allow --target "api.myapp.com"
 ```
 
 Allow-listing is powerful and easy to misconfigure: you may block OAuth, CDNs, or websockets your app needs. Prefer **block** rules for known noise until you are sure of the full host inventory.
@@ -139,8 +139,8 @@ Remove block rules, add a single **allow** rule for `api.myapp.com`, and reload.
 *[YouTube link -- coming soon]*
 
 - 0:00 — Proxy with SSL for `api.myapp.com`
-- 1:00 — CLI: three `apxy rules filter set --type block` calls
-- 2:30 — `apxy rules filter list` and selective `remove`
+- 1:00 — CLI: three `apxy filter set --type block` calls
+- 2:30 — `apxy filter list` and selective `remove`
 - 3:30 — Web UI filter table and Traffic diff
 - 4:30 — Optional allow-list pitfall callout
 
@@ -148,8 +148,8 @@ Remove block rules, add a single **allow** rule for `api.myapp.com`, and reload.
 
 ## What You Learned
 
-- Creating host-pattern **block** filters with `apxy rules filter set --type block --target "pattern"`
-- Listing and removing rules via `apxy rules filter list` and `apxy rules filter remove`
+- Creating host-pattern **block** filters with `apxy filter set --type block --target "pattern"`
+- Listing and removing rules via `apxy filter list` and `apxy filter remove`
 - Optional **allow** filtering for API-only focus—and why it requires a complete host map
 - Pairing filters with SSL capture so decrypted first-party traffic stays visible while noise stays out
 

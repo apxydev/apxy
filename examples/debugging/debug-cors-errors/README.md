@@ -25,7 +25,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -45,7 +45,7 @@ If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../get
 **Your agent runs:** (no command—waits for traffic; optionally confirms proxy status)
 
 ```bash
-apxy proxy status
+apxy status
 ```
 
 Agent reports that the proxy is listening and that HTTPS to `api.myapp.com` will be decrypted because that host is in `--ssl-domains`.
@@ -59,7 +59,7 @@ Agent reports that the proxy is listening and that HTTPS to `api.myapp.com` will
 **Your agent runs:**
 
 ```bash
-apxy traffic logs search --query "OPTIONS"
+apxy logs search --query "OPTIONS"
 ```
 
 Agent shows something like:
@@ -81,7 +81,7 @@ You are looking for the pair: `OPTIONS` (preflight) immediately before the real 
 **Your agent runs:**
 
 ```bash
-apxy traffic logs show --id 42
+apxy logs show --id 42
 ```
 
 Agent reports the response status and headers. Typical CORS problems show up here: `204` or `200` but no `Access-Control-Allow-Origin`, wrong `Access-Control-Allow-Methods`, or missing `Access-Control-Allow-Headers` for `Authorization` / `Content-Type`. The follow-up `GET` or `POST` may show status `200` in APXY while the browser still blocks the page because the preflight failed.
@@ -95,7 +95,7 @@ Agent reports the response status and headers. Typical CORS problems show up her
 **Your agent runs:**
 
 ```bash
-apxy rules mock add --name "cors-preflight-localhost" \
+apxy mock add --name "cors-preflight-localhost" \
   --url "https://api.myapp.com/*" \
   --match wildcard \
   --method OPTIONS \
@@ -114,7 +114,7 @@ Agent confirms the rule was created (rule id and summary). This does not replace
 **Your agent runs:**
 
 ```bash
-apxy traffic logs search --query "api.myapp.com" --limit 10
+apxy logs search --query "api.myapp.com" --limit 10
 ```
 
 Agent finds the new `OPTIONS` row, `mocked` true if your UI surfaces that, and the subsequent `GET`/`POST` with status 200. In the browser, the CORS error should disappear for the mocked preflight path.
@@ -128,8 +128,8 @@ Agent finds the new `OPTIONS` row, `mocked` true if your UI surfaces that, and t
 **Your agent runs:**
 
 ```bash
-apxy rules mock list
-apxy rules mock remove --id <RULE_ID>
+apxy mock list
+apxy mock remove --id <RULE_ID>
 ```
 
 (Use the id from `list`.)
@@ -186,8 +186,8 @@ If you added a mock from Track A, go to **Rules** -> find **cors-preflight-local
 
 - How CORS preflights show up as real `OPTIONS` records in APXY, not as a black box
 - How to correlate browser errors with missing or incorrect `Access-Control-*` headers
-- How to use `apxy traffic logs search` and `apxy traffic logs show` for header-level debugging
-- How to temporarily mock an `OPTIONS` response with `apxy rules mock add` to unblock local development or validate a hypothesis
+- How to use `apxy logs search` and `apxy logs show` for header-level debugging
+- How to temporarily mock an `OPTIONS` response with `apxy mock add` to unblock local development or validate a hypothesis
 
 ## Next Steps
 

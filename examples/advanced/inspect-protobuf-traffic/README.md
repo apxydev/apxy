@@ -25,7 +25,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -51,7 +51,7 @@ Point the client at the system HTTP/HTTPS proxy APXY exposes. Trigger calls that
 **Your agent runs:**
 
 ```bash
-apxy traffic logs search --query "api.myapp.com/v2/orders" --limit 5
+apxy logs search --query "api.myapp.com/v2/orders" --limit 5
 ```
 
 Pick a record ID from the list (below we use `a1b2c3d4` as a placeholder—replace with your real ID).
@@ -63,7 +63,7 @@ Pick a record ID from the list (below we use `a1b2c3d4` as a placeholder—repla
 **Your agent runs:**
 
 ```bash
-apxy traffic logs show --id a1b2c3d4
+apxy logs show --id a1b2c3d4
 ```
 
 **Example (abbreviated) — what the agent highlights**
@@ -175,7 +175,7 @@ apxy tools protobuf decode --id a1b2c3d4 --scope request
 **Your agent runs:**
 
 ```bash
-apxy traffic logs search --query "checkout" --limit 10
+apxy logs search --query "checkout" --limit 10
 apxy tools protobuf decode --id <ID_FROM_SEARCH> --scope response
 ```
 
@@ -235,10 +235,10 @@ For tickets and agent prompts, copy the record ID and run **`apxy tools protobuf
 
 ## What You Learned
 
-- Recognizing Protobuf and gRPC traffic from `Content-Type` and non-printable bodies in **`apxy traffic logs show`**
+- Recognizing Protobuf and gRPC traffic from `Content-Type` and non-printable bodies in **`apxy logs show`**
 - Registering schema files with **`apxy tools protobuf add-schema`** and listing them with **`list-schemas`**
 - Turning wire bytes into inspectable structures via **`apxy tools protobuf decode`** (`--scope request` or `response`)
-- Combining **`apxy traffic logs search`** with decode to filter many captures down to the one message you need
+- Combining **`apxy logs search`** with decode to filter many captures down to the one message you need
 
 ---
 

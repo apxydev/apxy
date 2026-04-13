@@ -63,7 +63,7 @@ cleanup() {
         wait "$APXY_PID" 2>/dev/null || true
     fi
     if $PROXY_STARTED; then
-        apxy traffic logs clear 2>/dev/null || true
+        apxy logs clear 2>/dev/null || true
     fi
     FIXTURE_PID=""
     APXY_PID=""
@@ -113,9 +113,9 @@ run_scenario() {
 
     # Step 2: Start APXY proxy (runs in background — it blocks in foreground)
     echo "  Starting APXY proxy on :$proxy_port..."
-    apxy proxy stop 2>/dev/null || true
-    apxy traffic logs clear 2>/dev/null || true
-    apxy proxy start --port "$proxy_port" --no-system-proxy >/dev/null 2>&1 &
+    apxy stop 2>/dev/null || true
+    apxy logs clear 2>/dev/null || true
+    apxy start --port "$proxy_port" --no-system-proxy >/dev/null 2>&1 &
     APXY_PID=$!
 
     PROXY_STARTED=true

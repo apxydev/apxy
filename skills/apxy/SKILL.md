@@ -29,10 +29,10 @@ Before suggesting commands, be aware of what requires a Pro license so you can o
 | Tier | Features |
 |------|----------|
 | **Free** | Proxy, traffic logs, mock rules (max 3 active), redirects, filters, schema validation, replay, diff, export/import, tools (compose/batch/diagnose), setup |
-| **Pro** | SQL queries (`apxy traffic sql query`), breakpoints, network simulation (`apxy rules network`), scripts (`apxy rules script`) |
+| **Pro** | SQL queries (`apxy sql query`), breakpoints, network simulation (`apxy network`), scripts (`apxy script`) |
 
 **Free alternatives when Pro isn't available:**
-- Instead of SQL → use `apxy traffic logs search` + `jq` filters
+- Instead of SQL → use `apxy logs search` + `jq` filters
 - Instead of breakpoints → add a temporary mock rule to intercept the request
 - Instead of network simulation → use mock `--delay` flag on a specific rule
 - Instead of scripts → use a mock rule with `--headers` to set response headers, or `--status` / `--body` to override the response
@@ -42,23 +42,23 @@ Check license status with: `apxy license status`
 ## Quick Start
 
 ```bash
-apxy proxy start --port 8080          # proxy :8080, control API :8081
-eval $(apxy proxy env)                # inject proxy env into shell
-apxy traffic logs list --format json --limit 10
-apxy rules mock add --name "stub" --url "/api/users" --match exact --status 200 --body '{"users":[]}'
+apxy start --port 8080          # proxy :8080, control API :8081
+eval $(apxy env)                # inject proxy env into shell
+apxy logs list --format json --limit 10
+apxy mock add --name "stub" --url "/api/users" --match exact --status 200 --body '{"users":[]}'
 ```
 
 ## Quick Triage
 
 | Problem | First command to run |
 |---------|---------------------|
-| API returning 4xx/5xx | `apxy traffic logs search --query "host.com" --format json \| jq '.[] \| select(.status_code >= 400)'` |
-| Response body wrong | `apxy traffic logs show --id <ID> --format markdown` |
-| Compare good vs bad | `apxy traffic logs diff --id-a <GOOD_ID> --id-b <BAD_ID> --scope response` |
-| Mock a broken endpoint | `apxy rules mock add --name stub --url "/api/path" --match wildcard --status 200 --body '{}'` |
-| Replay a failed request | `apxy traffic logs replay --id <ID>` |
-| Export for sharing | `apxy traffic logs export-har --file ./traffic.har` |
-| Frontend blocked, backend not ready | `apxy rules mock add --name <endpoint> --url "/api/path" --match wildcard --status 200 --body '<contract-shape>'` |
+| API returning 4xx/5xx | `apxy logs search --query "host.com" --format json \| jq '.[] \| select(.status_code >= 400)'` |
+| Response body wrong | `apxy logs show --id <ID> --format markdown` |
+| Compare good vs bad | `apxy logs diff --id-a <GOOD_ID> --id-b <BAD_ID> --scope response` |
+| Mock a broken endpoint | `apxy mock add --name stub --url "/api/path" --match wildcard --status 200 --body '{}'` |
+| Replay a failed request | `apxy logs replay --id <ID>` |
+| Export for sharing | `apxy logs export-har --file ./traffic.har` |
+| Frontend blocked, backend not ready | `apxy mock add --name <endpoint> --url "/api/path" --match wildcard --status 200 --body '<contract-shape>'` |
 | Check if deploy broke the API contract | `apxy schema import --name api --file ./openapi.yaml && apxy schema validate-recent --limit 50` |
 | API regression test after refactor | `apxy tools request batch --file ./requests.json --compare-history --time-range 60` |
 
@@ -66,18 +66,18 @@ apxy rules mock add --name "stub" --url "/api/users" --match exact --status 200 
 
 | Symptom | Likely cause | Fix |
 |---------|-------------|-----|
-| `apxy proxy start` fails with "address in use" | Another process on that port | `apxy proxy stop` or use a different `--port` |
-| No traffic captured | SSL domain not enabled or proxy env not set | Run `eval $(apxy proxy env)` and add `--ssl-domains <host>` to `proxy start` |
+| `apxy start` fails with "address in use" | Another process on that port | `apxy stop` or use a different `--port` |
+| No traffic captured | SSL domain not enabled or proxy env not set | Run `eval $(apxy env)` and add `--ssl-domains <host>` to `proxy start` |
 | HTTPS body shows empty/encrypted | Domain not in `--ssl-domains` | Restart proxy with `--ssl-domains <domain>` or `--mitm-all` |
-| Certificate errors in client | APXY CA not trusted | Run `apxy setup certs generate && apxy setup certs trust` |
-| Empty search results | Wrong query term or traffic cleared | Try `apxy traffic logs list --limit 10` to see what's captured |
-| Mock rule not matching | URL pattern or match type mismatch | Check `apxy rules mock list` and verify `--url` pattern and `--match` type |
+| Certificate errors in client | APXY CA not trusted | Run `apxy certs generate && apxy certs trust` |
+| Empty search results | Wrong query term or traffic cleared | Try `apxy logs list --limit 10` to see what's captured |
+| Mock rule not matching | URL pattern or match type mismatch | Check `apxy mock list` and verify `--url` pattern and `--match` type |
 
 ## Tips
 
 - Use `--format toon` to minimize tokens when feeding output to an AI agent
 - Use `--help-format agent` on any command for AI-optimized help output
 - `apxy proxy browser` launches a pre-configured browser — no manual proxy setup needed
-- `apxy setup init` creates a project-scoped `.apxy/` directory for isolated config/data
+- `apxy init` creates a project-scoped `.apxy/` directory for isolated config/data
 - DB commands (logs, mock, sql, schema, request) work without a running proxy
-- Runtime commands (`rules filter`, `rules redirect`, `rules breakpoint`, `rules script`, `rules network`, `rules caching`, `traffic recording`) need `apxy proxy start`
+- Runtime commands (`rules filter`, `rules redirect`, `rules breakpoint`, `rules script`, `rules network`, `rules caching`, `traffic recording`) need `apxy start`

@@ -6,7 +6,7 @@ Build SMS notifications, status callbacks, and message lookups without sending r
 
 ## Scenario
 
-You integrate Twilio's 2010 REST API: create messages, poll message status, and later verify your webhook handler receives Twilio-style `POST` callbacks. Real SMS tests cost money and clutter devices. By intercepting TLS for `api.twilio.com`, you can return `201` creates with a fake `sid`, `200` fetches for `GET .../Messages/{Sid}.json`, and optional mock callbacks to your local server URL (captured as outbound traffic or mocked on the Twilio side if your app calls Twilio-hosted URLs). There is no bundled `mock-templates/twilio/` pack yet; define rules with **`apxy rules mock add`** (or maintain a local `rules.json` and `apxy rules mock import`).
+You integrate Twilio's 2010 REST API: create messages, poll message status, and later verify your webhook handler receives Twilio-style `POST` callbacks. Real SMS tests cost money and clutter devices. By intercepting TLS for `api.twilio.com`, you can return `201` creates with a fake `sid`, `200` fetches for `GET .../Messages/{Sid}.json`, and optional mock callbacks to your local server URL (captured as outbound traffic or mocked on the Twilio side if your app calls Twilio-hosted URLs). There is no bundled `mock-templates/twilio/` pack yet; define rules with **`apxy mock add`** (or maintain a local `rules.json` and `apxy mock import`).
 
 ## Prerequisites
 
@@ -25,7 +25,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.twilio.com
+apxy start --ssl-domains api.twilio.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -55,7 +55,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "Twilio: create message" \
   --url "https://api.twilio.com/2010-04-01/Accounts/*/Messages.json" \
   --match wildcard \
@@ -73,7 +73,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "Twilio: get message" \
   --url "https://api.twilio.com/2010-04-01/Accounts/*/Messages/*.json" \
   --match wildcard \
@@ -91,7 +91,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "Twilio: message create failed" \
   --url "https://api.twilio.com/2010-04-01/Accounts/*/Messages.json" \
   --match wildcard \
@@ -145,8 +145,8 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock list
-apxy rules mock remove --id <RULE_ID>
+apxy mock list
+apxy mock remove --id <RULE_ID>
 ```
 
 ---

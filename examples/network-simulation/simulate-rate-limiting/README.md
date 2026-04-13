@@ -25,7 +25,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.example.com
+apxy start --ssl-domains api.example.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -45,7 +45,7 @@ Traffic to `https://api.example.com` must pass through the proxy. The mock rule 
 **Your agent runs:**
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "example-rate-limit" \
   --url "https://api.example.com/api/*" \
   --match wildcard \
@@ -65,7 +65,7 @@ Header values use the CLI’s `k=v` form (comma-separated pairs). Adjust `X-Rate
 No command is required unless you also want captures:
 
 ```bash
-apxy traffic logs search --query "api.example.com" --limit 20
+apxy logs search --query "api.example.com" --limit 20
 ```
 
 Confirm: your client reads `Retry-After` (seconds or HTTP-date, per spec), backs off, surfaces a toast or inline message, and does not tight-loop.
@@ -79,7 +79,7 @@ Confirm: your client reads `Retry-After` (seconds or HTTP-date, per spec), backs
 **Your agent runs:**
 
 ```bash
-apxy rules mock list
+apxy mock list
 ```
 
 If you need a different window, remove and re-add with new headers or body. To simulate “one more call allowed” alongside a catch-all 429, add a narrower URL rule with a **smaller** `--priority` integer so it wins over the wildcard (in the Web UI: lower number = evaluated first).
@@ -93,14 +93,14 @@ If you need a different window, remove and re-add with new headers or body. To s
 **Your agent runs:**
 
 ```bash
-apxy rules mock list
-apxy rules mock remove --id <MOCK_RULE_ID>
+apxy mock list
+apxy mock remove --id <MOCK_RULE_ID>
 ```
 
 Or clear all mocks in this workspace:
 
 ```bash
-apxy rules mock remove --all
+apxy mock remove --all
 ```
 
 **Tell your agent:**
@@ -154,7 +154,7 @@ Toggle the rule off or delete it, then refresh the app and confirm successful ca
 *[YouTube link -- coming soon]*
 
 - 0:00 — Proxy + SSL for `api.example.com`
-- 1:30 — CLI `apxy rules mock add` with headers and wildcard URL
+- 1:30 — CLI `apxy mock add` with headers and wildcard URL
 - 4:00 — Client behavior: backoff and UI
 - 6:00 — Web UI mock editor and **Traffic**
 - 7:30 — Removing the mock and sanity check with Compose
@@ -165,7 +165,7 @@ Toggle the rule off or delete it, then refresh the app and confirm successful ca
 
 - Faking **429** responses with realistic **Retry-After** and vendor-style rate-limit headers
 - Using **wildcard** URL matching for whole API subtrees (`/api/*`)
-- Attaching response headers via `--headers` on `apxy rules mock add`
+- Attaching response headers via `--headers` on `apxy mock add`
 - Listing and removing mocks so staging behavior does not leak into the next task
 
 ## Next Steps

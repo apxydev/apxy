@@ -47,7 +47,7 @@ apxy version
 ## Step 2: Start the proxy
 
 ```bash
-apxy proxy start
+apxy start
 ```
 
 On macOS, this automatically:
@@ -61,7 +61,7 @@ All traffic on your machine now flows through APXY.
 On Linux, set proxy environment variables manually:
 
 ```bash
-apxy proxy start --no-system-proxy
+apxy start --no-system-proxy
 export http_proxy=http://localhost:8080
 export https_proxy=http://localhost:8080
 ```
@@ -86,13 +86,13 @@ curl https://httpbin.org/get
 
 ```bash
 # List recent traffic
-apxy traffic logs list --limit 10
+apxy logs list --limit 10
 
 # Search for specific requests
-apxy traffic logs search --query "httpbin"
+apxy logs search --query "httpbin"
 
 # View a specific record
-apxy traffic logs show --id <record-id>
+apxy logs show --id <record-id>
 ```
 
 ---
@@ -100,7 +100,7 @@ apxy traffic logs show --id <record-id>
 ## Step 5: Mock an API
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "Mock Users" \
   --url "/api/users" \
   --match exact \
@@ -117,7 +117,7 @@ Now any request to `/api/users` returns your fake response instead of hitting th
 Press `Ctrl+C` in the terminal, or from another terminal:
 
 ```bash
-apxy proxy stop
+apxy stop
 ```
 
 This restores your original network settings automatically.

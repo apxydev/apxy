@@ -1,6 +1,6 @@
 # Replay & Diff -- Verify Fixes, Export, Regression Test
 
-Ensure proxy is running: `apxy proxy status`. Need existing captured traffic (at least 1 record): `apxy traffic logs list --limit 1`.
+Ensure proxy is running: `apxy status`. Need existing captured traffic (at least 1 record): `apxy logs list --limit 1`.
 
 ## Core Loop
 
@@ -17,11 +17,11 @@ capture -> fix code -> replay -> diff -> prove the fix works
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy traffic logs replay` | Replay one captured request against the live upstream | `--id` (record ID), `--port` (default 8080) |
-| `apxy traffic logs diff` | Compare two captured traffic records | `--id-a`, `--id-b`, `--scope` (request\|response\|both) |
-| `apxy traffic logs export-curl` | Export one traffic record as a reusable client snippet | `--id`, `--format` (curl\|fetch\|httpie\|python) |
-| `apxy traffic logs export-har` | Export captured traffic as a HAR 1.2 file | `--file` (path, stdout if omitted), `--limit` (default 10000) |
-| `apxy traffic logs import-har` | Import traffic records from a HAR file | `--file` (HAR file path) |
+| `apxy logs replay` | Replay one captured request against the live upstream | `--id` (record ID), `--port` (default 8080) |
+| `apxy logs diff` | Compare two captured traffic records | `--id-a`, `--id-b`, `--scope` (request\|response\|both) |
+| `apxy logs export-curl` | Export one traffic record as a reusable client snippet | `--id`, `--format` (curl\|fetch\|httpie\|python) |
+| `apxy logs export-har` | Export captured traffic as a HAR 1.2 file | `--file` (path, stdout if omitted), `--limit` (default 10000) |
+| `apxy logs import-har` | Import traffic records from a HAR file | `--file` (HAR file path) |
 | `apxy tools request compose` | Send a one-off HTTP request through the proxy | `--method` (default GET), `--url` (req), `--body`, `--headers` (JSON) |
 | `apxy tools request batch` | Send multiple HTTP requests from a JSON file | `--file` (req), `--compare-history`, `--time-range` (min, default 60), `--timeout` (ms, default 10000), `--format` (json\|markdown\|toon) |
 | `apxy tools request diagnose` | Diagnose endpoints using historical traffic records | `--file` (req), `--time-range` (min, default 60), `--match-mode` (exact\|contains\|prefix), `--format` (json\|markdown\|toon) |
@@ -29,7 +29,7 @@ capture -> fix code -> replay -> diff -> prove the fix works
 ## Export Formats
 
 ```bash
-apxy traffic logs export-curl --id <ID> --format <FORMAT>
+apxy logs export-curl --id <ID> --format <FORMAT>
 ```
 
 | Format | Use Case |
@@ -82,16 +82,16 @@ HAR (HTTP Archive) is the standard format for sharing captured traffic between t
 
 ```bash
 # Export to file
-apxy traffic logs export-har --file ./traffic.har --limit 5000
+apxy logs export-har --file ./traffic.har --limit 5000
 
 # Export to stdout (pipe to other tools)
-apxy traffic logs export-har
+apxy logs export-har
 ```
 
 **Import** loads a HAR file into the current APXY traffic database:
 
 ```bash
-apxy traffic logs import-har --file ./colleague-traffic.har
+apxy logs import-har --file ./colleague-traffic.har
 ```
 
 After import, all records are available for replay, diff, SQL queries, and search -- just like locally captured traffic.
@@ -128,12 +128,12 @@ The `--file` flag for `request batch` and `request diagnose` expects a JSON arra
 
 ### Prove a bug fix before pushing
 
-1. Find the failing record: `apxy traffic logs search --query "api.myapp.com" --format json | jq '.[] | select(.status_code >= 500)'`
+1. Find the failing record: `apxy logs search --query "api.myapp.com" --format json | jq '.[] | select(.status_code >= 500)'`
 2. Note the record ID (e.g., 7).
 3. Fix the code, restart the server.
-4. Replay: `apxy traffic logs replay --id 7` -- note new ID (e.g., 12).
-5. Diff: `apxy traffic logs diff --id-a 7 --id-b 12 --scope response`
-6. Export evidence: `apxy traffic logs export-curl --id 7` and `--id 12` for the PR.
+4. Replay: `apxy logs replay --id 7` -- note new ID (e.g., 12).
+5. Diff: `apxy logs diff --id-a 7 --id-b 12 --scope response`
+6. Export evidence: `apxy logs export-curl --id 7` and `--id 12` for the PR.
 
 ### Regression test before deploy
 
@@ -145,7 +145,7 @@ The `--file` flag for `request batch` and `request diagnose` expects a JSON arra
 
 ### Share a reproducible bug report
 
-1. `apxy traffic logs export-curl --id <ID> --format curl` -- one command anyone can run.
+1. `apxy logs export-curl --id <ID> --format curl` -- one command anyone can run.
 2. Or export as HAR for full context including headers and timing.
 
 ## Tips

@@ -8,7 +8,7 @@ You're building a frontend that calls `/api/users` and `/api/users/:id`. The bac
 
 ## Prerequisites
 
-- APXY installed and proxy running (`apxy proxy start`)
+- APXY installed and proxy running (`apxy start`)
 
 ## Steps
 
@@ -16,7 +16,7 @@ You're building a frontend that calls `/api/users` and `/api/users/:id`. The bac
 
 ```bash
 # Mock the user list endpoint
-apxy rules mock add \
+apxy mock add \
   --name "Mock User List" \
   --url "/api/users" \
   --match exact \
@@ -25,7 +25,7 @@ apxy rules mock add \
   --body '{"users":[{"id":1,"name":"Alice","email":"alice@example.com"},{"id":2,"name":"Bob","email":"bob@example.com"}]}'
 
 # Mock individual user endpoint (regex for any ID)
-apxy rules mock add \
+apxy mock add \
   --name "Mock User Detail" \
   --url "/api/users/\\d+" \
   --match regex \
@@ -34,7 +34,7 @@ apxy rules mock add \
   --body '{"id":1,"name":"Alice","email":"alice@example.com","role":"admin"}'
 
 # Mock creating a user
-apxy rules mock add \
+apxy mock add \
   --name "Mock Create User" \
   --url "/api/users" \
   --match exact \
@@ -46,7 +46,7 @@ apxy rules mock add \
 ### 2. Verify the mocks are active
 
 ```bash
-apxy rules mock list
+apxy mock list
 ```
 
 ### 3. Test the mocked endpoints
@@ -70,7 +70,7 @@ All these requests return your mocked responses, regardless of what the real ser
 
 ```bash
 # Add a mock with 2-second delay
-apxy rules mock add \
+apxy mock add \
   --name "Slow Endpoint" \
   --url "/api/slow-data" \
   --match exact \
@@ -85,10 +85,10 @@ This lets you test loading states and timeout handling in your frontend.
 
 ```bash
 # Remove a specific rule
-apxy rules mock remove --id <rule-id>
+apxy mock remove --id <rule-id>
 
 # Or clear all mocks
-apxy rules mock clear
+apxy mock clear
 ```
 
 ## What you learned

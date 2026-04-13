@@ -25,7 +25,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -51,7 +51,7 @@ Encourage varied query strings and auth states so failures are not all identical
 **Your agent runs:**
 
 ```bash
-apxy traffic sql query "SELECT status_code, COUNT(*) AS count FROM traffic_logs WHERE url LIKE '%/api/search%' GROUP BY status_code ORDER BY count DESC"
+apxy sql query "SELECT status_code, COUNT(*) AS count FROM traffic_logs WHERE url LIKE '%/api/search%' GROUP BY status_code ORDER BY count DESC"
 ```
 
 Agent reports:
@@ -73,7 +73,7 @@ That ratio turns “sometimes” into a metric you can attach to a ticket.
 **Your agent runs:**
 
 ```bash
-apxy traffic sql query "SELECT id, status_code, duration_ms FROM traffic_logs WHERE url LIKE '%/api/search%' AND status_code >= 500 ORDER BY id DESC LIMIT 20"
+apxy sql query "SELECT id, status_code, duration_ms FROM traffic_logs WHERE url LIKE '%/api/search%' AND status_code >= 500 ORDER BY id DESC LIMIT 20"
 ```
 
 Pick one `id` as **FAIL_ID** and find a nearby **200** with similar query params (search `logs` or SQL on `url`).
@@ -87,8 +87,8 @@ Pick one `id` as **FAIL_ID** and find a nearby **200** with similar query params
 **Your agent runs:**
 
 ```bash
-apxy traffic logs show --id <FAIL_ID>
-apxy traffic logs show --id <SUCCESS_ID>
+apxy logs show --id <FAIL_ID>
+apxy logs show --id <SUCCESS_ID>
 ```
 
 Agent compares:
@@ -106,7 +106,7 @@ Agent compares:
 **Your agent runs:**
 
 ```bash
-apxy traffic logs diff --id-a <FAIL_ID> --id-b <SUCCESS_ID> --scope request
+apxy logs diff --id-a <FAIL_ID> --id-b <SUCCESS_ID> --scope request
 ```
 
 If requests match byte-for-byte, the flakiness is likely upstream (load balancer, DB replica lag). If they differ (e.g. `cursor` or `page` param), you may have a data-dependent bug.
@@ -120,7 +120,7 @@ If requests match byte-for-byte, the flakiness is likely upstream (load balancer
 **Your agent runs:**
 
 ```bash
-apxy traffic logs diff --id-a <FAIL_ID> --id-b <SUCCESS_ID> --scope response
+apxy logs diff --id-a <FAIL_ID> --id-b <SUCCESS_ID> --scope response
 ```
 
 Agent surfaces error message fields or empty bodies typical of gateway resets.
@@ -134,7 +134,7 @@ Agent surfaces error message fields or empty bodies typical of gateway resets.
 **Your agent runs:**
 
 ```bash
-apxy traffic logs search-bodies --pattern "upstream" --scope response --limit 10
+apxy logs search-bodies --pattern "upstream" --scope response --limit 10
 ```
 
 Adjust pattern to your stack.
@@ -190,7 +190,7 @@ Go to **Traffic** -> **Stats** (or summary widgets)—distribution of status cod
 
 - Quantifying flakiness with `GROUP BY status_code` on `traffic_logs`
 - Selecting concrete failure rows with SQL (`id`, `duration_ms`)
-- Using `apxy traffic logs diff` to separate “bad request” from “bad infrastructure”
+- Using `apxy logs diff` to separate “bad request” from “bad infrastructure”
 - Optional `search-bodies` to grep captured responses for error tokens
 
 ## Next Steps

@@ -6,7 +6,7 @@ Build a headless storefront against GraphQL on `your-store.myshopify.com` withou
 
 ## Scenario
 
-You query products, run cart mutations, and step through checkout-related fields using Shopify's **Storefront API**. Each request is typically a single `POST` with a JSON body containing `query` and `variables`. For local work you want stable products, carts, and controlled GraphQL errors (`userErrors`, throttling) without Shopify rate limits. There is no bundled `mock-templates/shopify/` yet; use **`apxy rules mock add`** with a wildcard path and optional header conditions to branch scenarios, or split into multiple rules with different body matchers if your APXY build supports them.
+You query products, run cart mutations, and step through checkout-related fields using Shopify's **Storefront API**. Each request is typically a single `POST` with a JSON body containing `query` and `variables`. For local work you want stable products, carts, and controlled GraphQL errors (`userErrors`, throttling) without Shopify rate limits. There is no bundled `mock-templates/shopify/` yet; use **`apxy mock add`** with a wildcard path and optional header conditions to branch scenarios, or split into multiple rules with different body matchers if your APXY build supports them.
 
 ## Prerequisites
 
@@ -25,7 +25,7 @@ Start the proxy with SSL enabled for the domains in this example. Replace `your-
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains your-store.myshopify.com
+apxy start --ssl-domains your-store.myshopify.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -54,7 +54,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "Shopify: products query" \
   --url "https://your-store.myshopify.com/api/2024-01/graphql.json" \
   --match exact \
@@ -74,7 +74,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "Shopify: cartCreate" \
   --url "https://your-store.myshopify.com/api/2024-01/graphql.json" \
   --match exact \
@@ -95,7 +95,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "Shopify: GraphQL throttled" \
   --url "https://your-store.myshopify.com/api/2024-01/graphql.json" \
   --match exact \
@@ -114,7 +114,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "Shopify: cartLinesAdd userErrors" \
   --url "https://your-store.myshopify.com/api/2024-01/graphql.json" \
   --match exact \
@@ -150,7 +150,7 @@ Maintaining many GraphQL branches as separate CLI one-liners gets unwieldy. Crea
 **Your agent runs:**
 
 ```bash
-apxy rules mock import --file rules.json
+apxy mock import --file rules.json
 ```
 
 Align field names with `mock-templates/_template/rules.json` in the APXY repo.
@@ -164,8 +164,8 @@ Align field names with `mock-templates/_template/rules.json` in the APXY repo.
 **Your agent runs:**
 
 ```bash
-apxy rules mock list
-apxy rules mock remove --id <RULE_ID>
+apxy mock list
+apxy mock remove --id <RULE_ID>
 ```
 
 ---

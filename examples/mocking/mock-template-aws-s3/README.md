@@ -6,7 +6,7 @@ Develop upload, download, list, and delete flows against `s3.amazonaws.com` (or 
 
 ## Scenario
 
-Your application uses the S3 REST API: `PUT` objects, `GET` objects, `HEAD` for existence, `DELETE`, and `GET` on the bucket root for list-bucket results. You want deterministic errors such as `NoSuchKey` and `AccessDenied` for unhappy-path tests. There is no official `mock-templates/aws-s3/` bundle in-repo; compose rules with **`apxy rules mock add`** using wildcard URLs for bucket and key segments.
+Your application uses the S3 REST API: `PUT` objects, `GET` objects, `HEAD` for existence, `DELETE`, and `GET` on the bucket root for list-bucket results. You want deterministic errors such as `NoSuchKey` and `AccessDenied` for unhappy-path tests. There is no official `mock-templates/aws-s3/` bundle in-repo; compose rules with **`apxy mock add`** using wildcard URLs for bucket and key segments.
 
 ## Prerequisites
 
@@ -25,7 +25,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains s3.amazonaws.com
+apxy start --ssl-domains s3.amazonaws.com
 ```
 
 If you use **virtual-hosted-style** buckets (`my-bucket.s3.amazonaws.com`), add those hostnames to `--ssl-domains` as well. If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -56,7 +56,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "S3: PUT object success" \
   --url "https://s3.amazonaws.com/my-bucket/*" \
   --match wildcard \
@@ -76,7 +76,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "S3: GET object" \
   --url "https://s3.amazonaws.com/my-bucket/*" \
   --match wildcard \
@@ -96,7 +96,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "S3: NoSuchKey" \
   --url "https://s3.amazonaws.com/my-bucket/*" \
   --match wildcard \
@@ -115,7 +115,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "S3: AccessDenied" \
   --url "https://s3.amazonaws.com/my-bucket/*" \
   --match wildcard \
@@ -134,7 +134,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "S3: list all buckets" \
   --url "https://s3.amazonaws.com/" \
   --match exact \
@@ -152,7 +152,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "S3: HEAD object" \
   --url "https://s3.amazonaws.com/my-bucket/*" \
   --match wildcard \
@@ -160,7 +160,7 @@ apxy rules mock add \
   --status 200 \
   --body ""
 
-apxy rules mock add \
+apxy mock add \
   --name "S3: DELETE object" \
   --url "https://s3.amazonaws.com/my-bucket/*" \
   --match wildcard \
@@ -193,8 +193,8 @@ Signed requests from AWS SDKs still hit the same hostnames—ensure the proxy is
 **Your agent runs:**
 
 ```bash
-apxy rules mock list
-apxy rules mock remove --id <RULE_ID>
+apxy mock list
+apxy mock remove --id <RULE_ID>
 ```
 
 ---

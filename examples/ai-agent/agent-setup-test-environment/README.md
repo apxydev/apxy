@@ -17,7 +17,7 @@ You are starting a feature that depends on **Stripe**, **GitHub**, and **api.mya
 
 ### Plan note
 
-**`apxy rules mock import`** is a **Pro** feature in licensed builds. On **Free**, open the same JSON under **`mock-templates/`** and have your agent create each rule with **`apxy rules mock add --name ... --url ...`** using the URL, method, status, and body from each template entry. **`apxy traffic sql`** (if used for verification) is also **Pro**; use **`apxy traffic logs search`** on Free.
+**`apxy mock import`** is a **Pro** feature in licensed builds. On **Free**, open the same JSON under **`mock-templates/`** and have your agent create each rule with **`apxy mock add --name ... --url ...`** using the URL, method, status, and body from each template entry. **`apxy sql`** (if used for verification) is also **Pro**; use **`apxy logs search`** on Free.
 
 ## Before You Start
 
@@ -30,7 +30,7 @@ Start the proxy with SSL enabled for **all** hostnames this feature will call:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.stripe.com,api.github.com,api.myapp.com
+apxy start --ssl-domains api.stripe.com,api.github.com,api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -41,7 +41,7 @@ Run commands from the **`apxy`** repository root so relative paths like **`mock-
 
 ## Track A: Agent + CLI Workflow
 
-> Order matters: import broad vendor templates first, then add **higher-priority** or more specific internal mocks if needed (see **`apxy rules mock add --priority`**).
+> Order matters: import broad vendor templates first, then add **higher-priority** or more specific internal mocks if needed (see **`apxy mock add --priority`**).
 
 ### Step 1: Confirm proxy and SSL host list
 
@@ -52,10 +52,10 @@ Run commands from the **`apxy`** repository root so relative paths like **`mock-
 **Your agent runs:**
 
 ```bash
-apxy proxy status
+apxy status
 ```
 
-If SSL was not started with all three hosts, restart **`apxy proxy start`** with the comma-separated list from **Before You Start**.
+If SSL was not started with all three hosts, restart **`apxy start`** with the comma-separated list from **Before You Start**.
 
 ### Step 2: Import Stripe template rules
 
@@ -66,7 +66,7 @@ If SSL was not started with all three hosts, restart **`apxy proxy start`** with
 **Your agent runs:**
 
 ```bash
-apxy rules mock import --file mock-templates/stripe/rules.json
+apxy mock import --file mock-templates/stripe/rules.json
 ```
 
 Each imported rule prints a line; the agent notes rule names for later cleanup.
@@ -82,7 +82,7 @@ The repository uses **`github-api`** as the template folder name.
 **Your agent runs:**
 
 ```bash
-apxy rules mock import --file mock-templates/github-api/rules.json
+apxy mock import --file mock-templates/github-api/rules.json
 ```
 
 ### Step 4: Add internal API mocks your feature needs
@@ -96,14 +96,14 @@ Templates rarely know your private routes. Add explicit mocks for **`api.myapp.c
 **Your agent runs:**
 
 ```bash
-apxy rules mock add --name "local-users" \
+apxy mock add --name "local-users" \
   --url "https://api.myapp.com/api/users" \
   --method GET \
   --status 200 \
   --body '{"users":[{"id":"u1","name":"Ada"},{"id":"u2","name":"Bob"}]}'
 ```
 
-Repeat with additional **`apxy rules mock add`** commands for other internal routes (orders, feature flags, etc.) using bodies that match your OpenAPI or fixtures.
+Repeat with additional **`apxy mock add`** commands for other internal routes (orders, feature flags, etc.) using bodies that match your OpenAPI or fixtures.
 
 ### Step 5: List and review mock rules
 
@@ -114,7 +114,7 @@ Repeat with additional **`apxy rules mock add`** commands for other internal rou
 **Your agent runs:**
 
 ```bash
-apxy rules mock list
+apxy mock list
 ```
 
 The agent checks for duplicates, wrong **`--match`** type (exact vs wildcard), and accidental overlaps between Stripe/GitHub templates and your internal URLs.
@@ -134,7 +134,7 @@ curl -x http://127.0.0.1:8080 https://api.stripe.com/v1/customers/cus_mock
 (Adjust path to a route your imported rules actually match.) Then:
 
 ```bash
-apxy traffic logs search --query "stripe"
+apxy logs search --query "stripe"
 ```
 
 ### Step 7: Verify GitHub and internal mocks
@@ -148,14 +148,14 @@ apxy traffic logs search --query "stripe"
 ```bash
 curl -x http://127.0.0.1:8080 https://api.github.com/user
 curl -x http://127.0.0.1:8080 https://api.myapp.com/api/users
-apxy traffic logs search --query "github"
-apxy traffic logs search --query "users"
+apxy logs search --query "github"
+apxy logs search --query "users"
 ```
 
 Optional SQL sanity check when licensed:
 
 ```bash
-apxy traffic sql query "SELECT host, mocked, COUNT(*) FROM traffic_logs GROUP BY host, mocked"
+apxy sql query "SELECT host, mocked, COUNT(*) FROM traffic_logs GROUP BY host, mocked"
 ```
 
 ### Step 8: Document teardown for the team
@@ -167,19 +167,19 @@ apxy traffic sql query "SELECT host, mocked, COUNT(*) FROM traffic_logs GROUP BY
 **Your agent runs:**
 
 ```bash
-apxy rules mock list
+apxy mock list
 ```
 
 Removal is per id:
 
 ```bash
-apxy rules mock remove --id RULE_ID
+apxy mock remove --id RULE_ID
 ```
 
 Or reset everything in a scratch environment:
 
 ```bash
-apxy rules mock clear
+apxy mock clear
 ```
 
 (Use **`clear`** only when you intend to drop **all** mocks.)
@@ -203,10 +203,10 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 ## What You Learned
 
-- How one **`apxy proxy start --ssl-domains`** line terminates TLS for multiple vendors at once
-- How **`apxy rules mock import`** loads curated **`mock-templates`** packs for Stripe and GitHub
-- How **`apxy rules mock add`** fills gaps for private **`api.myapp.com`** contracts
-- How **`apxy rules mock list`**, **`search`**, and **`curl`** through the proxy prove the environment before you write feature code
+- How one **`apxy start --ssl-domains`** line terminates TLS for multiple vendors at once
+- How **`apxy mock import`** loads curated **`mock-templates`** packs for Stripe and GitHub
+- How **`apxy mock add`** fills gaps for private **`api.myapp.com`** contracts
+- How **`apxy mock list`**, **`search`**, and **`curl`** through the proxy prove the environment before you write feature code
 
 ---
 

@@ -6,7 +6,7 @@ You can drive APXY entirely from the CLI or an AI agent -- but the Web UI brings
 
 ## Scenario
 
-You already run `apxy proxy start` and occasionally ask your agent to list logs. You want the full picture: the live traffic stream, how mock and filter rules look in a table editor, redirect rules, the compose panel for ad-hoc requests, side-by-side diffs, SSL settings, and the extras (network simulation, breakpoints, scripts, SQL). After this tour you can choose CLI or UI per task without hunting for features.
+You already run `apxy start` and occasionally ask your agent to list logs. You want the full picture: the live traffic stream, how mock and filter rules look in a table editor, redirect rules, the compose panel for ad-hoc requests, side-by-side diffs, SSL settings, and the extras (network simulation, breakpoints, scripts, SQL). After this tour you can choose CLI or UI per task without hunting for features.
 
 ## Prerequisites
 
@@ -25,7 +25,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains httpbin.org
+apxy start --ssl-domains httpbin.org
 ```
 
 If you haven't set up APXY's CA certificate yet, see
@@ -48,7 +48,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy proxy start --ssl-domains httpbin.org
+apxy start --ssl-domains httpbin.org
 ```
 
 Agent shows:
@@ -67,7 +67,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy traffic logs list --limit 20
+apxy logs list --limit 20
 ```
 
 Agent shows rows with method, URL, status, and duration for each captured request.
@@ -81,7 +81,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock list
+apxy mock list
 ```
 
 Agent shows a table of active mock rules (empty if none have been created yet).
@@ -109,7 +109,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy traffic sql query "SELECT status_code, COUNT(*) AS count FROM traffic_logs GROUP BY status_code ORDER BY count DESC"
+apxy sql query "SELECT status_code, COUNT(*) AS count FROM traffic_logs GROUP BY status_code ORDER BY count DESC"
 ```
 
 Agent shows a table of status codes and their frequencies from captured traffic.
@@ -125,7 +125,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy proxy stop
+apxy stop
 ```
 
 ---
@@ -204,7 +204,7 @@ Go to **Diff**. Pick two captured responses (from **Traffic** or from saved arti
 
 ### Step 11: SSL page -- configured domains
 
-Go to **SSL**. Confirm `httpbin.org` (or your `--ssl-domains` entries) appear in the interception list. This is the same logical state as `apxy proxy start --ssl-domains ...` but editable while running where supported.
+Go to **SSL**. Confirm `httpbin.org` (or your `--ssl-domains` entries) appear in the interception list. This is the same logical state as `apxy start --ssl-domains ...` but editable while running where supported.
 
 > screenshots/11-ssl-domains.png
 
@@ -223,7 +223,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy proxy stop
+apxy stop
 ```
 
 ---

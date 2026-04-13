@@ -19,7 +19,7 @@ You want your AI coding agent to use APXY for HTTP/HTTPS debugging: searching ca
 No proxy is required **only** to verify the binary. For real traffic capture you will still run:
 
 ```bash
-apxy proxy start --ssl-domains api.example.com
+apxy start --ssl-domains api.example.com
 ```
 
 Replace **`api.example.com`** with your actual target domain(s). See [SSL Setup Guide](../../getting-started/ssl-setup-guide/) before intercepting HTTPS.
@@ -89,7 +89,7 @@ The agent should see command groups such as **`proxy`**, **`traffic`**, **`logs`
 
 ### Step 5: Example interaction -- search traffic
 
-After **`apxy proxy start --ssl-domains api.example.com`** and a few requests through the proxy:
+After **`apxy start --ssl-domains api.example.com`** and a few requests through the proxy:
 
 **Tell your agent:**
 
@@ -98,7 +98,7 @@ After **`apxy proxy start --ssl-domains api.example.com`** and a few requests th
 **Your agent runs:**
 
 ```bash
-apxy traffic logs search --query "error"
+apxy logs search --query "error"
 ```
 
 ### Step 6: Example interaction -- inspect one record
@@ -110,7 +110,7 @@ apxy traffic logs search --query "error"
 **Your agent runs:**
 
 ```bash
-apxy traffic logs show --id 3
+apxy logs show --id 3
 ```
 
 ### Step 7: Example interaction -- temporary mock
@@ -122,7 +122,7 @@ apxy traffic logs show --id 3
 **Your agent runs:**
 
 ```bash
-apxy rules mock add --name "skill-demo-health" \
+apxy mock add --name "skill-demo-health" \
   --url "https://api.example.com/health" \
   --method GET \
   --status 200 \
@@ -138,8 +138,8 @@ apxy rules mock add --name "skill-demo-health" \
 **Your agent runs:**
 
 ```bash
-apxy rules mock list
-apxy rules mock remove --id RULE_ID_FROM_LIST
+apxy mock list
+apxy mock remove --id RULE_ID_FROM_LIST
 ```
 
 ### Step 9: Keep the skill version-aligned
@@ -159,7 +159,7 @@ The Web UI is optional for skill setup. After the agent can run CLI commands, op
 Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 - Dropping the skill into Cursor / Claude Code
-- `apxy version` and first `apxy traffic logs search` from natural language
+- `apxy version` and first `apxy logs search` from natural language
 
 ---
 

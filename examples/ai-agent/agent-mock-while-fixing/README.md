@@ -25,7 +25,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -47,7 +47,7 @@ Reproduce the broken call at least once through the proxy so the agent has somet
 **Your agent runs:**
 
 ```bash
-apxy traffic logs search --query "inventory"
+apxy logs search --query "inventory"
 ```
 
 The agent records the traffic **id** of a representative failure (timeout, 500, or wrong shape).
@@ -61,14 +61,14 @@ The agent records the traffic **id** of a representative failure (timeout, 500, 
 **Your agent runs:**
 
 ```bash
-apxy traffic logs show --id 15
+apxy logs show --id 15
 ```
 
 (Replace `15` with the id from Step 1.) Together you decide what the **correct** successful response should look like (for example `{ "items": [...], "updated_at": "..." }`).
 
 ### Step 3: Add a temporary mock rule
 
-APXY creates mocks with **`apxy rules mock add`** (named rule, URL, method, status, body).
+APXY creates mocks with **`apxy mock add`** (named rule, URL, method, status, body).
 
 **Tell your agent:**
 
@@ -77,7 +77,7 @@ APXY creates mocks with **`apxy rules mock add`** (named rule, URL, method, stat
 **Your agent runs:**
 
 ```bash
-apxy rules mock add --name "temp-inventory-unblock" \
+apxy mock add --name "temp-inventory-unblock" \
   --url "https://api.myapp.com/api/inventory" \
   --method GET \
   --status 200 \
@@ -95,7 +95,7 @@ The agent pastes JSON that matches your real schema so UI code does not need hac
 **Your agent runs:**
 
 ```bash
-apxy rules mock list
+apxy mock list
 ```
 
 The agent copies the rule **id** from the list for removal later.
@@ -112,10 +112,10 @@ The agent copies the rule **id** from the list for removal later.
 curl -x http://127.0.0.1:8080 https://api.myapp.com/api/inventory
 ```
 
-(Adjust proxy address/port to match your `apxy proxy start` settings.) Then:
+(Adjust proxy address/port to match your `apxy start` settings.) Then:
 
 ```bash
-apxy traffic logs search --query "inventory"
+apxy logs search --query "inventory"
 ```
 
 The newest row should show success and reflect the canned payload.
@@ -133,7 +133,7 @@ Implement the backend fix, deploy or restart, and tell the agent when the real s
 **Your agent runs:**
 
 ```bash
-apxy rules mock remove --id RULE_ID_FROM_LIST
+apxy mock remove --id RULE_ID_FROM_LIST
 ```
 
 Use the id from Step 4. If multiple temp rules exist, the agent removes by explicit id rather than `--all`.
@@ -148,16 +148,16 @@ Use the id from Step 4. If multiple temp rules exist, the agent removes by expli
 
 ```bash
 curl -x http://127.0.0.1:8080 https://api.myapp.com/api/inventory
-apxy traffic logs search --query "inventory"
+apxy logs search --query "inventory"
 ```
 
-Optionally the agent runs **`apxy traffic logs show --id ...`** on the newest id to prove the response matches production data, not the static mock.
+Optionally the agent runs **`apxy logs show --id ...`** on the newest id to prove the response matches production data, not the static mock.
 
 ---
 
 ## Track B: Web UI Workflow
 
-You can follow along in the Web UI: open the dashboard, use **Traffic** to find `/api/inventory` the same way the agent used `apxy traffic logs search`. The detail panel matches **`apxy traffic logs show`**. Mock rules created on the CLI appear in the rules section of the UI; you can confirm names, URLs, and priority there instead of only running **`apxy rules mock list`**. After your backend fix, disable or delete the rule in the UI if you prefer not to use **`apxy rules mock remove`** from the terminal.
+You can follow along in the Web UI: open the dashboard, use **Traffic** to find `/api/inventory` the same way the agent used `apxy logs search`. The detail panel matches **`apxy logs show`**. Mock rules created on the CLI appear in the rules section of the UI; you can confirm names, URLs, and priority there instead of only running **`apxy mock list`**. After your backend fix, disable or delete the rule in the UI if you prefer not to use **`apxy mock remove`** from the terminal.
 
 ---
 
@@ -172,9 +172,9 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 ## What You Learned
 
-- How **`apxy traffic logs search`** and **`apxy traffic logs show`** ground mocks in real failing traffic
-- How **`apxy rules mock add`** supplies a **named** temporary contract for the frontend
-- How **`apxy rules mock list`** and **`apxy rules mock remove --id`** keep cleanup explicit and safe
+- How **`apxy logs search`** and **`apxy logs show`** ground mocks in real failing traffic
+- How **`apxy mock add`** supplies a **named** temporary contract for the frontend
+- How **`apxy mock list`** and **`apxy mock remove --id`** keep cleanup explicit and safe
 - How to verify behavior end-to-end with a proxied **`curl`** plus a fresh log search
 
 ---

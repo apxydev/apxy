@@ -25,7 +25,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.stripe.com
+apxy start --ssl-domains api.stripe.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -54,7 +54,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock import --file mock-templates/stripe/rules.json
+apxy mock import --file mock-templates/stripe/rules.json
 ```
 
 ### Step 2: Verify rules are loaded
@@ -66,7 +66,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock list
+apxy mock list
 ```
 
 ### Step 3: Create a charge through the proxy
@@ -105,7 +105,7 @@ curl -X POST "https://api.stripe.com/v1/payment_intents/pi_test_123/confirm" \
   -H "X-APXY-Scenario: card_declined"
 ```
 
-The confirm call should return `402` with a Stripe-style `card_error` and `code: card_declined`. To practice an `expired_card`-style response later, duplicate that rule in the template or add a new rule with `apxy rules mock add` and a different scenario header value.
+The confirm call should return `402` with a Stripe-style `card_error` and `code: card_declined`. To practice an `expired_card`-style response later, duplicate that rule in the template or add a new rule with `apxy mock add` and a different scenario header value.
 
 ### Step 5: Fetch a customer
 
@@ -129,11 +129,11 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock list
-apxy rules mock remove --id <RULE_ID>
+apxy mock list
+apxy mock remove --id <RULE_ID>
 ```
 
-Use `apxy rules mock add` with `--header-conditions` when you need new branches (for example a dedicated `expired_card` scenario) without editing JSON on disk.
+Use `apxy mock add` with `--header-conditions` when you need new branches (for example a dedicated `expired_card` scenario) without editing JSON on disk.
 
 ---
 
@@ -165,7 +165,7 @@ Send one normal confirm (no scenario header) and one with `X-APXY-Scenario: card
 
 ### Step 5: Optional — rules overview
 
-If your build exposes mock rules in the UI, locate the Stripe rules and note priorities; otherwise use `apxy rules mock list` in parallel.
+If your build exposes mock rules in the UI, locate the Stripe rules and note priorities; otherwise use `apxy mock list` in parallel.
 
 > screenshots/04-mock-rules-stripe.png
 
@@ -189,7 +189,7 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 ## Next Steps
 
-- Add a custom `apxy rules mock add` rule for `expired_card` or other decline codes
+- Add a custom `apxy mock add` rule for `expired_card` or other decline codes
 - [API Mocking](../../api-mocking/) -- generic mock patterns
 - [Replay and Diff](../../replay-and-diff/) -- capture real Stripe traffic once, then replay against mocks
 - [SSL Setup Guide](../../getting-started/ssl-setup-guide/) -- trust CA on additional machines

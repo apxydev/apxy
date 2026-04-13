@@ -25,7 +25,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -51,7 +51,7 @@ Ensure the browser or client uses the system proxy so POSTs hit APXY.
 **Your agent runs:**
 
 ```bash
-apxy traffic logs graphql --operation-type query --limit 20
+apxy logs graphql --operation-type query --limit 20
 ```
 
 Agent shows rows tying record IDs to operation names and endpoints, for example **GetUser** and **GetDashboard**.
@@ -65,7 +65,7 @@ Agent shows rows tying record IDs to operation names and endpoints, for example 
 **Your agent runs:**
 
 ```bash
-apxy traffic logs graphql --operation-name "GetUser" --limit 10
+apxy logs graphql --operation-name "GetUser" --limit 10
 ```
 
 If your client aliases operations, use the exact name the server sees (check one `show` first).
@@ -79,7 +79,7 @@ If your client aliases operations, use the exact name the server sees (check one
 **Your agent runs:**
 
 ```bash
-apxy traffic logs show --id <ID>
+apxy logs show --id <ID>
 ```
 
 Agent highlights:
@@ -98,7 +98,7 @@ Agent highlights:
 **Your agent runs:**
 
 ```bash
-apxy traffic logs jsonpath --id <ID> --path "data.user.profile" --scope response
+apxy logs jsonpath --id <ID> --path "data.user.profile" --scope response
 ```
 
 Agent prints `null`, `{}`, or the nested object—fast confirmation without scrolling megabytes of JSON.
@@ -112,7 +112,7 @@ Agent prints `null`, `{}`, or the nested object—fast confirmation without scro
 **Your agent runs:**
 
 ```bash
-apxy traffic logs jsonpath --id <ID> --path "variables" --scope request
+apxy logs jsonpath --id <ID> --path "variables" --scope request
 ```
 
 ### Step 7: Capture a mutation path (optional)
@@ -124,7 +124,7 @@ apxy traffic logs jsonpath --id <ID> --path "variables" --scope request
 **Your agent runs:**
 
 ```bash
-apxy traffic logs graphql --operation-type mutation --limit 15
+apxy logs graphql --operation-type mutation --limit 15
 ```
 
 ---
@@ -170,9 +170,9 @@ Open **http://localhost:8082**. Go to **Traffic**. Filter or scan for **POST** t
 
 ## What You Learned
 
-- Using `apxy traffic logs graphql --operation-type` and `--operation-name` to find the right records
-- Reading `query`, `variables`, and `errors` via `apxy traffic logs show`
-- Pulling nested JSON with `apxy traffic logs jsonpath` on `data.*` paths
+- Using `apxy logs graphql --operation-type` and `--operation-name` to find the right records
+- Reading `query`, `variables`, and `errors` via `apxy logs show`
+- Pulling nested JSON with `apxy logs jsonpath` on `data.*` paths
 - Separating “server returned null” from “client never asked for the field”
 
 ## Next Steps

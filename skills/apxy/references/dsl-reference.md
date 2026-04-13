@@ -87,6 +87,6 @@ Used by breakpoint `--match`, script `--match`, and filter `--target`.
 
 | Command | Flag | Default |
 |---------|------|---------|
-| `apxy rules breakpoint add` | `--match` (required) | — |
-| `apxy rules script add` | `--match` | `*` (all traffic) |
-| `apxy rules filter set` | `--target` | — |
+| `apxy breakpoint add` | `--match` (required) | — |
+| `apxy script add` | `--match` | `*` (all traffic) |
+| `apxy filter set` | `--target` | — |

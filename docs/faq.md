@@ -57,7 +57,7 @@ Or manually: `rm $(which apxy) && rm -rf ~/.apxy`
 
 ### Does APXY capture all traffic on my machine?
 
-On macOS, `apxy proxy start` configures the system-wide proxy, so all HTTP/HTTPS traffic flows through APXY. You can skip this with `--no-system-proxy` for manual mode.
+On macOS, `apxy start` configures the system-wide proxy, so all HTTP/HTTPS traffic flows through APXY. You can skip this with `--no-system-proxy` for manual mode.
 
 ### Is HTTPS traffic readable?
 
@@ -65,7 +65,7 @@ APXY generates a local CA certificate and uses it to create leaf certificates on
 
 ### Can I use APXY in CI/CD?
 
-Yes. Run `apxy proxy start --no-system-proxy` and set `http_proxy`/`https_proxy` environment variables. Use `apxy proxy env` for automatic proxy injection.
+Yes. Run `apxy start --no-system-proxy` and set `http_proxy`/`https_proxy` environment variables. Use `apxy env` for automatic proxy injection.
 
 ### How do I use mock templates from this repo?
 
@@ -76,7 +76,7 @@ curl -O https://raw.githubusercontent.com/apxydev/apxy/main/mock-templates/strip
 # Import selected rules. Templates may use response headers and header conditions.
 jq -c '.[]' rules.json | while read -r rule; do
   args=(
-    apxy rules mock add
+    apxy mock add
     --name "$(echo "$rule" | jq -r '.name')"
     --url "$(echo "$rule" | jq -r '.url_pattern')"
     --match "$(echo "$rule" | jq -r '.match_type')"

@@ -25,7 +25,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -45,7 +45,7 @@ Point your browser or API client at traffic that flows through the proxy (system
 **Your agent runs:**
 
 ```bash
-apxy rules network set --latency 200 --bandwidth 384 --packet-loss 1
+apxy network set --latency 200 --bandwidth 384 --packet-loss 1
 ```
 
 Exercise your app: navigation, search, infinite scroll, file upload if relevant. Note where loading feedback is missing, where users might tap twice, and which screens block the whole UI.
@@ -59,7 +59,7 @@ Exercise your app: navigation, search, infinite scroll, file upload if relevant.
 **Your agent runs:**
 
 ```bash
-apxy rules network set --latency 80 --bandwidth 2048 --packet-loss 0
+apxy network set --latency 80 --bandwidth 2048 --packet-loss 0
 ```
 
 Compare the same flows. Some bugs only appear when requests overlap (waterfalls); others show up only under extreme throttling.
@@ -73,7 +73,7 @@ Compare the same flows. Some bugs only appear when requests overlap (waterfalls)
 **Your agent runs:**
 
 ```bash
-apxy rules network set --latency 500 --bandwidth 128 --packet-loss 5
+apxy network set --latency 500 --bandwidth 128 --packet-loss 5
 ```
 
 Watch for hard-coded timeouts, optimistic UI that never reconciles, and error messages that blame the user instead of the network.
@@ -89,7 +89,7 @@ Network simulation in APXY is global for proxied traffic: each `set` replaces th
 **Your agent runs:**
 
 ```bash
-apxy rules network clear
+apxy network clear
 ```
 
 Re-run a critical path once to verify baseline performance and that no client-side state was corrupted during testing.
@@ -98,7 +98,7 @@ Re-run a critical path once to verify baseline performance and that no client-si
 
 ## Track B: Web UI Workflow
 
-Assume the Web UI is served by your proxy (default is often **http://localhost:8082**—use whatever URL your `apxy proxy start` output shows).
+Assume the Web UI is served by your proxy (default is often **http://localhost:8082**—use whatever URL your `apxy start` output shows).
 
 ### Step 1: Open Network controls
 
@@ -133,14 +133,14 @@ Repeat with harsher values (e.g. **500 ms**, **128 kbps**, **5%** loss), then us
 - 0:00 — Start proxy with SSL for `api.myapp.com`
 - 2:00 — CLI: 3G-like `rules network set`, exercise the app
 - 5:00 — Web UI sliders and Traffic view
-- 7:30 — `apxy rules network clear` and sanity check
+- 7:30 — `apxy network clear` and sanity check
 
 ---
 
 ## What You Learned
 
 - Applying **latency**, **bandwidth**, and **packet loss** together to approximate real-world profiles (3G, slow broadband, satellite-ish)
-- Replacing conditions with each `apxy rules network set` and removing them with `apxy rules network clear`
+- Replacing conditions with each `apxy network set` and removing them with `apxy network clear`
 - Spotting UX gaps: skeletons, cancellation, duplicate actions, and timeout copy under stress
 - Correlating simulated conditions with longer rows in **Traffic** timing
 

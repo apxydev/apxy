@@ -25,7 +25,7 @@ Start the proxy with SSL enabled for **both** API hosts used in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains identitytoolkit.googleapis.com,firestore.googleapis.com
+apxy start --ssl-domains identitytoolkit.googleapis.com,firestore.googleapis.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -57,7 +57,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "Firebase: signInWithPassword" \
   --url "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword*" \
   --match wildcard \
@@ -75,7 +75,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "Firebase: signUp" \
   --url "https://identitytoolkit.googleapis.com/v1/accounts:signUp*" \
   --match wildcard \
@@ -93,7 +93,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "Firebase: signUp email exists" \
   --url "https://identitytoolkit.googleapis.com/v1/accounts:signUp*" \
   --match wildcard \
@@ -114,7 +114,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "Firestore: get document" \
   --url "https://firestore.googleapis.com/v1/projects/*/databases/(default)/documents/users/*" \
   --match wildcard \
@@ -134,7 +134,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "Firestore: runQuery" \
   --url "https://firestore.googleapis.com/v1/projects/*/databases/(default)/documents:runQuery*" \
   --match wildcard \
@@ -167,8 +167,8 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock list
-apxy rules mock remove --id <RULE_ID>
+apxy mock list
+apxy mock remove --id <RULE_ID>
 ```
 
 ---
@@ -212,7 +212,7 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 ## What You Learned
 
-- How to list **two** Google API hosts in one `apxy proxy start --ssl-domains` invocation
+- How to list **two** Google API hosts in one `apxy start --ssl-domains` invocation
 - How wildcard URL patterns cover API key query strings on Identity Toolkit
 - How Firestore REST paths include `(default)` and project ids
 - How to layer error scenarios for auth without touching Firebase Console

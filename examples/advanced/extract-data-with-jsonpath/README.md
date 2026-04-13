@@ -25,7 +25,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -34,9 +34,9 @@ If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../get
 
 ## Track A: Agent + CLI Workflow
 
-JSONPath in APXY is primarily a **CLI** feature: you pass a traffic record ID and a path expression (gjson-style paths). The examples below use record ID `k9m8n7p6`—substitute the ID from your own `apxy traffic logs list` or `search`.
+JSONPath in APXY is primarily a **CLI** feature: you pass a traffic record ID and a path expression (gjson-style paths). The examples below use record ID `k9m8n7p6`—substitute the ID from your own `apxy logs list` or `search`.
 
-> **Command prefix:** Use **`apxy traffic logs jsonpath`** (some older notes may say `apxy logs jsonpath`; the `traffic` group is the supported path).
+> **Command prefix:** Use **`apxy logs jsonpath`** (some older notes may say `apxy logs jsonpath`; the `traffic` group is the supported path).
 
 ### Step 1: Capture a request with a large JSON response
 
@@ -47,7 +47,7 @@ JSONPath in APXY is primarily a **CLI** feature: you pass a traffic record ID an
 **Your agent runs:**
 
 ```bash
-apxy traffic logs list --limit 15
+apxy logs list --limit 15
 ```
 
 **Example (abbreviated)**
@@ -67,7 +67,7 @@ k9m8n7p6   GET     /v1/users/me/profile      200
 **Your agent runs:**
 
 ```bash
-apxy traffic logs jsonpath --id k9m8n7p6 --path "display_name" --scope response
+apxy logs jsonpath --id k9m8n7p6 --path "display_name" --scope response
 ```
 
 **Example output**
@@ -85,7 +85,7 @@ apxy traffic logs jsonpath --id k9m8n7p6 --path "display_name" --scope response
 **Your agent runs:**
 
 ```bash
-apxy traffic logs jsonpath --id k9m8n7p6 --path "address.city" --scope response
+apxy logs jsonpath --id k9m8n7p6 --path "address.city" --scope response
 ```
 
 **Example output**
@@ -103,7 +103,7 @@ apxy traffic logs jsonpath --id k9m8n7p6 --path "address.city" --scope response
 **Your agent runs:**
 
 ```bash
-apxy traffic logs jsonpath --id k9m8n7p6 --path "recent_orders.0.product_name" --scope response
+apxy logs jsonpath --id k9m8n7p6 --path "recent_orders.0.product_name" --scope response
 ```
 
 **Example output**
@@ -123,7 +123,7 @@ apxy traffic logs jsonpath --id k9m8n7p6 --path "recent_orders.0.product_name" -
 **Your agent runs:**
 
 ```bash
-apxy traffic logs jsonpath --id k9m8n7p6 --path "cart.items.#.price" --scope response
+apxy logs jsonpath --id k9m8n7p6 --path "cart.items.#.price" --scope response
 ```
 
 **Example output**
@@ -141,8 +141,8 @@ apxy traffic logs jsonpath --id k9m8n7p6 --path "cart.items.#.price" --scope res
 **Your agent runs:**
 
 ```bash
-apxy traffic logs jsonpath --id k9m8n7p6 --path "account_tier" --scope response
-apxy traffic logs jsonpath --id k9m8n7p6 --path "usage.api_calls_this_month" --scope response
+apxy logs jsonpath --id k9m8n7p6 --path "account_tier" --scope response
+apxy logs jsonpath --id k9m8n7p6 --path "usage.api_calls_this_month" --scope response
 ```
 
 **Example output**
@@ -155,7 +155,7 @@ apxy traffic logs jsonpath --id k9m8n7p6 --path "usage.api_calls_this_month" --s
 To read from the **request** body instead (for example posted JSON), set `--scope request`:
 
 ```bash
-apxy traffic logs jsonpath --id k9m8n7p6 --path "filters.query" --scope request
+apxy logs jsonpath --id k9m8n7p6 --path "filters.query" --scope request
 ```
 
 **Example output**
@@ -184,7 +184,7 @@ Open the **Response** tab. Scroll the formatted JSON if needed, or use the **JSO
 
 ### Step 3: Copy the record ID for the agent
 
-Note the record identifier shown in the detail panel (or row). Paste it to your agent with the path you care about so it can run `apxy traffic logs jsonpath` for repeatable, log-friendly output.
+Note the record identifier shown in the detail panel (or row). Paste it to your agent with the path you care about so it can run `apxy logs jsonpath` for repeatable, log-friendly output.
 
 > screenshots/03-record-id-for-cli.png
 
@@ -206,7 +206,7 @@ That keeps large bodies out of chat while preserving exact values for debugging.
 
 ## What You Learned
 
-- Pulling scalar and nested values with **`apxy traffic logs jsonpath`** and **`--scope request|response`**
+- Pulling scalar and nested values with **`apxy logs jsonpath`** and **`--scope request|response`**
 - Addressing array elements with gjson-style paths (`.0`, `.1`, `.#`)
 - Using the Web UI to choose a record, then the CLI for precise, copy-paste extracts
 

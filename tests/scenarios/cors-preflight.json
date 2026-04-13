@@ -23,12 +23,12 @@
     {
       "id": "search-options",
       "description": "Agent searches for OPTIONS/preflight requests",
-      "match": { "command_contains_any": ["apxy traffic logs search", "apxy traffic logs list"] }
+      "match": { "command_contains_any": ["apxy logs search", "apxy logs list"] }
     },
     {
       "id": "inspect-preflight",
       "description": "Agent inspects the preflight response",
-      "match": { "command_contains": "apxy traffic logs show" },
+      "match": { "command_contains": "apxy logs show" },
       "after": "search-options"
     }
   ],

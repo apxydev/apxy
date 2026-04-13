@@ -15,7 +15,7 @@ You are a frontend developer building a user dashboard. The backend team has not
 - AI coding agent with APXY skill installed
 - Optional but recommended: add `127.0.0.1 api.myapp.com` to `/etc/hosts` so your app and `curl` resolve the mock host to your machine through the proxy
 
-**Free tier:** You can have up to **three active** mock rules at once on the Free plan. This walkthrough defines five rules for a complete CRUD story. Either upgrade to Pro for unlimited rules, or keep only the three rules you are actively testing and `apxy rules mock disable` the rest (see Step 7).
+**Free tier:** You can have up to **three active** mock rules at once on the Free plan. This walkthrough defines five rules for a complete CRUD story. Either upgrade to Pro for unlimited rules, or keep only the three rules you are actively testing and `apxy mock disable` the rest (see Step 7).
 
 ## Before You Start
 
@@ -28,7 +28,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -48,7 +48,7 @@ If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../get
 **Your agent runs:**
 
 ```bash
-apxy rules mock add --name "users-list" --url "https://api.myapp.com/api/users" --method GET --match exact --status 200 --delay 200 --priority 10 --body '[{"id":1,"name":"Alice"},{"id":2,"name":"Bob"}]'
+apxy mock add --name "users-list" --url "https://api.myapp.com/api/users" --method GET --match exact --status 200 --delay 200 --priority 10 --body '[{"id":1,"name":"Alice"},{"id":2,"name":"Bob"}]'
 ```
 
 Agent reports something like:
@@ -68,7 +68,7 @@ Use a **wildcard** URL so any numeric id matches. Give this rule a **lower** `--
 **Your agent runs:**
 
 ```bash
-apxy rules mock add --name "users-by-id" --url "https://api.myapp.com/api/users/*" --method GET --match wildcard --status 200 --priority 0 --body '{"id":42,"name":"Carol","email":"carol@example.com"}'
+apxy mock add --name "users-by-id" --url "https://api.myapp.com/api/users/*" --method GET --match wildcard --status 200 --priority 0 --body '{"id":42,"name":"Carol","email":"carol@example.com"}'
 ```
 
 ### Step 3: Mock POST /api/users (create)
@@ -80,7 +80,7 @@ apxy rules mock add --name "users-by-id" --url "https://api.myapp.com/api/users/
 **Your agent runs:**
 
 ```bash
-apxy rules mock add --name "users-create" --url "https://api.myapp.com/api/users" --method POST --match exact --status 201 --body '{"id":99,"name":"New User","email":"new@example.com"}'
+apxy mock add --name "users-create" --url "https://api.myapp.com/api/users" --method POST --match exact --status 201 --body '{"id":99,"name":"New User","email":"new@example.com"}'
 ```
 
 ### Step 4: Mock PUT /api/users/:id
@@ -92,7 +92,7 @@ apxy rules mock add --name "users-create" --url "https://api.myapp.com/api/users
 **Your agent runs:**
 
 ```bash
-apxy rules mock add --name "users-update" --url "https://api.myapp.com/api/users/*" --method PUT --match wildcard --status 200 --body '{"id":42,"name":"Carol Updated","email":"carol@example.com"}'
+apxy mock add --name "users-update" --url "https://api.myapp.com/api/users/*" --method PUT --match wildcard --status 200 --body '{"id":42,"name":"Carol Updated","email":"carol@example.com"}'
 ```
 
 ### Step 5: Mock DELETE /api/users/:id
@@ -104,7 +104,7 @@ apxy rules mock add --name "users-update" --url "https://api.myapp.com/api/users
 **Your agent runs:**
 
 ```bash
-apxy rules mock add --name "users-delete" --url "https://api.myapp.com/api/users/*" --method DELETE --match wildcard --status 204 --body ''
+apxy mock add --name "users-delete" --url "https://api.myapp.com/api/users/*" --method DELETE --match wildcard --status 204 --body ''
 ```
 
 ### Step 6: List rules and hit the API through the proxy
@@ -116,12 +116,12 @@ apxy rules mock add --name "users-delete" --url "https://api.myapp.com/api/users
 **Your agent runs:**
 
 ```bash
-apxy rules mock list
+apxy mock list
 curl -sS "https://api.myapp.com/api/users"
 curl -sS "https://api.myapp.com/api/users/42"
 ```
 
-Agent shows JSON matching your rules and may show traffic in `apxy traffic logs list` if logging is enabled.
+Agent shows JSON matching your rules and may show traffic in `apxy logs list` if logging is enabled.
 
 ### Step 7 (Free tier): Rotate active rules
 
@@ -134,9 +134,9 @@ If you hit the active-rule limit, pause rules you are not testing:
 **Your agent runs:**
 
 ```bash
-apxy rules mock list
-apxy rules mock disable --id <put-rule-id>
-apxy rules mock disable --id <delete-rule-id>
+apxy mock list
+apxy mock disable --id <put-rule-id>
+apxy mock disable --id <delete-rule-id>
 ```
 
 ---
@@ -150,7 +150,7 @@ apxy rules mock disable --id <delete-rule-id>
 Run (or ask your agent):
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 Open **http://localhost:8082**. Confirm the dashboard shows the proxy as running.
@@ -198,7 +198,7 @@ Open **Traffic**, perform requests from your app or from **Compose** if availabl
 In the terminal:
 
 ```bash
-apxy proxy stop
+apxy stop
 ```
 
 ---

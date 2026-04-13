@@ -34,7 +34,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -55,7 +55,7 @@ If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../get
 **Your agent runs:**
 
 ```bash
-apxy traffic logs search --query "checkout 500"
+apxy logs search --query "checkout 500"
 ```
 
 Suppose the ID is `88`.
@@ -67,7 +67,7 @@ Suppose the ID is `88`.
 **Your agent runs:**
 
 ```bash
-apxy traffic logs export-curl --id 88 --format curl > repro-checkout.sh
+apxy logs export-curl --id 88 --format curl > repro-checkout.sh
 ```
 
 Optional: add fetch/Python variants the same way as in the multi-format guide.
@@ -81,13 +81,13 @@ Optional: add fetch/Python variants the same way as in the multi-format guide.
 **Your agent runs:**
 
 ```bash
-apxy rules mock list
+apxy mock list
 ```
 
 For a compact handoff, use markdown or toon format:
 
 ```bash
-apxy rules mock list --format markdown
+apxy mock list --format markdown
 ```
 
 Paste the output under a **Mock rules** section in your bundle doc so reviewers
@@ -140,7 +140,7 @@ up first if needed.
 **Your agent runs:**
 
 ```bash
-apxy traffic logs replay --id 88
+apxy logs replay --id 88
 ```
 
 Add that line to the README for teammates who keep the same SQLite database you

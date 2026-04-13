@@ -109,7 +109,7 @@ Ideas for skill contributions:
 - Keep PRs focused on a single contribution
 - Follow the existing file structure and naming conventions
 - Include a clear description of what you're adding/changing
-- For mock templates: test representative rules with `apxy rules mock add` before submitting
+- For mock templates: test representative rules with `apxy mock add` before submitting
 
 ---
 

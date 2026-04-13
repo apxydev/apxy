@@ -23,7 +23,7 @@ curl -O https://raw.githubusercontent.com/apxydev/apxy/main/mock-templates/strip
 # Import a subset. On the Free plan, keep it to 3 active rules at a time.
 jq -c '.[]' rules.json | while read -r rule; do
   args=(
-    apxy rules mock add
+    apxy mock add
     --name "$(echo "$rule" | jq -r '.name')"
     --url "$(echo "$rule" | jq -r '.url_pattern')"
     --match "$(echo "$rule" | jq -r '.match_type')"
@@ -56,7 +56,7 @@ done
 Browse a template's `rules.json`, pick the rules you need, and add them manually:
 
 ```bash
-apxy rules mock add --name "Mock Stripe Charge" \
+apxy mock add --name "Mock Stripe Charge" \
   --url "https://api.stripe.com/v1/charges" --match exact --method POST \
   --headers "Content-Type=application/json,Request-Id=req_test_123" \
   --status 200 --body '{"id":"ch_test_123","object":"charge","status":"succeeded"}'
@@ -67,7 +67,7 @@ apxy rules mock add --name "Mock Stripe Charge" \
 Some templates include alternate outcomes on the same endpoint by matching a request header:
 
 ```bash
-apxy rules mock add --name "Stripe: Card Declined" \
+apxy mock add --name "Stripe: Card Declined" \
   --url "https://api.stripe.com/v1/payment_intents/*/confirm" \
   --match wildcard --method POST \
   --header-conditions "X-APXY-Scenario=card_declined" \

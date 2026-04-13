@@ -26,7 +26,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -48,7 +48,7 @@ Put this rule at **lower** `--priority` (for example `0`) so APXY tries it befor
 **Your agent runs:**
 
 ```bash
-apxy rules mock add --name "checkout-experiment" --url "https://api.myapp.com/api/checkout" --method GET --match exact --priority 0 --header-conditions "X-Feature-Flag=new-checkout" --status 200 --body '{"layout":"v2","features":["express-pay","one-click"]}'
+apxy mock add --name "checkout-experiment" --url "https://api.myapp.com/api/checkout" --method GET --match exact --priority 0 --header-conditions "X-Feature-Flag=new-checkout" --status 200 --body '{"layout":"v2","features":["express-pay","one-click"]}'
 ```
 
 Agent reports:
@@ -66,7 +66,7 @@ Rule created: checkout-experiment (ID: ...)
 **Your agent runs:**
 
 ```bash
-apxy rules mock add --name "checkout-control" --url "https://api.myapp.com/api/checkout" --method GET --match exact --priority 10 --status 200 --body '{"layout":"v1","features":["standard"]}'
+apxy mock add --name "checkout-control" --url "https://api.myapp.com/api/checkout" --method GET --match exact --priority 10 --status 200 --body '{"layout":"v1","features":["standard"]}'
 ```
 
 ### Step 3: Prove both paths with curl
@@ -92,7 +92,7 @@ Agent shows:
 **Your agent runs:**
 
 ```bash
-apxy rules mock list
+apxy mock list
 ```
 
 Agent finds both rules with their `header_conditions` and priorities visible in JSON output.
@@ -120,7 +120,7 @@ Agent confirms the **v1** body (experiment rule does not match).
 ### Step 1: Start proxy and open UI
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 Browse to **http://localhost:8082**.
@@ -159,7 +159,7 @@ If your Web UI offers **Compose** or a replay tool, send two requests differing 
 ### Step 5: Cleanup
 
 ```bash
-apxy proxy stop
+apxy stop
 ```
 
 ---

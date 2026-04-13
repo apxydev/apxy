@@ -10,10 +10,10 @@ Global flags available on every command: `--config`, `--error-format` (text\|jso
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy proxy start` | Start proxy server | `--port` (8080), `--ssl-domains`, `--mitm-all`, `--bypass-domains`, `--no-system-proxy`, `--upstream-proxy`, `--project-dir`, `--auto-validate`, `--max-body` (1048576), `--web-port`, `--control-port`, `--no-mdns`, `--cert-dir`, `--network-service` |
-| `apxy proxy stop` | Stop running proxy | |
-| `apxy proxy status` | Show proxy status | `--port` (8080), `--format` (json\|toon) |
-| `apxy proxy env` | Print proxy env vars for shell | `--port` (8080), `--lang` (all\|go\|node\|python\|ruby\|curl), `--open`, `--script`, `--bypass-domains`, `--no-cert`, `--cert-dir` |
+| `apxy start` | Start proxy server | `--port` (8080), `--ssl-domains`, `--mitm-all`, `--bypass-domains`, `--no-system-proxy`, `--upstream-proxy`, `--project-dir`, `--auto-validate`, `--max-body` (1048576), `--web-port`, `--control-port`, `--no-mdns`, `--cert-dir`, `--network-service` |
+| `apxy stop` | Stop running proxy | |
+| `apxy status` | Show proxy status | `--port` (8080), `--format` (json\|toon) |
+| `apxy env` | Print proxy env vars for shell | `--port` (8080), `--lang` (all\|go\|node\|python\|ruby\|curl), `--open`, `--script`, `--bypass-domains`, `--no-cert`, `--cert-dir` |
 | `apxy proxy browser` | Launch browser with proxy pre-configured | `--browser` (chrome\|firefox), `--port` (8080), `--cert-dir` |
 
 ---
@@ -22,13 +22,13 @@ Global flags available on every command: `--config`, `--error-format` (text\|jso
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy rules mock add` | Create mock response rule | `--name`, `--url`, `--match` (exact\|wildcard\|regex), `--method`, `--header-conditions`, `--headers`, `--status` (200), `--body`, `--delay` (ms), `--priority`, `--control-url` |
-| `apxy rules mock list` | List mock rules | `--format` (json\|toon), `--quiet`, `--control-url` |
-| `apxy rules mock enable` | Enable a mock rule | `--id` or `--all`, `--dry-run`, `--control-url` |
-| `apxy rules mock disable` | Disable a mock rule | `--id` or `--all`, `--dry-run`, `--control-url` |
-| `apxy rules mock remove` | Remove a mock rule | `--id` or `--all`, `--dry-run`, `--control-url` |
-| `apxy rules mock clear` | Delete all mock rules | `--dry-run`, `--control-url` |
-| `apxy rules mock import` | Import mock rules from JSON template | `--file`, `--control-url` |
+| `apxy mock add` | Create mock response rule | `--name`, `--url`, `--match` (exact\|wildcard\|regex), `--method`, `--header-conditions`, `--headers`, `--status` (200), `--body`, `--delay` (ms), `--priority`, `--control-url` |
+| `apxy mock list` | List mock rules | `--format` (json\|toon), `--quiet`, `--control-url` |
+| `apxy mock enable` | Enable a mock rule | `--id` or `--all`, `--dry-run`, `--control-url` |
+| `apxy mock disable` | Disable a mock rule | `--id` or `--all`, `--dry-run`, `--control-url` |
+| `apxy mock remove` | Remove a mock rule | `--id` or `--all`, `--dry-run`, `--control-url` |
+| `apxy mock clear` | Delete all mock rules | `--dry-run`, `--control-url` |
+| `apxy mock import` | Import mock rules from JSON template | `--file`, `--control-url` |
 
 ---
 
@@ -36,9 +36,9 @@ Global flags available on every command: `--config`, `--error-format` (text\|jso
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy rules redirect set` | Add URL rewrite rule | `--name`, `--from` (source pattern), `--to` (destination), `--match` (exact\|wildcard\|regex), `--control-url` |
-| `apxy rules redirect list` | List redirect rules | `--format` (json\|toon), `--quiet`, `--control-url` |
-| `apxy rules redirect remove` | Remove redirect rule | `--id` or `--all`, `--dry-run`, `--control-url` |
+| `apxy rewrite set` | Add URL rewrite rule | `--name`, `--from` (source pattern), `--to` (destination), `--match` (exact\|wildcard\|regex), `--control-url` |
+| `apxy rewrite list` | List redirect rules | `--format` (json\|toon), `--quiet`, `--control-url` |
+| `apxy rewrite remove` | Remove redirect rule | `--id` or `--all`, `--dry-run`, `--control-url` |
 
 ---
 
@@ -46,13 +46,13 @@ Global flags available on every command: `--config`, `--error-format` (text\|jso
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy rules breakpoint add` | Add breakpoint rule | `--name` (req), `--match` (DSL, req), `--phase` (request\|response\|both), `--timeout` (30000ms), `--control-url` |
-| `apxy rules breakpoint list` | List breakpoint rules | `--format` (json\|toon), `--quiet`, `--control-url` |
-| `apxy rules breakpoint enable` | Enable breakpoint | `--id` or `--all`, `--dry-run`, `--control-url` |
-| `apxy rules breakpoint disable` | Disable breakpoint | `--id` or `--all`, `--dry-run`, `--control-url` |
-| `apxy rules breakpoint remove` | Remove breakpoint | `--id` or `--all`, `--dry-run`, `--control-url` |
-| `apxy rules breakpoint pending` | List paused requests | `--quiet`, `--control-url` |
-| `apxy rules breakpoint resolve` | Resume paused request | `--id` (req), `--status`, `--headers` (JSON), `--body`, `--drop`, `--dry-run`, `--control-url` |
+| `apxy breakpoint add` | Add breakpoint rule | `--name` (req), `--match` (DSL, req), `--phase` (request\|response\|both), `--timeout` (30000ms), `--control-url` |
+| `apxy breakpoint list` | List breakpoint rules | `--format` (json\|toon), `--quiet`, `--control-url` |
+| `apxy breakpoint enable` | Enable breakpoint | `--id` or `--all`, `--dry-run`, `--control-url` |
+| `apxy breakpoint disable` | Disable breakpoint | `--id` or `--all`, `--dry-run`, `--control-url` |
+| `apxy breakpoint remove` | Remove breakpoint | `--id` or `--all`, `--dry-run`, `--control-url` |
+| `apxy breakpoint pending` | List paused requests | `--quiet`, `--control-url` |
+| `apxy breakpoint resolve` | Resume paused request | `--id` (req), `--status`, `--headers` (JSON), `--body`, `--drop`, `--dry-run`, `--control-url` |
 
 ---
 
@@ -60,11 +60,11 @@ Global flags available on every command: `--config`, `--error-format` (text\|jso
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy rules script add` | Add JS proxy script | `--name` (req), `--file` or `--code` (one req), `--hook` (onRequest\|onResponse), `--match` (DSL, default: *), `--control-url` |
-| `apxy rules script list` | List scripts | `--format` (json\|toon), `--quiet`, `--control-url` |
-| `apxy rules script enable` | Enable script | `--id` or `--all`, `--dry-run`, `--control-url` |
-| `apxy rules script disable` | Disable script | `--id` or `--all`, `--dry-run`, `--control-url` |
-| `apxy rules script remove` | Remove script | `--id` or `--all`, `--dry-run`, `--control-url` |
+| `apxy script add` | Add JS proxy script | `--name` (req), `--file` or `--code` (one req), `--hook` (onRequest\|onResponse), `--match` (DSL, default: *), `--control-url` |
+| `apxy script list` | List scripts | `--format` (json\|toon), `--quiet`, `--control-url` |
+| `apxy script enable` | Enable script | `--id` or `--all`, `--dry-run`, `--control-url` |
+| `apxy script disable` | Disable script | `--id` or `--all`, `--dry-run`, `--control-url` |
+| `apxy script remove` | Remove script | `--id` or `--all`, `--dry-run`, `--control-url` |
 
 ---
 
@@ -72,8 +72,8 @@ Global flags available on every command: `--config`, `--error-format` (text\|jso
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy rules network set` | Simulate network conditions | `--latency` (ms), `--bandwidth` (kbps), `--packet-loss` (0-100%), `--control-url` |
-| `apxy rules network clear` | Clear simulated conditions | `--dry-run`, `--control-url` |
+| `apxy network set` | Simulate network conditions | `--latency` (ms), `--bandwidth` (kbps), `--packet-loss` (0-100%), `--control-url` |
+| `apxy network clear` | Clear simulated conditions | `--dry-run`, `--control-url` |
 
 ---
 
@@ -81,8 +81,8 @@ Global flags available on every command: `--config`, `--error-format` (text\|jso
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy rules caching disable-cache` | Strip cache headers from proxied requests | `--host` (empty = all hosts), `--control-url` |
-| `apxy rules caching enable-cache` | Restore normal upstream caching | `--control-url` |
+| `apxy caching disable-cache` | Strip cache headers from proxied requests | `--host` (empty = all hosts), `--control-url` |
+| `apxy caching enable-cache` | Restore normal upstream caching | `--control-url` |
 
 ---
 
@@ -90,9 +90,9 @@ Global flags available on every command: `--config`, `--error-format` (text\|jso
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy rules filter set` | Add block/allow filter rule | `--type` (block\|allow), `--target` (domain pattern), `--control-url` |
-| `apxy rules filter list` | List filter rules | `--format` (json\|toon), `--quiet`, `--control-url` |
-| `apxy rules filter remove` | Remove filter rule | `--id` or `--all`, `--dry-run`, `--control-url` |
+| `apxy filter set` | Add block/allow filter rule | `--type` (block\|allow), `--target` (domain pattern), `--control-url` |
+| `apxy filter list` | List filter rules | `--format` (json\|toon), `--quiet`, `--control-url` |
+| `apxy filter remove` | Remove filter rule | `--id` or `--all`, `--dry-run`, `--control-url` |
 
 ---
 
@@ -100,23 +100,23 @@ Global flags available on every command: `--config`, `--error-format` (text\|jso
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy traffic logs list` | List captured traffic records | `--limit` (50), `--offset`, `--format` (json\|markdown\|toon), `--quiet` |
-| `apxy traffic logs show` | Show one record in detail | `--id` (req), `--format` (json\|markdown\|toon) |
-| `apxy traffic logs search` | Search by URL/host/method | `--query`, `--limit` (20), `--format` (json\|markdown\|toon), `--quiet` |
-| `apxy traffic logs search-bodies` | Full-text body search | `--pattern`, `--scope` (request\|response\|both), `--limit` (20), `--format` (json\|markdown\|toon) |
-| `apxy traffic logs graphql` | Search GraphQL operations | `--operation-name`, `--operation-type` (query\|mutation\|subscription), `--limit` (20), `--format` (json\|markdown\|toon) |
-| `apxy traffic logs jsonpath` | Extract JSON via gjson path | `--id`, `--path` (gjson expression), `--scope` (request\|response) |
-| `apxy traffic logs diff` | Compare two traffic records | `--id-a`, `--id-b`, `--scope` (request\|response\|both) |
-| `apxy traffic logs label` | Label a traffic record | `--id` (req), `--color` (red\|green\|blue\|yellow\|purple), `--comment` |
-| `apxy traffic logs replay` | Replay captured request | `--id`, `--port` (8080) |
-| `apxy traffic logs export-curl` | Export as client snippet | `--id`, `--format` (curl\|fetch\|httpie\|python) |
-| `apxy traffic logs export-har` | Export traffic as HAR 1.2 | `--file`, `--limit` (10000) |
-| `apxy traffic logs import-har` | Import from HAR file | `--file` (req) |
-| `apxy traffic logs tail` | Live-tail traffic from a running instance | `--format` (text\|json), `--host`, `--port`, `--sse` |
-| `apxy traffic logs sse-events` | List parsed SSE events for a traffic record | `--id`, `--limit`, `--format` (text\|json) |
-| `apxy traffic logs sse-merge` | Merge AI streaming SSE events into one response | `--id`, `--format` (text\|json) |
-| `apxy traffic logs stats` | Show traffic statistics | `--format` (json\|toon) |
-| `apxy traffic logs clear` | Delete all traffic records | `--dry-run` |
+| `apxy logs list` | List captured traffic records | `--limit` (50), `--offset`, `--format` (json\|markdown\|toon), `--quiet` |
+| `apxy logs show` | Show one record in detail | `--id` (req), `--format` (json\|markdown\|toon) |
+| `apxy logs search` | Search by URL/host/method | `--query`, `--limit` (20), `--format` (json\|markdown\|toon), `--quiet` |
+| `apxy logs search-bodies` | Full-text body search | `--pattern`, `--scope` (request\|response\|both), `--limit` (20), `--format` (json\|markdown\|toon) |
+| `apxy logs graphql` | Search GraphQL operations | `--operation-name`, `--operation-type` (query\|mutation\|subscription), `--limit` (20), `--format` (json\|markdown\|toon) |
+| `apxy logs jsonpath` | Extract JSON via gjson path | `--id`, `--path` (gjson expression), `--scope` (request\|response) |
+| `apxy logs diff` | Compare two traffic records | `--id-a`, `--id-b`, `--scope` (request\|response\|both) |
+| `apxy logs label` | Label a traffic record | `--id` (req), `--color` (red\|green\|blue\|yellow\|purple), `--comment` |
+| `apxy logs replay` | Replay captured request | `--id`, `--port` (8080) |
+| `apxy logs export-curl` | Export as client snippet | `--id`, `--format` (curl\|fetch\|httpie\|python) |
+| `apxy logs export-har` | Export traffic as HAR 1.2 | `--file`, `--limit` (10000) |
+| `apxy logs import-har` | Import from HAR file | `--file` (req) |
+| `apxy logs tail` | Live-tail traffic from a running instance | `--format` (text\|json), `--host`, `--port`, `--sse` |
+| `apxy logs sse-events` | List parsed SSE events for a traffic record | `--id`, `--limit`, `--format` (text\|json) |
+| `apxy logs sse-merge` | Merge AI streaming SSE events into one response | `--id`, `--format` (text\|json) |
+| `apxy logs stats` | Show traffic statistics | `--format` (json\|toon) |
+| `apxy logs clear` | Delete all traffic records | `--dry-run` |
 
 ---
 
@@ -124,10 +124,10 @@ Global flags available on every command: `--config`, `--error-format` (text\|jso
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy traffic recording start` | Start traffic capture | `--control-url` |
-| `apxy traffic recording stop` | Stop traffic capture | `--control-url` |
+| `apxy recording start` | Start traffic capture | `--control-url` |
+| `apxy recording stop` | Stop traffic capture | `--control-url` |
 | `apxy traffic devices list` | List connected devices | `--format` (json\|markdown\|toon), `--mobile`, `--quiet`, `--web-url` |
-| `apxy traffic sql query "<SQL>"` | Run read-only SQL query | Tables: `traffic_logs`, `mock_rules` |
+| `apxy sql query "<SQL>"` | Run read-only SQL query | Tables: `traffic_logs`, `mock_rules` |
 
 ---
 
@@ -148,18 +148,18 @@ Global flags available on every command: `--config`, `--error-format` (text\|jso
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy setup init` | Init project workspace | Creates `.apxy/` directory |
-| `apxy setup certs generate` | Generate root CA certificate | `--cert-dir` |
-| `apxy setup certs info` | Show CA certificate details | `--cert-dir` |
-| `apxy setup certs trust` | Trust CA in system keychain | `--cert-dir` |
-| `apxy setup certs custom add` | Add custom CA for domain | `--domain` (req), `--cert` (req), `--key` (req), `--label`, `--no-trust`, `--cert-dir`, `--control-url` |
-| `apxy setup certs custom list` | List custom CAs | `--format` (json\|toon), `--quiet`, `--cert-dir`, `--control-url` |
-| `apxy setup certs custom info` | Show custom CA details | `--domain` (req), `--cert-dir`, `--control-url` |
-| `apxy setup certs custom remove` | Remove custom CA | `--domain` or `--all`, `--dry-run`, `--cert-dir`, `--control-url` |
-| `apxy setup certs custom trust` | Trust custom CA in keychain | `--domain` (req), `--cert-dir`, `--control-url` |
-| `apxy setup ssl enable` | Enable HTTPS interception | `--domain` (req), `--control-url` |
-| `apxy setup ssl disable` | Disable HTTPS interception | `--domain` or `--all`, `--dry-run`, `--control-url` |
-| `apxy setup ssl list` | List SSL-enabled domains | `--format` (json\|toon), `--quiet`, `--control-url` |
+| `apxy init` | Init project workspace | Creates `.apxy/` directory |
+| `apxy certs generate` | Generate root CA certificate | `--cert-dir` |
+| `apxy certs info` | Show CA certificate details | `--cert-dir` |
+| `apxy certs trust` | Trust CA in system keychain | `--cert-dir` |
+| `apxy certs custom add` | Add custom CA for domain | `--domain` (req), `--cert` (req), `--key` (req), `--label`, `--no-trust`, `--cert-dir`, `--control-url` |
+| `apxy certs custom list` | List custom CAs | `--format` (json\|toon), `--quiet`, `--cert-dir`, `--control-url` |
+| `apxy certs custom info` | Show custom CA details | `--domain` (req), `--cert-dir`, `--control-url` |
+| `apxy certs custom remove` | Remove custom CA | `--domain` or `--all`, `--dry-run`, `--cert-dir`, `--control-url` |
+| `apxy certs custom trust` | Trust custom CA in keychain | `--domain` (req), `--cert-dir`, `--control-url` |
+| `apxy ssl enable` | Enable HTTPS interception | `--domain` (req), `--control-url` |
+| `apxy ssl disable` | Disable HTTPS interception | `--domain` or `--all`, `--dry-run`, `--control-url` |
+| `apxy ssl list` | List SSL-enabled domains | `--format` (json\|toon), `--quiet`, `--control-url` |
 | `apxy setup mobile setup` | Mobile device setup guide | `--platform` (ios\|android), `--port`, `--qr` |
 | `apxy setup settings export` | Export settings to JSON | `--file`, `--control-url` |
 | `apxy setup settings import` | Import settings from JSON | `--file` (req), `--dry-run`, `--control-url` |
@@ -196,7 +196,7 @@ Global flags available on every command: `--config`, `--error-format` (text\|jso
 
 ## SQL Schema Reference
 
-The `apxy traffic sql query` command supports read-only SELECT queries against these tables:
+The `apxy sql query` command supports read-only SELECT queries against these tables:
 
 **traffic_logs**: `id`, `timestamp`, `method`, `url`, `host`, `path`, `status_code`, `duration_ms`, `tls`, `mocked`, request/response headers and bodies.
 

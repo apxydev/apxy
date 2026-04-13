@@ -25,7 +25,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.github.com
+apxy start --ssl-domains api.github.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -55,7 +55,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock import --file mock-templates/github-api/rules.json
+apxy mock import --file mock-templates/github-api/rules.json
 ```
 
 ### Step 2: Confirm rules loaded
@@ -67,7 +67,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock list
+apxy mock list
 ```
 
 ### Step 3: Look up a user
@@ -138,8 +138,8 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock list
-apxy rules mock remove --id <RULE_ID>
+apxy mock list
+apxy mock remove --id <RULE_ID>
 ```
 
 ---
@@ -190,7 +190,7 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 ## Next Steps
 
-- Add rules for GraphQL or enterprise endpoints with `apxy rules mock add`
+- Add rules for GraphQL or enterprise endpoints with `apxy mock add`
 - [SSL Setup Guide](../../getting-started/ssl-setup-guide/) -- trust CA on additional machines
 - [API Mocking](../../api-mocking/) -- baseline mock concepts
 - [Replay and Diff](../../replay-and-diff/) -- diff mock vs captured real GitHub traffic

@@ -21,13 +21,13 @@ Mock rules for the [Stripe API](https://stripe.com/docs/api).
 
 ```bash
 # Add the default create-charge rule
-apxy rules mock add --name "Stripe: Create Charge" \
+apxy mock add --name "Stripe: Create Charge" \
   --url "https://api.stripe.com/v1/charges" --match exact --method POST \
   --headers "Content-Type=application/json,Request-Id=req_test_stripe_charge" \
   --status 200 --body '{"id":"ch_test_123","object":"charge","amount":2000,"currency":"usd","status":"succeeded"}'
 
 # Add a scenario rule for declined cards
-apxy rules mock add --name "Stripe: Confirm Payment Intent (Card Declined)" \
+apxy mock add --name "Stripe: Confirm Payment Intent (Card Declined)" \
   --url "https://api.stripe.com/v1/payment_intents/*/confirm" \
   --match wildcard --method POST \
   --header-conditions "X-APXY-Scenario=card_declined" \

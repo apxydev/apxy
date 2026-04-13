@@ -25,7 +25,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -51,7 +51,7 @@ For local dev, common patterns include `stripe listen --forward-to https://api.m
 **Your agent runs:**
 
 ```bash
-apxy traffic logs search --query "webhook"
+apxy logs search --query "webhook"
 ```
 
 Agent finds rows such as:
@@ -71,7 +71,7 @@ ID    METHOD   URL                                           STATUS
 **Your agent runs:**
 
 ```bash
-apxy traffic logs show --id 55
+apxy logs show --id 55
 ```
 
 Agent reports:
@@ -110,7 +110,7 @@ Agent prints the new status—expect **200** after the fix.
 **Your agent runs:**
 
 ```bash
-apxy traffic logs diff --id-a 55 --id-b 54 --scope request
+apxy logs diff --id-a 55 --id-b 54 --scope request
 ```
 
 Then optionally `--scope response` to see how error payloads differ.
@@ -119,7 +119,7 @@ Agent highlights header or body differences (e.g. missing `customer` expansion, 
 
 ### Step 6: Re-run provider delivery
 
-After deploying, trigger “Resend” from the provider UI or CLI and confirm a new row shows **200** in `apxy traffic logs search --query "webhook"`.
+After deploying, trigger “Resend” from the provider UI or CLI and confirm a new row shows **200** in `apxy logs search --query "webhook"`.
 
 ---
 
@@ -169,10 +169,10 @@ Go to **Compose** -> POST a test body after fixes; confirm new row is **200**.
 
 ## What You Learned
 
-- Using `apxy traffic logs search --query "webhook"` to isolate integration traffic
-- Reading provider headers and JSON bodies with `apxy traffic logs show`
+- Using `apxy logs search --query "webhook"` to isolate integration traffic
+- Reading provider headers and JSON bodies with `apxy logs show`
 - Reproducing failures with `apxy tools request compose` (with test credentials)
-- Using `apxy traffic logs diff` to contrast failing vs succeeding deliveries
+- Using `apxy logs diff` to contrast failing vs succeeding deliveries
 
 ## Next Steps
 

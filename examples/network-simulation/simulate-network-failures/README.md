@@ -25,7 +25,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -45,7 +45,7 @@ Use **network** rules for transport-level chaos and **mock** rules for determini
 **Your agent runs:**
 
 ```bash
-apxy rules network set --packet-loss 50
+apxy network set --packet-loss 50
 ```
 
 Drive flows that depend on multiple parallel calls (dashboards, checkout). Expect intermittent failures, partial loads, and race conditions between retries. Note whether your UI surfaces “try again” vs. silent failure.
@@ -59,14 +59,14 @@ Drive flows that depend on multiple parallel calls (dashboards, checkout). Expec
 **Your agent runs:**
 
 ```bash
-apxy rules mock add --name "health-503" --url "https://api.myapp.com/api/health" --status 503 --body '{"error":"service_unavailable"}'
+apxy mock add --name "health-503" --url "https://api.myapp.com/api/health" --status 503 --body '{"error":"service_unavailable"}'
 ```
 
 Confirm the client treats 503 differently from 404/401, respects any backoff, and does not cache the error as success. List or remove mocks when finished:
 
 ```bash
-apxy rules mock list
-apxy rules mock remove --id <MOCK_RULE_ID>
+apxy mock list
+apxy mock remove --id <MOCK_RULE_ID>
 ```
 
 ### Step 3: Simulate extreme latency (timeout pressure)
@@ -78,13 +78,13 @@ apxy rules mock remove --id <MOCK_RULE_ID>
 **Your agent runs:**
 
 ```bash
-apxy rules network set --latency 30000
+apxy network set --latency 30000
 ```
 
 This does not guarantee your HTTP client will wait exactly 30 seconds; stacks differ. The goal is to force **your** configured timeouts to trigger. After the exercise, clear simulation:
 
 ```bash
-apxy rules network clear
+apxy network clear
 ```
 
 ### Step 4: Combine failure modes carefully
@@ -96,15 +96,15 @@ apxy rules network clear
 **Your agent runs:**
 
 ```bash
-apxy rules network set --packet-loss 20 --latency 100
-apxy rules mock add --name "health-503" --url "https://api.myapp.com/api/health" --status 503 --body '{"error":"service_unavailable"}'
+apxy network set --packet-loss 20 --latency 100
+apxy mock add --name "health-503" --url "https://api.myapp.com/api/health" --status 503 --body '{"error":"service_unavailable"}'
 ```
 
 Document what you observed, then tear down:
 
 ```bash
-apxy rules mock remove --all
-apxy rules network clear
+apxy mock remove --all
+apxy network clear
 ```
 
 ### Step 5: Verify retry behavior explicitly
@@ -116,7 +116,7 @@ apxy rules network clear
 **Your agent runs:**
 
 ```bash
-apxy rules network clear
+apxy network clear
 apxy tools request compose --method GET --url "https://api.myapp.com/api/health"
 ```
 
@@ -164,10 +164,10 @@ Disable or delete the mock rule. Reset **Network** sliders or use **clear** so t
 
 ## What You Learned
 
-- Using `apxy rules network set` with **packet loss** and **latency** to stress transport behavior
-- Returning precise **503** bodies with `apxy rules mock add` for API-level failure injection
-- Listing and removing mock rules with `apxy rules mock list` / `apxy rules mock remove`
-- Resetting global simulation with `apxy rules network clear` so you do not pollute the next debugging session
+- Using `apxy network set` with **packet loss** and **latency** to stress transport behavior
+- Returning precise **503** bodies with `apxy mock add` for API-level failure injection
+- Listing and removing mock rules with `apxy mock list` / `apxy mock remove`
+- Resetting global simulation with `apxy network clear` so you do not pollute the next debugging session
 
 ## Next Steps
 

@@ -12,7 +12,7 @@ Mock rules for **[API Name]** ([link to API docs]).
 ## Usage
 
 ```bash
-apxy rules mock add --name "List examples" \
+apxy mock add --name "List examples" \
   --url "https://api.example.com/v1/example*" --match wildcard --method GET \
   --headers "Content-Type=application/json" \
   --status 200 --body '{"object":"list","data":[],"has_more":false}'

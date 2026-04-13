@@ -28,7 +28,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -39,7 +39,7 @@ Point your client (browser, mobile simulator, or API client) at the proxy so HTT
 
 ## Track A: Agent + CLI Workflow
 
-Breakpoints are created with `apxy rules breakpoint add` (a name and match expression are required). The match DSL supports expressions like `path contains "/api/orders"` combined with host checks.
+Breakpoints are created with `apxy breakpoint add` (a name and match expression are required). The match DSL supports expressions like `path contains "/api/orders"` combined with host checks.
 
 ### Step 1: Add a request-phase breakpoint
 
@@ -50,7 +50,7 @@ Breakpoints are created with `apxy rules breakpoint add` (a name and match expre
 **Your agent runs:**
 
 ```bash
-apxy rules breakpoint add \
+apxy breakpoint add \
   --name "orders-inspect" \
   --match 'host == "api.myapp.com" && path contains "/api/orders"' \
   --phase request \
@@ -84,7 +84,7 @@ curl -x http://127.0.0.1:8080 -X POST "https://api.myapp.com/api/orders" \
 **Your agent runs:**
 
 ```bash
-apxy rules breakpoint pending
+apxy breakpoint pending
 ```
 
 Note the **pending** id (not the rule id from `breakpoint list`). You need this for `resolve`.
@@ -98,7 +98,7 @@ Note the **pending** id (not the rule id from `breakpoint list`). You need this 
 Use Web UI (recommended) or ask the agent to open the breakpoint inspector modal. From the CLI alone you rely on `pending` JSON plus **Traffic** / log views for the frozen snapshot—if your build surfaces request bodies there, use:
 
 ```bash
-apxy traffic logs show --id LOG_ID
+apxy logs show --id LOG_ID
 ```
 
 …after identifying `LOG_ID` from the pending payload or Traffic tab.
@@ -116,17 +116,17 @@ If you are only **resuming without edits** after visual inspection:
 **Your agent runs:**
 
 ```bash
-apxy rules breakpoint resolve --id PENDING_ID
+apxy breakpoint resolve --id PENDING_ID
 ```
 
 When the product supports applying header overrides from CLI for paused **requests**, your agent may instead run:
 
 ```bash
-apxy rules breakpoint resolve --id PENDING_ID \
+apxy breakpoint resolve --id PENDING_ID \
   --headers '{"Authorization":"Bearer <token>","Content-Type":"application/json"}'
 ```
 
-Consult `apxy rules breakpoint resolve --help` for your version’s exact flags; response-phase breakpoints use `--status` / `--body` for synthetic responses.
+Consult `apxy breakpoint resolve --help` for your version’s exact flags; response-phase breakpoints use `--status` / `--body` for synthetic responses.
 
 ### Step 6: Verify the server response
 
@@ -137,7 +137,7 @@ Consult `apxy rules breakpoint resolve --help` for your version’s exact flags;
 **Your agent runs:**
 
 ```bash
-apxy traffic logs search --query "/api/orders" --limit 5
+apxy logs search --query "/api/orders" --limit 5
 ```
 
 ### Step 7: Remove or disable the breakpoint
@@ -149,8 +149,8 @@ apxy traffic logs search --query "/api/orders" --limit 5
 **Your agent runs:**
 
 ```bash
-apxy rules breakpoint list
-apxy rules breakpoint remove --id RULE_ID
+apxy breakpoint list
+apxy breakpoint remove --id RULE_ID
 ```
 
 ---

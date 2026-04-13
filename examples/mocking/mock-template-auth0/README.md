@@ -6,7 +6,7 @@ Exercise login, token exchange, JWKS fetching, and OIDC discovery against fixed 
 
 ## Scenario
 
-Your stack depends on Auth0 for OAuth2/OIDC: `POST /oauth/token` for tokens, `GET /userinfo` for profiles, `GET /.well-known/jwks.json` for key material, and `GET /.well-known/openid-configuration` for metadata. You want local development and automated tests that do not call Auth0's cloud or require a live tenant secret rotation. APXY can terminate TLS for `your-tenant.auth0.com` and return canned responses for each path. This guide shows **`apxy rules mock add`** invocations you can paste and tune; you can also maintain a single `rules.json` and use `apxy rules mock import --file` once the file exists.
+Your stack depends on Auth0 for OAuth2/OIDC: `POST /oauth/token` for tokens, `GET /userinfo` for profiles, `GET /.well-known/jwks.json` for key material, and `GET /.well-known/openid-configuration` for metadata. You want local development and automated tests that do not call Auth0's cloud or require a live tenant secret rotation. APXY can terminate TLS for `your-tenant.auth0.com` and return canned responses for each path. This guide shows **`apxy mock add`** invocations you can paste and tune; you can also maintain a single `rules.json` and use `apxy mock import --file` once the file exists.
 
 ## Prerequisites
 
@@ -25,14 +25,14 @@ Start the proxy with SSL enabled for the domains in this example. Replace `your-
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains your-tenant.auth0.com
+apxy start --ssl-domains your-tenant.auth0.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
 
 **Template status:** Auth0 is a **community / bring-your-own-rules** example. Options:
 
-1. Create `rules.json` beside this README (array of rule objects) and `apxy rules mock import --file ./rules.json`.
+1. Create `rules.json` beside this README (array of rule objects) and `apxy mock import --file ./rules.json`.
 2. Watch [apxy-public](https://github.com/apxydev/apxy-public) for a shared Auth0 template and download it when available.
 
 ### What you will mock
@@ -60,7 +60,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "Auth0: token success" \
   --url "https://your-tenant.auth0.com/oauth/token" \
   --match exact \
@@ -78,7 +78,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "Auth0: userinfo" \
   --url "https://your-tenant.auth0.com/userinfo" \
   --match exact \
@@ -96,7 +96,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "Auth0: JWKS" \
   --url "https://your-tenant.auth0.com/.well-known/jwks.json" \
   --match exact \
@@ -116,7 +116,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "Auth0: OIDC discovery" \
   --url "https://your-tenant.auth0.com/.well-known/openid-configuration" \
   --match exact \
@@ -134,7 +134,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "Auth0: invalid_grant" \
   --url "https://your-tenant.auth0.com/oauth/token" \
   --match exact \
@@ -144,7 +144,7 @@ apxy rules mock add \
   --body '{"error":"invalid_grant","error_description":"Grant expired or revoked"}'
 ```
 
-Give this rule a **higher priority** (lower numeric conflict — check `apxy rules mock add --help` for `--priority`) than the success rule so the scenario wins when the header is present.
+Give this rule a **higher priority** (lower numeric conflict — check `apxy mock add --help` for `--priority`) than the success rule so the scenario wins when the header is present.
 
 ### Step 6: Access denied (JSON error body)
 
@@ -155,7 +155,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock add \
+apxy mock add \
   --name "Auth0: access_denied" \
   --url "https://your-tenant.auth0.com/oauth/token" \
   --match exact \
@@ -176,8 +176,8 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy rules mock list
-apxy rules mock remove --id <RULE_ID>
+apxy mock list
+apxy mock remove --id <RULE_ID>
 ```
 
 ---

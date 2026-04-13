@@ -24,18 +24,18 @@
     {
       "id": "search-traffic",
       "description": "Agent searches traffic for the failing endpoint",
-      "match": { "command_contains_any": ["apxy traffic logs search", "apxy traffic logs list"] }
+      "match": { "command_contains_any": ["apxy logs search", "apxy logs list"] }
     },
     {
       "id": "inspect-record",
       "description": "Agent inspects a specific traffic record",
-      "match": { "command_contains": "apxy traffic logs show" },
+      "match": { "command_contains": "apxy logs show" },
       "after": "search-traffic"
     },
     {
       "id": "extract-or-correlate",
       "description": "Agent extracts error details or diffs/correlates records",
-      "match": { "command_contains_any": ["apxy traffic logs jsonpath", "apxy traffic logs diff", "apxy traffic logs search-bodies"] },
+      "match": { "command_contains_any": ["apxy logs jsonpath", "apxy logs diff", "apxy logs search-bodies"] },
       "after": "inspect-record"
     }
   ],

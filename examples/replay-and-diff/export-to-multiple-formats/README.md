@@ -30,7 +30,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -54,7 +54,7 @@ Generate the request through your app or Compose so it appears in **Traffic**.
 **Your agent runs:**
 
 ```bash
-apxy traffic logs search --query "api.myapp.com" --limit 15
+apxy logs search --query "api.myapp.com" --limit 15
 ```
 
 Pick the **ID** of the request you want to share (below we use `7` as a
@@ -69,7 +69,7 @@ placeholder—replace with your real ID).
 **Your agent runs:**
 
 ```bash
-apxy traffic logs export-curl --id 7 --format curl
+apxy logs export-curl --id 7 --format curl
 ```
 
 **When to use:** shell scripts, backend engineers, CI snippets, and chat systems
@@ -84,7 +84,7 @@ where a single pasted command reproduces the call.
 **Your agent runs:**
 
 ```bash
-apxy traffic logs export-curl --id 7 --format fetch
+apxy logs export-curl --id 7 --format fetch
 ```
 
 **When to use:** browser or Node code paths, quick prototypes in devtools, and
@@ -99,7 +99,7 @@ frontend teams avoiding subprocess shells.
 **Your agent runs:**
 
 ```bash
-apxy traffic logs export-curl --id 7 --format httpie
+apxy logs export-curl --id 7 --format httpie
 ```
 
 **When to use:** human-friendly CLI debugging (`http` is expressive and
@@ -114,7 +114,7 @@ readable in docs).
 **Your agent runs:**
 
 ```bash
-apxy traffic logs export-curl --id 7 --format python
+apxy logs export-curl --id 7 --format python
 ```
 
 **When to use:** notebooks, ETL scripts, load-test harnesses, and any ecosystem
@@ -130,7 +130,7 @@ where `requests` is the default HTTP client.
 **Your agent runs:**
 
 ```bash
-apxy traffic logs show --id 7 --format json
+apxy logs show --id 7 --format json
 ```
 
 All four exports derive from this single stored record, so they stay in sync

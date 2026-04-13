@@ -25,7 +25,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -51,7 +51,7 @@ No command required until capture exists.
 **Your agent runs:**
 
 ```bash
-apxy traffic sql query "SELECT method, url, status_code, duration_ms FROM traffic_logs ORDER BY duration_ms DESC LIMIT 10"
+apxy sql query "SELECT method, url, status_code, duration_ms FROM traffic_logs ORDER BY duration_ms DESC LIMIT 10"
 ```
 
 Agent shows a table, for example:
@@ -73,8 +73,8 @@ Pick an ID from a follow-up `list` if needed, or note the URL to search.
 **Your agent runs:**
 
 ```bash
-apxy traffic logs search --query "api.myapp.com/api/users" --limit 5
-apxy traffic logs show --id <SLOW_ID>
+apxy logs search --query "api.myapp.com/api/users" --limit 5
+apxy logs show --id <SLOW_ID>
 ```
 
 Agent reports response size, headers (`content-encoding`, pagination), and timing breakdown if available. Large JSON or N+1 patterns often show up as huge bodies or repeated parallel calls you can correlate with multiple rows.
@@ -102,7 +102,7 @@ Agent prints status, timing, and a truncated body. Run again after deploy or DB 
 **Your agent runs:**
 
 ```bash
-apxy traffic logs diff --id-a <BEFORE_ID> --id-b <AFTER_ID> --scope both
+apxy logs diff --id-a <BEFORE_ID> --id-b <AFTER_ID> --scope both
 ```
 
 Agent highlights header and body differences. If only duration improved, bodies may match while user-visible performance still changes.
@@ -116,7 +116,7 @@ Agent highlights header and body differences. If only duration improved, bodies 
 **Your agent runs:**
 
 ```bash
-apxy traffic logs replay --id <SLOW_ID> --port 8080
+apxy logs replay --id <SLOW_ID> --port 8080
 ```
 
 Use your actual proxy port if not `8080`.
@@ -163,9 +163,9 @@ Go to **Tools** -> **Compose**, paste the URL, send **GET**, compare duration to
 
 ## What You Learned
 
-- Using `apxy traffic sql query` with `traffic_logs.duration_ms` to rank real user-driven traffic
-- Connecting aggregate slowness to a single `apxy traffic logs show` story (body size, status, timing)
-- Retesting with `apxy tools request compose` and comparing runs via `apxy traffic logs diff`
+- Using `apxy sql query` with `traffic_logs.duration_ms` to rank real user-driven traffic
+- Connecting aggregate slowness to a single `apxy logs show` story (body size, status, timing)
+- Retesting with `apxy tools request compose` and comparing runs via `apxy logs diff`
 - Optional `replay` for byte-for-byte reproduction of a slow call
 
 ## Next Steps

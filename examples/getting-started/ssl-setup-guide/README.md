@@ -30,7 +30,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy setup certs generate
+apxy certs generate
 ```
 
 Agent shows something like:
@@ -52,7 +52,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy setup certs trust
+apxy certs trust
 ```
 
 On macOS this typically adds the CA to the login keychain and may prompt for Touch ID or password. On Linux, the command installs into the system trust store where supported (distribution-dependent). If automatic trust fails, agent shows the manual path to `apxy-ca.crt` for you to import via system settings.
@@ -73,13 +73,13 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy proxy start --ssl-domains api.example.com
+apxy start --ssl-domains api.example.com
 ```
 
 Startup output includes the Web UI URL (default **http://localhost:8082**) and confirms SSL proxying for the listed domains. Multiple hosts use commas, with optional wildcards where supported:
 
 ```bash
-apxy proxy start --ssl-domains api.example.com,*.staging.example.com
+apxy start --ssl-domains api.example.com,*.staging.example.com
 ```
 
 ### Step 4: Verify decryption with a real HTTPS request
@@ -92,13 +92,13 @@ Your agent runs:
 
 ```bash
 curl -sS https://api.example.com/health
-apxy traffic logs list --limit 5
+apxy logs list --limit 5
 ```
 
 Agent shows recent rows where the URL matches your target and status/duration are populated. Then:
 
 ```bash
-apxy traffic logs show --id <latest-id>
+apxy logs show --id <latest-id>
 ```
 
 Agent reports full **request** and **response** bodies (JSON, HTML, etc.) -- not a raw TLS stream. If you still see tunnel-only metadata, the hostname may not match `--ssl-domains`, or the client is not using the system proxy.
@@ -112,14 +112,14 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy proxy stop
-apxy proxy start --mitm-all
+apxy stop
+apxy start --mitm-all
 ```
 
 Agent shows a warning-style line that all HTTPS is subject to deep inspection. Use this only on trusted networks and for short debugging windows; prefer `--ssl-domains` for day-to-day work. You can narrow exceptions later with `--bypass-domains` if needed.
 
 ```bash
-apxy proxy start --mitm-all --bypass-domains "*.bank.com,*.openai.com"
+apxy start --mitm-all --bypass-domains "*.bank.com,*.openai.com"
 ```
 
 ### Step 6: Stop when finished
@@ -131,7 +131,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy proxy stop
+apxy stop
 ```
 
 ---
@@ -145,7 +145,7 @@ apxy proxy stop
 Start the proxy (or ask your agent to):
 
 ```bash
-apxy proxy start --ssl-domains api.example.com
+apxy start --ssl-domains api.example.com
 ```
 
 Open **http://localhost:8082** in your browser.
@@ -191,9 +191,9 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 ## What You Learned
 
 - How APXY's CA fits into HTTPS interception and why trust is required
-- How to run `apxy setup certs generate` and `apxy setup certs trust`
+- How to run `apxy certs generate` and `apxy certs trust`
 - How to scope interception with `--ssl-domains` versus broad `--mitm-all`
-- How to confirm decryption via `apxy traffic logs list` / `apxy traffic logs show` or the Web UI Traffic view
+- How to confirm decryption via `apxy logs list` / `apxy logs show` or the Web UI Traffic view
 - When to prefer narrow domain lists over full MITM for safety and noise control
 
 ## Next Steps

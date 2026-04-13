@@ -28,7 +28,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -48,8 +48,8 @@ If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../get
 **Your agent runs:**
 
 ```bash
-apxy rules mock clear
-apxy rules mock add --name "users-errors" --url "https://api.myapp.com/api/users" --method GET --match exact --status 401 --body '{"error":"unauthorized","message":"Invalid or expired token"}'
+apxy mock clear
+apxy mock add --name "users-errors" --url "https://api.myapp.com/api/users" --method GET --match exact --status 401 --body '{"error":"unauthorized","message":"Invalid or expired token"}'
 ```
 
 Agent confirms:
@@ -79,9 +79,9 @@ Agent reports status **401** and your JSON error payload.
 **Your agent runs:**
 
 ```bash
-apxy rules mock list
-apxy rules mock remove --id <previous-id>
-apxy rules mock add --name "users-errors" --url "https://api.myapp.com/api/users" --method GET --match exact --status 400 --body '{"error":"bad_request","message":"Missing required query param: org_id"}'
+apxy mock list
+apxy mock remove --id <previous-id>
+apxy mock add --name "users-errors" --url "https://api.myapp.com/api/users" --method GET --match exact --status 400 --body '{"error":"bad_request","message":"Missing required query param: org_id"}'
 ```
 
 Agent shows **400** on curl.
@@ -95,8 +95,8 @@ Agent shows **400** on curl.
 **Your agent runs:**
 
 ```bash
-apxy rules mock remove --all
-apxy rules mock add --name "users-errors" --url "https://api.myapp.com/api/users" --method GET --match exact --status 403 --body '{"error":"forbidden","message":"You do not have access to this organization"}'
+apxy mock remove --all
+apxy mock add --name "users-errors" --url "https://api.myapp.com/api/users" --method GET --match exact --status 403 --body '{"error":"forbidden","message":"You do not have access to this organization"}'
 ```
 
 ### Step 4: 404 Not Found
@@ -108,8 +108,8 @@ apxy rules mock add --name "users-errors" --url "https://api.myapp.com/api/users
 **Your agent runs:**
 
 ```bash
-apxy rules mock remove --all
-apxy rules mock add --name "users-errors" --url "https://api.myapp.com/api/users" --method GET --match exact --status 404 --body '{"error":"not_found","message":"Resource not found"}'
+apxy mock remove --all
+apxy mock add --name "users-errors" --url "https://api.myapp.com/api/users" --method GET --match exact --status 404 --body '{"error":"not_found","message":"Resource not found"}'
 ```
 
 ### Step 5: 429 Rate Limited
@@ -123,8 +123,8 @@ Include a hint header in the mock response if you want to test `Retry-After` par
 **Your agent runs:**
 
 ```bash
-apxy rules mock remove --all
-apxy rules mock add --name "users-errors" --url "https://api.myapp.com/api/users" --method GET --match exact --status 429 --headers "Retry-After=30" --body '{"error":"rate_limited","message":"Too many requests; try again in 30 seconds"}'
+apxy mock remove --all
+apxy mock add --name "users-errors" --url "https://api.myapp.com/api/users" --method GET --match exact --status 429 --headers "Retry-After=30" --body '{"error":"rate_limited","message":"Too many requests; try again in 30 seconds"}'
 ```
 
 ### Step 6: 500 Internal Server Error
@@ -136,8 +136,8 @@ apxy rules mock add --name "users-errors" --url "https://api.myapp.com/api/users
 **Your agent runs:**
 
 ```bash
-apxy rules mock remove --all
-apxy rules mock add --name "users-errors" --url "https://api.myapp.com/api/users" --method GET --match exact --status 500 --body '{"error":"internal_error","message":"Unexpected failure","trace_id":"demo-trace"}'
+apxy mock remove --all
+apxy mock add --name "users-errors" --url "https://api.myapp.com/api/users" --method GET --match exact --status 500 --body '{"error":"internal_error","message":"Unexpected failure","trace_id":"demo-trace"}'
 ```
 
 ### Step 7: 503 Service Unavailable
@@ -149,8 +149,8 @@ apxy rules mock add --name "users-errors" --url "https://api.myapp.com/api/users
 **Your agent runs:**
 
 ```bash
-apxy rules mock remove --all
-apxy rules mock add --name "users-errors" --url "https://api.myapp.com/api/users" --method GET --match exact --status 503 --body '{"error":"unavailable","message":"Service temporarily unavailable"}'
+apxy mock remove --all
+apxy mock add --name "users-errors" --url "https://api.myapp.com/api/users" --method GET --match exact --status 503 --body '{"error":"unavailable","message":"Service temporarily unavailable"}'
 ```
 
 ### Step 8: List rules before teardown
@@ -162,7 +162,7 @@ apxy rules mock add --name "users-errors" --url "https://api.myapp.com/api/users
 **Your agent runs:**
 
 ```bash
-apxy rules mock list
+apxy mock list
 ```
 
 Agent shows a single active rule (or your remaining experiments).
@@ -176,7 +176,7 @@ Agent shows a single active rule (or your remaining experiments).
 ### Step 1: Proxy + Web UI
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 Open **http://localhost:8082**.

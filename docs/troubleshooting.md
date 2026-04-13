@@ -21,15 +21,15 @@ Or go to **System Settings > Privacy & Security**, find the APXY message, and cl
 ```bash
 # Regenerate and re-trust the CA
 rm -rf certs/
-apxy proxy start
+apxy start
 # macOS will prompt for your password to trust the new CA
 ```
 
 Or manually:
 
 ```bash
-apxy setup certs generate
-sudo apxy setup certs trust
+apxy certs generate
+sudo apxy certs trust
 ```
 
 For Linux:
@@ -49,24 +49,24 @@ lsof -i :8080
 kill $(lsof -ti :8080)
 
 # Or use a different port
-apxy proxy start --port 9090
+apxy start --port 9090
 ```
 
 ### Proxy starts but HTTPS requests fail
 
-1. Verify the CA exists: `apxy setup certs info`
+1. Verify the CA exists: `apxy certs info`
 2. Verify the cert path: `ls -la certs/`
-3. Try regenerating: `rm -rf certs/ && apxy setup certs generate`
+3. Try regenerating: `rm -rf certs/ && apxy certs generate`
 
 ### No traffic being captured
 
 1. Check the proxy is running: `curl -x http://localhost:8080 http://httpbin.org/get`
-2. Verify with verbose: `apxy proxy start --verbose`
+2. Verify with verbose: `apxy start --verbose`
 3. On Linux, ensure env vars are set: `echo $http_proxy`
 
 ### Mock rules not matching
 
-1. Check `apxy rules mock list` to verify the rule exists and is enabled
+1. Check `apxy mock list` to verify the rule exists and is enabled
 2. Verify the URL pattern. Match type matters:
    - `exact`: `/api/users` matches only `/api/users`
    - `wildcard`: `/api/*` matches `/api/users`, `/api/posts`
@@ -88,8 +88,8 @@ If APXY crashes without cleanup, the system proxy may remain configured:
 networksetup -setwebproxystate "Wi-Fi" off
 networksetup -setsecurewebproxystate "Wi-Fi" off
 
-# Or run apxy proxy stop (it disables system proxy as a safety net)
-apxy proxy stop
+# Or run apxy stop (it disables system proxy as a safety net)
+apxy stop
 ```
 
 ---

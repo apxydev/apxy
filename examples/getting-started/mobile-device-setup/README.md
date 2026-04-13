@@ -27,7 +27,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see
@@ -48,7 +48,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 Agent shows something like:
@@ -60,7 +60,7 @@ Web UI available at http://127.0.0.1:8082
 Mobile setup available on LAN at port 8083
 ```
 
-Note the **proxy host** (`192.168.1.42`) and **proxy port** (`8080` unless you passed `--port` to `apxy proxy start`). Your device Wi‑Fi proxy must use this host and port. The **mobile setup** line is a separate LAN port (often `Web UI port + 1` when the UI binds to localhost) so your phone can open setup pages without changing `--listen-addr`.
+Note the **proxy host** (`192.168.1.42`) and **proxy port** (`8080` unless you passed `--port` to `apxy start`). Your device Wi‑Fi proxy must use this host and port. The **mobile setup** line is a separate LAN port (often `Web UI port + 1` when the UI binds to localhost) so your phone can open setup pages without changing `--listen-addr`.
 
 ### Step 2: Print mobile setup instructions (and optional QR)
 
@@ -101,12 +101,12 @@ Tell your agent:
 Your agent runs on the dev machine (if you still need the cert file path):
 
 ```bash
-apxy setup certs info
+apxy certs info
 ```
 
 On **iOS**: Open the mobile setup URL or AirDrop/email the `.crt`, install the profile, then Settings → General → About → Certificate Trust Settings → enable full trust for APXY.
 
-On **Android**: Install the CA from the setup page or `apxy setup certs` path as a user credential (nougat+ may require "Install from storage" in security settings). Some OEMs need a lock screen PIN first.
+On **Android**: Install the CA from the setup page or `apxy certs` path as a user credential (nougat+ may require "Install from storage" in security settings). Some OEMs need a lock screen PIN first.
 
 Agent reminds you: **public apps in production must never ship with user-trusted MITM CAs** -- this is dev-only.
 
@@ -119,7 +119,7 @@ Tell your agent:
 Open your app and navigate to screens that call `api.myapp.com`. In parallel, your agent runs:
 
 ```bash
-apxy traffic logs list --limit 20
+apxy logs list --limit 20
 ```
 
 Agent shows rows with your API host, methods, and status codes as requests hit the proxy.
@@ -141,8 +141,8 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy traffic logs list --limit 5
-apxy traffic logs show --id 11
+apxy logs list --limit 5
+apxy logs show --id 11
 ```
 
 Agent reports request headers (including `Authorization` if present), request body, response headers, JSON error payload, and timing -- the same detail you would get for desktop traffic.
@@ -156,7 +156,7 @@ When finished, disable the Wi‑Fi manual proxy on the device so normal browsing
 Your agent runs:
 
 ```bash
-apxy proxy stop
+apxy stop
 ```
 
 ---
@@ -179,7 +179,7 @@ Scan the **QR code** with the phone camera; it should open the LAN setup page wi
 
 ### Step 3: Confirm traffic in the Traffic tab
 
-On the device, exercise the app. In the Web UI, go to **Traffic** and filter by your API host. You should see the same requests as in `apxy traffic logs list`, with click-through detail for bodies after SSL interception is trusted.
+On the device, exercise the app. In the Web UI, go to **Traffic** and filter by your API host. You should see the same requests as in `apxy logs list`, with click-through detail for bodies after SSL interception is trusted.
 
 > screenshots/03-traffic-from-mobile.png
 
@@ -188,7 +188,7 @@ On the device, exercise the app. In the Web UI, go to **Traffic** and filter by 
 Use the UI status control or terminal:
 
 ```bash
-apxy proxy stop
+apxy stop
 ```
 
 Remember to clear the device Wi‑Fi proxy.
@@ -207,10 +207,10 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 ## What You Learned
 
-- How to pair `apxy proxy start` with `apxy setup mobile setup` for IP, port, and QR
+- How to pair `apxy start` with `apxy setup mobile setup` for IP, port, and QR
 - How to configure iOS and Android Wi‑Fi manual HTTP proxies toward your dev machine
 - How to install APXY's CA so HTTPS from the device decrypts inside APXY
-- How to list and inspect mobile-originated requests with `apxy traffic logs list` / `apxy traffic logs show` or the **Traffic** tab
+- How to list and inspect mobile-originated requests with `apxy logs list` / `apxy logs show` or the **Traffic** tab
 - Why you must remove proxy settings and stop the proxy when debugging is done
 
 ## Next Steps

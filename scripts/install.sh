@@ -251,7 +251,7 @@ do_install() {
     info "Next steps:"
     echo "  1. Reload your shell:  source ${APXY_SHELL_RC}  (or open a new terminal)"
     echo "  2. Verify:             apxy version"
-    echo "  3. Start proxy:        apxy proxy start"
+    echo "  3. Start proxy:        apxy start"
     echo ""
 }
 

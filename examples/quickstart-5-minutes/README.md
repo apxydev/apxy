@@ -33,7 +33,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy proxy start --ssl-domains httpbin.org
+apxy start --ssl-domains httpbin.org
 ```
 
 On macOS, this automatically configures the system proxy. All HTTP/HTTPS traffic now flows through APXY, with SSL interception enabled for httpbin.org.
@@ -61,7 +61,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy traffic logs list --limit 10
+apxy logs list --limit 10
 ```
 
 Agent shows you something like:
@@ -82,7 +82,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy traffic logs show --id 2
+apxy logs show --id 2
 ```
 
 Agent reports the complete request and response -- method, URL, headers, request body `{"hello":"world"}`, response body with the echoed data, status 200, timing, and more.
@@ -96,7 +96,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy traffic logs export-curl --id 2
+apxy logs export-curl --id 2
 ```
 
 Agent gives you a ready-to-paste cURL command:
@@ -116,7 +116,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy proxy stop
+apxy stop
 ```
 
 ---
@@ -130,7 +130,7 @@ apxy proxy stop
 Run in your terminal (or ask your agent to do it):
 
 ```bash
-apxy proxy start --ssl-domains httpbin.org
+apxy start --ssl-domains httpbin.org
 ```
 
 Open your browser to **http://localhost:8082**. The dashboard shows the proxy is running.
@@ -175,7 +175,7 @@ The cURL command is copied to your clipboard, ready to share.
 Go back to your terminal and run:
 
 ```bash
-apxy proxy stop
+apxy stop
 ```
 
 Or close the Web UI -- the proxy continues running until explicitly stopped.

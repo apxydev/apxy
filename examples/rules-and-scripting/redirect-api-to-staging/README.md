@@ -27,7 +27,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.prod.com
+apxy start --ssl-domains api.prod.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -47,7 +47,7 @@ You also need something listening on `localhost:3000` (or adjust the `--to` URL 
 **Your agent runs:**
 
 ```bash
-apxy rules redirect set \
+apxy rewrite set \
   --name "prod-to-local" \
   --from "https://api.prod.com/*" \
   --to "http://localhost:3000/*" \
@@ -65,7 +65,7 @@ The `--match wildcard` mode treats `*` in `--from` / `--to` as a path segment wi
 **Your agent runs:**
 
 ```bash
-apxy rules redirect list
+apxy rewrite list
 ```
 
 Agent should show your rule with an **id**, **from**, **to**, and **match** type. Keep the **id** handy for cleanup.
@@ -87,7 +87,7 @@ Watch your local server logs: you should see the same paths you would have hit o
 **Your agent runs** (adjust query to your CLI / traffic tools as needed):
 
 ```bash
-apxy traffic logs search --query "api.prod.com" --limit 10
+apxy logs search --query "api.prod.com" --limit 10
 ```
 
 You want to see requests whose **original** URL matched production while the **forwarded** target was your local stack.
@@ -101,7 +101,7 @@ You want to see requests whose **original** URL matched production while the **f
 **Your agent runs:**
 
 ```bash
-apxy rules redirect set \
+apxy rewrite set \
   --name "staging-canary" \
   --from "https://api.prod.com/v2/*" \
   --to "https://staging.internal.example.com/v2/*" \
@@ -114,18 +114,18 @@ More specific rules typically take precedence depending on your APXY version and
 
 **Tell your agent:**
 
-> "Remove the redirect rule with id RULE_ID" (paste the id from `apxy rules redirect list`).
+> "Remove the redirect rule with id RULE_ID" (paste the id from `apxy rewrite list`).
 
 **Your agent runs:**
 
 ```bash
-apxy rules redirect remove --id RULE_ID
+apxy rewrite remove --id RULE_ID
 ```
 
 To clear everything quickly during a reset:
 
 ```bash
-apxy rules redirect remove --all
+apxy rewrite remove --all
 ```
 
 ---

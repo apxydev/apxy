@@ -16,7 +16,7 @@ Your app is throwing 500 errors in production. Instead of manually digging throu
 
 ### Plan note
 
-**`apxy traffic sql`** is a **Pro** feature in licensed builds. On **Free**, have your agent use **`apxy traffic logs search --query "500"`** (or status tokens your UI surfaces) instead of SQL, then **`apxy traffic logs show`** on each candidate id. Upgrade or use Pro for ad-hoc aggregates.
+**`apxy sql`** is a **Pro** feature in licensed builds. On **Free**, have your agent use **`apxy logs search --query "500"`** (or status tokens your UI surfaces) instead of SQL, then **`apxy logs show`** on each candidate id. Upgrade or use Pro for ad-hoc aggregates.
 
 ## Before You Start
 
@@ -29,7 +29,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -51,7 +51,7 @@ Generate traffic through the proxy (your app, integration tests, or `curl`) so t
 **Your agent runs:**
 
 ```bash
-apxy traffic sql query "SELECT id, method, url, status_code, duration_ms FROM traffic_logs WHERE status_code >= 500 ORDER BY id DESC LIMIT 50"
+apxy sql query "SELECT id, method, url, status_code, duration_ms FROM traffic_logs WHERE status_code >= 500 ORDER BY id DESC LIMIT 50"
 ```
 
 The agent picks the most relevant row (for example the one matching `/api/orders` or the latest customer-facing failure) and notes its `id` for the next steps.
@@ -65,7 +65,7 @@ The agent picks the most relevant row (for example the one matching `/api/orders
 **Your agent runs:**
 
 ```bash
-apxy traffic logs show --id 42
+apxy logs show --id 42
 ```
 
 (Replace `42` with the id from Step 1.) The agent reads the response body and headers, looking for stack traces, upstream error envelopes, or validation failures.
@@ -79,7 +79,7 @@ apxy traffic logs show --id 42
 **Your agent runs:**
 
 ```bash
-apxy traffic logs jsonpath --id 42 --path "error.message"
+apxy logs jsonpath --id 42 --path "error.message"
 ```
 
 If your API nests errors differently, the agent adjusts the path (for example `message` or `errors.0.detail`).
@@ -93,10 +93,10 @@ If your API nests errors differently, the agent adjusts the path (for example `m
 **Your agent runs:**
 
 ```bash
-apxy traffic logs jsonpath --id 42 --path "error.stack"
+apxy logs jsonpath --id 42 --path "error.stack"
 ```
 
-If the body is not JSON or the path misses, the agent falls back to the full `apxy traffic logs show` output from Step 2.
+If the body is not JSON or the path misses, the agent falls back to the full `apxy logs show` output from Step 2.
 
 ### Step 5: Correlate pattern across multiple 500s
 
@@ -107,7 +107,7 @@ If the body is not JSON or the path misses, the agent falls back to the full `ap
 **Your agent runs:**
 
 ```bash
-apxy traffic sql query "SELECT path, status_code, COUNT(*) AS n FROM traffic_logs WHERE status_code >= 500 GROUP BY path, status_code ORDER BY n DESC"
+apxy sql query "SELECT path, status_code, COUNT(*) AS n FROM traffic_logs WHERE status_code >= 500 GROUP BY path, status_code ORDER BY n DESC"
 ```
 
 The agent explains the pattern (for example "all 500s are POST /api/orders with the same error.message").
@@ -129,7 +129,7 @@ apxy tools request compose --method POST --url https://api.myapp.com/api/orders 
   --body '{"customer_id":"cust_42","items":[{"sku":"WIDGET-1","qty":2}]}'
 ```
 
-The agent uses the real body from `apxy traffic logs show` when available so the replay matches production. The new exchange appears as a new traffic id (for example `58`).
+The agent uses the real body from `apxy logs show` when available so the replay matches production. The new exchange appears as a new traffic id (for example `58`).
 
 ### Step 8: Diff old failure vs new success
 
@@ -140,7 +140,7 @@ The agent uses the real body from `apxy traffic logs show` when available so the
 **Your agent runs:**
 
 ```bash
-apxy traffic logs diff --id-a 42 --id-b 58 --scope response
+apxy logs diff --id-a 42 --id-b 58 --scope response
 ```
 
 The agent summarizes: status code change, error object removed, expected success payload present.
@@ -151,7 +151,7 @@ The agent summarizes: status code change, error object removed, expected success
 
 You can follow the same investigation in the Web UI while the proxy runs. Open the local dashboard (default **http://localhost:8082** unless you changed the port), go to **Traffic**, and sort or filter for status **500** to match the SQL from Track A.
 
-Click a row to inspect the full request and response side by side; the UI is equivalent to `apxy traffic logs show`. When you need structured fields, the agent can still run `apxy traffic logs jsonpath` for you, or you can read the formatted JSON in the response panel. After your fix, use **Compose** to replay a request and **Diff** to compare two records visually -- the same before/after story as `apxy traffic logs diff` on the CLI.
+Click a row to inspect the full request and response side by side; the UI is equivalent to `apxy logs show`. When you need structured fields, the agent can still run `apxy logs jsonpath` for you, or you can read the formatted JSON in the response panel. After your fix, use **Compose** to replay a request and **Diff** to compare two records visually -- the same before/after story as `apxy logs diff` on the CLI.
 
 ---
 
@@ -167,8 +167,8 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 ## What You Learned
 
 - How to drive APXY from an agent using **read-only SQL** on `traffic_logs` for status and latency-aware listings
-- How **`apxy traffic logs show`** and **`apxy traffic logs jsonpath`** narrow huge responses to the fields that explain failures
-- How to **replay** with **`apxy tools request compose`** and prove a fix with **`apxy traffic logs diff --scope response`**
+- How **`apxy logs show`** and **`apxy logs jsonpath`** narrow huge responses to the fields that explain failures
+- How to **replay** with **`apxy tools request compose`** and prove a fix with **`apxy logs diff --scope response`**
 - That the Web UI mirrors the same capture data for visual confirmation
 
 ---

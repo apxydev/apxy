@@ -33,7 +33,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -60,7 +60,7 @@ before you replay.
 **Your agent runs:**
 
 ```bash
-apxy traffic sql query "SELECT id, method, url, status_code FROM traffic_logs WHERE host = 'api.myapp.com' LIMIT 20"
+apxy sql query "SELECT id, method, url, status_code FROM traffic_logs WHERE host = 'api.myapp.com' LIMIT 20"
 ```
 
 Note the record IDs you care about (for example `1` for `GET /api/users` and
@@ -106,7 +106,7 @@ request.
 **Your agent runs:**
 
 ```bash
-apxy traffic logs replay --id 1
+apxy logs replay --id 1
 ```
 
 Alternatively, for a hand-tuned replay:
@@ -133,13 +133,13 @@ Note the **new** record IDs after each replay (for example baseline `1` → new
 **Your agent runs:**
 
 ```bash
-apxy traffic logs diff --id-a 1 --id-b 21 --scope response
+apxy logs diff --id-a 1 --id-b 21 --scope response
 ```
 
 To include headers and line-level request changes:
 
 ```bash
-apxy traffic logs diff --id-a 1 --id-b 21 --scope both
+apxy logs diff --id-a 1 --id-b 21 --scope both
 ```
 
 ### Step 6: Repeat and triage
@@ -157,7 +157,7 @@ Repeat Steps 4–5 for every endpoint in your regression set. Flag any diff wher
 **Your agent runs:**
 
 ```bash
-apxy traffic logs show --id 21
+apxy logs show --id 21
 ```
 
 ---

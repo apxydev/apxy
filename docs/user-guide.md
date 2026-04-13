@@ -17,9 +17,9 @@ What makes APXY unique is that it's built for both **developers and AI coding ag
 When the proxy starts, a Web UI is available at `http://localhost:<proxy-port + 2>` (default: `http://localhost:8082`).
 
 ```bash
-apxy proxy start                    # Web UI on port 8082
-apxy proxy start --web-port 9090    # Custom port
-apxy proxy start --web-port 0       # Disable Web UI
+apxy start                    # Web UI on port 8082
+apxy start --web-port 9090    # Custom port
+apxy start --web-port 0       # Disable Web UI
 ```
 
 ### Pages
@@ -47,15 +47,15 @@ Supports dark/light theme toggle and a command palette for quick navigation.
 ### Traffic Capture & Inspection
 
 ```bash
-apxy traffic logs list --limit 20
-apxy traffic logs show --id <record-id>
-apxy traffic logs search --query "api.example.com"
-apxy traffic logs stats
+apxy logs list --limit 20
+apxy logs show --id <record-id>
+apxy logs search --query "api.example.com"
+apxy logs stats
 
 # Output formats
-apxy traffic logs list --format markdown    # Human-readable tables
-apxy traffic logs list --format json        # For piping to jq
-apxy traffic logs list --format toon        # Ultra-compact for AI agents
+apxy logs list --format markdown    # Human-readable tables
+apxy logs list --format json        # For piping to jq
+apxy logs list --format toon        # Ultra-compact for AI agents
 ```
 
 ### Mock Rules
@@ -64,49 +64,49 @@ Intercept matching requests and return fake responses.
 
 ```bash
 # Exact match
-apxy rules mock add --name "Mock Users" --url "/api/users" --match exact \
+apxy mock add --name "Mock Users" --url "/api/users" --match exact \
   --status 200 --body '{"users": [{"id": 1, "name": "Test"}]}'
 
 # Wildcard
-apxy rules mock add --name "Mock All API" --url "/api/*" --match wildcard \
+apxy mock add --name "Mock All API" --url "/api/*" --match wildcard \
   --status 200 --body '{"mocked": true}'
 
 # Regex
-apxy rules mock add --name "Mock User by ID" --url "/api/users/\\d+" --match regex \
+apxy mock add --name "Mock User by ID" --url "/api/users/\\d+" --match regex \
   --status 200 --body '{"id": 42}'
 
 # With delay (simulate slow API)
-apxy rules mock add --name "Slow" --url "/api/slow" --match exact \
+apxy mock add --name "Slow" --url "/api/slow" --match exact \
   --status 200 --body '{"data": "delayed"}' --delay 2000
 
-apxy rules mock list
-apxy rules mock remove --id <rule-id>
-apxy rules mock clear
+apxy mock list
+apxy mock remove --id <rule-id>
+apxy mock clear
 ```
 
 ### Traffic Filtering
 
 ```bash
-apxy rules filter set --type block --target "analytics.google.com"
-apxy rules filter set --type allow --target "api.myapp.com"
-apxy rules filter list
-apxy rules filter remove --id <rule-id>
+apxy filter set --type block --target "analytics.google.com"
+apxy filter set --type allow --target "api.myapp.com"
+apxy filter list
+apxy filter remove --id <rule-id>
 ```
 
 ### URL Redirects (Map Remote)
 
 ```bash
-apxy rules redirect set --name "Prod to Staging" \
+apxy rewrite set --name "Prod to Staging" \
   --from "https://api.production.com" --to "https://api.staging.com"
-apxy rules redirect list
-apxy rules redirect remove --id <rule-id>
+apxy rewrite list
+apxy rewrite remove --id <rule-id>
 ```
 
 ### Export & Replay
 
 ```bash
-apxy traffic logs export-curl --id <record-id>    # Export as cURL
-apxy traffic logs replay --id <record-id>         # Re-send the request
+apxy logs export-curl --id <record-id>    # Export as cURL
+apxy logs replay --id <record-id>         # Re-send the request
 apxy tools request compose --method POST --url "https://api.example.com/data" \
   --body '{"key": "value"}'
 ```
@@ -114,50 +114,50 @@ apxy tools request compose --method POST --url "https://api.example.com/data" \
 ### Network Conditions
 
 ```bash
-apxy rules network set --latency 500         # 500ms delay
-apxy rules network set --bandwidth 50000     # Throttle bandwidth
-apxy rules network clear
+apxy network set --latency 500         # 500ms delay
+apxy network set --bandwidth 50000     # Throttle bandwidth
+apxy network clear
 ```
 
 ### Recording Control
 
 ```bash
-apxy traffic recording start
-apxy traffic recording stop
+apxy recording start
+apxy recording stop
 ```
 
 ### SSL Management
 
 ```bash
-apxy setup ssl enable --domain "api.example.com"    # Enable MITM for domain
-apxy setup ssl disable --domain "api.example.com"   # Tunnel only (no inspection)
-apxy setup ssl list
+apxy ssl enable --domain "api.example.com"    # Enable MITM for domain
+apxy ssl disable --domain "api.example.com"   # Tunnel only (no inspection)
+apxy ssl list
 ```
 
 ### SQL Queries
 
 ```bash
-apxy traffic sql query "SELECT host, COUNT(*) as cnt FROM traffic_logs GROUP BY host ORDER BY cnt DESC"
-apxy traffic sql query "SELECT method, url, duration_ms FROM traffic_logs WHERE duration_ms > 1000"
+apxy sql query "SELECT host, COUNT(*) as cnt FROM traffic_logs GROUP BY host ORDER BY cnt DESC"
+apxy sql query "SELECT method, url, duration_ms FROM traffic_logs WHERE duration_ms > 1000"
 ```
 
 ### Body Search & JSONPath
 
 ```bash
-apxy traffic logs search-bodies --pattern "error" --scope response
-apxy traffic logs jsonpath --id <record-id> --path "data.users.#.name"
+apxy logs search-bodies --pattern "error" --scope response
+apxy logs jsonpath --id <record-id> --path "data.users.#.name"
 ```
 
 ### Diff
 
 ```bash
-apxy traffic logs diff --id-a <record-1> --id-b <record-2> --scope response
+apxy logs diff --id-a <record-1> --id-b <record-2> --scope response
 ```
 
 ### GraphQL
 
 ```bash
-apxy traffic logs graphql --operation-name "GetUser" --limit 10
+apxy logs graphql --operation-name "GetUser" --limit 10
 ```
 
 ### Dynamic Interceptors
@@ -189,7 +189,7 @@ apxy rules interceptor remove --id <rule-id>
 ### Linux setup
 
 ```bash
-apxy proxy start --no-system-proxy
+apxy start --no-system-proxy
 export http_proxy=http://localhost:8080
 export https_proxy=http://localhost:8080
 ```
@@ -197,10 +197,10 @@ export https_proxy=http://localhost:8080
 ### Proxy environment injection
 
 ```bash
-eval $(apxy proxy env)                    # Inject into current shell
-apxy proxy env --open                     # Open new terminal with env set
-eval $(apxy proxy env --lang node)        # Node.js only
-apxy proxy env --script ./proxy-env.sh    # Write to file
+eval $(apxy env)                    # Inject into current shell
+apxy env --open                     # Open new terminal with env set
+eval $(apxy env --lang node)        # Node.js only
+apxy env --script ./proxy-env.sh    # Write to file
 ```
 
 ---

@@ -348,7 +348,7 @@ def self_test():
     import tempfile, os
     jsonl_lines = [
         '{"type":"system","subtype":"init"}',
-        '{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Bash","input":{"command":"apxy traffic logs list"}}]}}',
+        '{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Bash","input":{"command":"apxy logs list"}}]}}',
         '{"type":"user","message":{"content":[{"type":"tool_result","content":"some output"}]}}',
         '{"type":"assistant","message":{"content":[{"type":"text","text":"Found 500 errors in the logs."}]}}',
         '{"type":"result","subtype":"success"}',
@@ -360,7 +360,7 @@ def self_test():
         loaded = load_transcript(tmp_path)
         cmds9 = extract_commands(loaded)
         texts9 = extract_agent_text(loaded)
-        if len(cmds9) != 1 or "apxy traffic logs list" not in cmds9[0]:
+        if len(cmds9) != 1 or "apxy logs list" not in cmds9[0]:
             failures.append(f"Test 9: JSONL should extract 1 command, got {cmds9}")
         if len(texts9) != 1 or "500 errors" not in texts9[0]:
             failures.append(f"Test 9: JSONL should extract text, got {texts9}")

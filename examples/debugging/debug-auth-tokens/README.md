@@ -25,7 +25,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains auth.myapp.com
+apxy start --ssl-domains auth.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -45,7 +45,7 @@ If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../get
 **Your agent runs:**
 
 ```bash
-apxy traffic logs search --query "auth.myapp.com"
+apxy logs search --query "auth.myapp.com"
 ```
 
 Agent shows matching rows, for example:
@@ -68,7 +68,7 @@ Note IDs for token and refresh calls.
 **Your agent runs:**
 
 ```bash
-apxy traffic logs show --id 88
+apxy logs show --id 88
 ```
 
 Agent reports JSON fields such as `access_token`, `refresh_token`, `expires_in`, and `scope`. A common bug is `expires_in` in seconds vs what the client assumes (ms), or missing `refresh_token` on silent renew.
@@ -82,7 +82,7 @@ Agent reports JSON fields such as `access_token`, `refresh_token`, `expires_in`,
 **Your agent runs:**
 
 ```bash
-apxy traffic logs jsonpath --id 88 --path "access_token" --scope response
+apxy logs jsonpath --id 88 --path "access_token" --scope response
 ```
 
 Agent finds:
@@ -110,10 +110,10 @@ Agent guides you to base64-decode the payload locally or uses a script on your m
 **Your agent runs:**
 
 ```bash
-apxy traffic logs search --query "refresh"
+apxy logs search --query "refresh"
 ```
 
-Agent lists rows hitting `/oauth/token` with `grant_type=refresh_token` or similar. Open any suspicious row with `apxy traffic logs show --id <ID>` to see 400/401 and error JSON (`invalid_grant`, `invalid_client`).
+Agent lists rows hitting `/oauth/token` with `grant_type=refresh_token` or similar. Open any suspicious row with `apxy logs show --id <ID>` to see 400/401 and error JSON (`invalid_grant`, `invalid_client`).
 
 ### Step 6: Correlate with an API call that started failing
 
@@ -124,13 +124,13 @@ Agent lists rows hitting `/oauth/token` with `grant_type=refresh_token` or simil
 **Your agent runs:**
 
 ```bash
-apxy traffic logs search --query "401" --limit 15
+apxy logs search --query "401" --limit 15
 ```
 
 Then:
 
 ```bash
-apxy traffic logs show --id <API_CALL_ID>
+apxy logs show --id <API_CALL_ID>
 ```
 
 Agent correlates timestamps: refresh failed at T+0, API calls return 401 at T+1s.
@@ -143,7 +143,7 @@ Agent correlates timestamps: refresh failed at T+0, API calls return 401 at T+1s
 
 ### Step 1: Dashboard and Traffic
 
-Open **http://localhost:8082** after `apxy proxy start --ssl-domains auth.myapp.com`. Go to **Traffic**
+Open **http://localhost:8082** after `apxy start --ssl-domains auth.myapp.com`. Go to **Traffic**
 
 > screenshots/01-dashboard-auth.png
 
@@ -185,8 +185,8 @@ In the traffic list, focus on host **auth.myapp.com**. Sort by time and identify
 
 ## What You Learned
 
-- How to isolate IdP traffic with `apxy traffic logs search --query "auth.myapp.com"`
-- How to inspect OAuth/OIDC token payloads with `apxy traffic logs show` and targeted `jsonpath`
+- How to isolate IdP traffic with `apxy logs search --query "auth.myapp.com"`
+- How to inspect OAuth/OIDC token payloads with `apxy logs show` and targeted `jsonpath`
 - How to trace `refresh` failures and tie them to downstream **401** responses
 - Operational hygiene: treat tokens as secrets even when debugging locally
 

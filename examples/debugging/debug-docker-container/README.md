@@ -25,7 +25,7 @@ Start the proxy with SSL enabled for **each HTTPS hostname** your containers cal
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com,internal-api
+apxy start --ssl-domains api.myapp.com,internal-api
 ```
 
 Replace the list with real hostnames from your `docker-compose.yml` or service URLs. If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first. Containers must trust APXY’s CA for TLS interception—mount or install the CA cert inside images that perform HTTPS (advanced; often done via custom image or compose volume).
@@ -43,7 +43,7 @@ Replace the list with real hostnames from your `docker-compose.yml` or service U
 **Your agent runs:**
 
 ```bash
-apxy proxy status
+apxy status
 ```
 
 Agent reports the **HTTP proxy** listen address (e.g. `127.0.0.1:8080`). Containers cannot use `127.0.0.1` for the host; they use `host.docker.internal` (Mac/Win Docker Desktop) or `172.17.0.1` / `host-gateway` (Linux).
@@ -93,7 +93,7 @@ Trigger the code path that performs the HTTP client call.
 **Your agent runs:**
 
 ```bash
-apxy traffic logs list --limit 25
+apxy logs list --limit 25
 ```
 
 Agent shows rows whose host matches your external API or internal hostname, proving egress went through the proxy.
@@ -107,7 +107,7 @@ Agent shows rows whose host matches your external API or internal hostname, prov
 **Your agent runs:**
 
 ```bash
-apxy traffic logs search --query "internal-api"
+apxy logs search --query "internal-api"
 ```
 
 Adjust the query to match your compose service DNS name or public host.
@@ -121,7 +121,7 @@ Adjust the query to match your compose service DNS name or public host.
 **Your agent runs:**
 
 ```bash
-apxy traffic logs show --id <ID>
+apxy logs show --id <ID>
 ```
 
 ### Step 7: Compose docker-compose snippet (optional)
@@ -196,7 +196,7 @@ If some calls must bypass the proxy, confirm they do not appear in APXY (or appe
 
 - Sending Docker egress through APXY with `HTTP_PROXY` and `HTTPS_PROXY`
 - Using `host.docker.internal` (and Linux equivalents) to reach the host’s proxy port
-- Listing and searching container-generated rows with `apxy traffic logs list` and `search`
+- Listing and searching container-generated rows with `apxy logs list` and `search`
 - Planning `--ssl-domains` for every hostname containers resolve in HTTPS calls
 
 ## Next Steps

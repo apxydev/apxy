@@ -23,12 +23,12 @@
     {
       "id": "list-traffic",
       "description": "Agent lists or searches traffic to see captured requests",
-      "match": { "command_contains_any": ["apxy traffic logs list", "apxy traffic logs search", "apxy traffic sql query", "apxy traffic logs stats"] }
+      "match": { "command_contains_any": ["apxy logs list", "apxy logs search", "apxy sql query", "apxy logs stats"] }
     },
     {
       "id": "identify-slow",
       "description": "Agent identifies slow endpoint via inspection or SQL",
-      "match": { "command_contains_any": ["apxy traffic logs show", "apxy traffic sql query", "apxy traffic logs stats"] },
+      "match": { "command_contains_any": ["apxy logs show", "apxy sql query", "apxy logs stats"] },
       "after": "list-traffic"
     }
   ],

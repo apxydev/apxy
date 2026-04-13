@@ -21,18 +21,18 @@
     {
       "id": "investigate",
       "description": "Agent searches or inspects the failing traffic",
-      "match": { "command_contains_any": ["apxy traffic logs search", "apxy traffic logs list", "apxy traffic logs show"] }
+      "match": { "command_contains_any": ["apxy logs search", "apxy logs list", "apxy logs show"] }
     },
     {
       "id": "create-mock",
       "description": "Agent creates a mock rule for the broken endpoint",
-      "match": { "command_contains": "apxy rules mock add" },
+      "match": { "command_contains": "apxy mock add" },
       "after": "investigate"
     },
     {
       "id": "verify-mock",
       "description": "Agent verifies the mock is active",
-      "match": { "command_contains_any": ["apxy rules mock list", "curl"] },
+      "match": { "command_contains_any": ["apxy mock list", "curl"] },
       "after": "create-mock"
     }
   ],

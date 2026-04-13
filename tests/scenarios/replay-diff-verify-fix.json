@@ -22,18 +22,18 @@
     {
       "id": "find-failure",
       "description": "Agent finds the failing traffic record",
-      "match": { "command_contains_any": ["apxy traffic logs search", "apxy traffic logs list"] }
+      "match": { "command_contains_any": ["apxy logs search", "apxy logs list"] }
     },
     {
       "id": "replay",
       "description": "Agent replays the failed request",
-      "match": { "command_contains": "apxy traffic logs replay" },
+      "match": { "command_contains": "apxy logs replay" },
       "after": "find-failure"
     },
     {
       "id": "diff",
       "description": "Agent diffs the old and new responses",
-      "match": { "command_contains": "apxy traffic logs diff" },
+      "match": { "command_contains": "apxy logs diff" },
       "after": "replay"
     }
   ],

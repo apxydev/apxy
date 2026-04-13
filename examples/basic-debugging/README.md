@@ -12,7 +12,7 @@ Your first proxy session -- capture HTTP traffic and inspect requests.
 ### 1. Start the proxy
 
 ```bash
-apxy proxy start
+apxy start
 ```
 
 On macOS, this automatically configures the system proxy. All traffic now flows through APXY.
@@ -31,29 +31,29 @@ curl https://httpbin.org/status/404
 
 ```bash
 # List recent requests
-apxy traffic logs list --limit 10
+apxy logs list --limit 10
 
 # Search for specific host
-apxy traffic logs search --query "httpbin"
+apxy logs search --query "httpbin"
 
 # View detailed info for a specific request
-apxy traffic logs show --id <record-id-from-list>
+apxy logs show --id <record-id-from-list>
 ```
 
 ### 4. Analyze with SQL
 
 ```bash
 # Count requests by status code
-apxy traffic sql query "SELECT status_code, COUNT(*) FROM traffic_logs GROUP BY status_code"
+apxy sql query "SELECT status_code, COUNT(*) FROM traffic_logs GROUP BY status_code"
 
 # Find the slowest request
-apxy traffic sql query "SELECT method, url, duration_ms FROM traffic_logs ORDER BY duration_ms DESC LIMIT 1"
+apxy sql query "SELECT method, url, duration_ms FROM traffic_logs ORDER BY duration_ms DESC LIMIT 1"
 ```
 
 ### 5. Export a request as cURL
 
 ```bash
-apxy traffic logs export-curl --id <record-id>
+apxy logs export-curl --id <record-id>
 ```
 
 This gives you a reproducible curl command you can share with teammates.
@@ -61,7 +61,7 @@ This gives you a reproducible curl command you can share with teammates.
 ### 6. Stop the proxy
 
 ```bash
-apxy proxy stop
+apxy stop
 ```
 
 ## What you learned

@@ -26,7 +26,7 @@ copies.
 - macOS or Linux
 - AI coding agent with APXY skill installed
 - Proxy **running** when exporting/importing settings via the control API (use
-  `apxy proxy status` to confirm)
+  `apxy status` to confirm)
 
 ## Before You Start
 
@@ -39,7 +39,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -64,8 +64,8 @@ If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../get
 **Your agent runs:**
 
 ```bash
-apxy traffic logs stats
-apxy rules mock list
+apxy logs stats
+apxy mock list
 ```
 
 Skim rule names and priorities so the export you share matches what you expect
@@ -127,7 +127,7 @@ their own settings first if they have local work worth keeping.
 **Your agent runs:**
 
 ```bash
-apxy rules mock list
+apxy mock list
 ```
 
 Have them hit a known mocked path through the proxy to confirm behavior before
@@ -137,7 +137,7 @@ resuming the investigation.
 
 If diffs or replays require **the same record IDs**, pair settings import with:
 
-- `apxy traffic logs export-har --file session.har` on the sender side and HAR
+- `apxy logs export-har --file session.har` on the sender side and HAR
   import on the receiver, or
 - Copying the project SQLite path documented in your internal runbook
 

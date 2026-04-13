@@ -29,7 +29,7 @@ Start the proxy with SSL enabled for the domains in this example:
 **Your agent runs:**
 
 ```bash
-apxy proxy start --ssl-domains api.myapp.com
+apxy start --ssl-domains api.myapp.com
 ```
 
 If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../getting-started/ssl-setup-guide/) first.
@@ -67,7 +67,7 @@ Replace the placeholder JWT with a **valid dev token** from your identity provid
 **Your agent runs:**
 
 ```bash
-apxy rules script add \
+apxy script add \
   --name "inject-bearer" \
   --file ./add-auth.js \
   --hook onRequest \
@@ -85,7 +85,7 @@ apxy rules script add \
 **Your agent runs:**
 
 ```bash
-apxy rules script list
+apxy script list
 ```
 
 ### Step 4: Generate traffic without client-side auth
@@ -111,8 +111,8 @@ If the endpoint returns **200** (or your expected auth error changed), the heade
 **Your agent runs:**
 
 ```bash
-apxy traffic logs search --query "/api/me" --limit 3
-apxy traffic logs show --id LOG_ID
+apxy logs search --query "/api/me" --limit 3
+apxy logs show --id LOG_ID
 ```
 
 Pick `LOG_ID` from the search results. Confirm the stored request reflects the injected header (some UIs show both client and forwarded views—use the one that represents what the upstream API received).
@@ -126,14 +126,14 @@ Pick `LOG_ID` from the search results. Confirm the stored request reflects the i
 **Your agent runs:**
 
 ```bash
-apxy rules script list
-apxy rules script disable --id SCRIPT_ID
+apxy script list
+apxy script disable --id SCRIPT_ID
 ```
 
-Re-enable with `apxy rules script enable --id SCRIPT_ID`, or remove entirely:
+Re-enable with `apxy script enable --id SCRIPT_ID`, or remove entirely:
 
 ```bash
-apxy rules script remove --id SCRIPT_ID
+apxy script remove --id SCRIPT_ID
 ```
 
 ---
