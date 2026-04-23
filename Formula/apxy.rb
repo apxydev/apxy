@@ -1,26 +1,26 @@
 class Apxy < Formula
   desc "Desktop network proxy for HTTPS debugging — inspect, mock, debug"
   homepage "https://github.com/apxydev/apxy"
-  version "1.1.8"
+  version "1.1.9"
   license :cannot_represent
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/apxydev/apxy/releases/download/v1.1.8/apxy-1.1.8-darwin-arm64.tar.gz"
-      sha256 "61be4ae0a4ac98fdefc1a3ec942c8fcd028cb7e58b6a578070b94f97c2225abf"
+      url "https://github.com/apxydev/apxy/releases/download/v1.1.9/apxy-1.1.9-darwin-arm64.tar.gz"
+      sha256 "74ae789c93c4249485413dcf6ed8be3d044d7dc557848b6bab1a02f76f8ef8bf"
     else
-      url "https://github.com/apxydev/apxy/releases/download/v1.1.8/apxy-1.1.8-darwin-amd64.tar.gz"
-      sha256 "13e18c4c00db2e19f89469690dbd7275cc370126f21aeeb5e7bbb1a8f5f6af7c"
+      url "https://github.com/apxydev/apxy/releases/download/v1.1.9/apxy-1.1.9-darwin-amd64.tar.gz"
+      sha256 "1e7506d56bd2ca1d97f8629ccd2a2933ee25dbe2dad1b77f881ae9d8cf2d8f38"
     end
   end
 
   on_linux do
     if Hardware::CPU.arm?
-      url "https://github.com/apxydev/apxy/releases/download/v1.1.8/apxy-1.1.8-linux-arm64.tar.gz"
-      sha256 "f8343542985978fe51089884fc2605e9535747a198b4e22fcfbafb92f9ce6402"
+      url "https://github.com/apxydev/apxy/releases/download/v1.1.9/apxy-1.1.9-linux-arm64.tar.gz"
+      sha256 "405f79e9f66665e54e396470c7ec559cbbb127ecd9d384953018dc54375b377d"
     else
-      url "https://github.com/apxydev/apxy/releases/download/v1.1.8/apxy-1.1.8-linux-amd64.tar.gz"
-      sha256 "22b4cc76e9dbf95889ea9ab4147840884f944e0d41d9badbb30b7bd15c5a497e"
+      url "https://github.com/apxydev/apxy/releases/download/v1.1.9/apxy-1.1.9-linux-amd64.tar.gz"
+      sha256 "1f84a5abfcd89117db5662099f87c7e23d52f0a4168d1a24ae90002974d29bb7"
     end
   end
 
