@@ -46,12 +46,12 @@ No command required until capture exists.
 
 **Tell your agent:**
 
-> "Run SQL to list the 10 slowest captured requests by duration_ms."
+> "List the 10 slowest captured requests by duration_ms."
 
 **Your agent runs:**
 
 ```bash
-apxy sql query "SELECT method, url, status_code, duration_ms FROM traffic_logs ORDER BY duration_ms DESC LIMIT 10"
+apxy logs list --format json | jq '[sort_by(-.duration_ms) | .[:10][] | {method, url, status_code, duration_ms}]'
 ```
 
 Agent shows a table, for example:
@@ -163,7 +163,7 @@ Go to **Tools** -> **Compose**, paste the URL, send **GET**, compare duration to
 
 ## What You Learned
 
-- Using `apxy sql query` with `traffic_logs.duration_ms` to rank real user-driven traffic
+- Using `apxy logs list --format json | jq` with `.duration_ms` to rank real user-driven traffic
 - Connecting aggregate slowness to a single `apxy logs show` story (body size, status, timing)
 - Retesting with `apxy tools request compose` and comparing runs via `apxy logs diff`
 - Optional `replay` for byte-for-byte reproduction of a slow call
