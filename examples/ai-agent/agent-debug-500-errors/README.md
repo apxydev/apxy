@@ -166,7 +166,7 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 ## What You Learned
 
-- How to drive APXY from an agent using **read-only SQL** on `traffic_logs` for status and latency-aware listings
+- How to drive APXY from an agent using **jq pipelines** on `apxy logs list` output
 - How **`apxy logs show`** and **`apxy logs jsonpath`** narrow huge responses to the fields that explain failures
 - How to **replay** with **`apxy tools request compose`** and prove a fix with **`apxy logs diff --scope response`**
 - That the Web UI mirrors the same capture data for visual confirmation

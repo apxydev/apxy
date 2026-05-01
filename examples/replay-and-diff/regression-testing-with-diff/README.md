@@ -203,7 +203,7 @@ Click into a traffic row whose status or size changed unexpectedly. Inspect
 
 Watch the full walkthrough: *[YouTube link -- coming soon]*
 
-- Selecting records with SQL: 0:00–3:00
+- Selecting records with `apxy logs search`: 0:00–3:00
 - Replay + diff loop: 3:00–10:00
 - Web UI diff review: 10:00–14:00
 
@@ -211,7 +211,7 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 ## What You Learned
 
-- How to narrow captured traffic to one host (and beyond) with `traffic sql query`
+- How to narrow captured traffic to one host (and beyond) with `apxy logs search` and `apxy logs list --format json | jq`
 - How to establish baseline captures, switch builds, and replay the same calls
 - How to compare arbitrary record pairs with `traffic logs diff` and `--scope`
 - How to use the Web UI Traffic + Diff tabs for regression review
