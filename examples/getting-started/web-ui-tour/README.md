@@ -104,12 +104,12 @@ Agent prints status, timing, and a truncated response body. The same exchange ap
 
 Tell your agent:
 
-> "Run a SQL query to count requests grouped by status code."
+> "Count requests grouped by status code."
 
 Your agent runs:
 
 ```bash
-apxy sql query "SELECT status_code, COUNT(*) AS count FROM traffic_logs GROUP BY status_code ORDER BY count DESC"
+apxy logs list --format json | jq '[group_by(.status_code)[] | {status_code: .[0].status_code, count: length}] | sort_by(-.count)'
 ```
 
 Agent shows a table of status codes and their frequencies from captured traffic.
