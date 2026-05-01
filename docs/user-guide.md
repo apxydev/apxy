@@ -134,11 +134,14 @@ apxy ssl disable --domain "api.example.com"   # Tunnel only (no inspection)
 apxy ssl list
 ```
 
-### SQL Queries
+### Traffic Analysis with jq
 
 ```bash
-apxy sql query "SELECT host, COUNT(*) as cnt FROM traffic_logs GROUP BY host ORDER BY cnt DESC"
-apxy sql query "SELECT method, url, duration_ms FROM traffic_logs WHERE duration_ms > 1000"
+# Count requests by host
+apxy logs list --format json | jq '[group_by(.host)[] | {host: .[0].host, count: length}] | sort_by(-.count)'
+
+# Find requests slower than 1000ms
+apxy logs list --format json | jq '[.[] | select(.duration_ms > 1000)] | sort_by(-.duration_ms)[] | {method, url, duration_ms}'
 ```
 
 ### Body Search & JSONPath
