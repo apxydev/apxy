@@ -127,8 +127,6 @@ Global flags available on every command: `--config`, `--error-format` (text\|jso
 | `apxy recording start` | Start traffic capture | `--control-url` |
 | `apxy recording stop` | Stop traffic capture | `--control-url` |
 | `apxy traffic devices list` | List connected devices | `--format` (json\|markdown\|toon), `--mobile`, `--quiet`, `--web-url` |
-| `apxy sql query "<SQL>"` | Run read-only SQL query | Tables: `traffic_logs`, `mock_rules` |
-
 ---
 
 ## 11. Schema (6 commands)
@@ -194,10 +192,3 @@ Global flags available on every command: `--config`, `--error-format` (text\|jso
 
 ---
 
-## SQL Schema Reference
-
-The `apxy sql query` command supports read-only SELECT queries against these tables:
-
-**traffic_logs**: `id`, `timestamp`, `method`, `url`, `host`, `path`, `status_code`, `duration_ms`, `tls`, `mocked`, request/response headers and bodies.
-
-**mock_rules**: `id`, `name`, `priority`, `active`, `url_pattern`, `match_type`, `method`, and rule configuration fields.
