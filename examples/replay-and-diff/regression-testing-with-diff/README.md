@@ -60,12 +60,11 @@ before you replay.
 **Your agent runs:**
 
 ```bash
-apxy sql query "SELECT id, method, url, status_code FROM traffic_logs WHERE host = 'api.myapp.com' LIMIT 20"
+apxy logs search --query api.myapp.com --limit 20
 ```
 
 Note the record IDs you care about (for example `1` for `GET /api/users` and
-`5` for `POST /api/orders`). Adjust the `WHERE` clause if you need a path
-prefix, method filter, or time window.
+`5` for `POST /api/orders`). Use `apxy logs list --format json | jq` if you need to filter by path prefix, method, or time window.
 
 ### Step 2: Establish baseline responses (before the new version)
 
