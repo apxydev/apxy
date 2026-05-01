@@ -40,14 +40,14 @@ apxy logs search --query "httpbin"
 apxy logs show --id <record-id-from-list>
 ```
 
-### 4. Analyze with SQL
+### 4. Analyze traffic with jq
 
 ```bash
 # Count requests by status code
-apxy sql query "SELECT status_code, COUNT(*) FROM traffic_logs GROUP BY status_code"
+apxy logs list --format json | jq '[group_by(.status_code)[] | {status_code: .[0].status_code, count: length}] | sort_by(-.count)'
 
 # Find the slowest request
-apxy sql query "SELECT method, url, duration_ms FROM traffic_logs ORDER BY duration_ms DESC LIMIT 1"
+apxy logs list --format json | jq 'sort_by(-.duration_ms) | .[0] | {method, url, duration_ms}'
 ```
 
 ### 5. Export a request as cURL
