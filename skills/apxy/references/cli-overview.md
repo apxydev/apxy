@@ -120,7 +120,7 @@ Global flags available on every command: `--config`, `--error-format` (text\|jso
 
 ---
 
-## 10. Traffic — Recording, Devices, SQL (4 commands) *(SQL requires Pro)*
+## 10. Traffic — Recording, Devices (3 commands)
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
