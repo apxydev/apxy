@@ -141,7 +141,7 @@ apxy ssl list
 apxy logs list --format json | jq '[group_by(.host)[] | {host: .[0].host, count: length}] | sort_by(-.count)'
 
 # Find requests slower than 1000ms
-apxy logs list --format json | jq '[.[] | select(.duration_ms > 1000)] | sort_by(-.duration_ms)[] | {method, url, duration_ms}'
+apxy logs list --format json | jq '[.[] | select(.duration_ms > 1000) | {method, url, duration_ms}] | sort_by(-.duration_ms)'
 ```
 
 ### Body Search & JSONPath
