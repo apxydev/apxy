@@ -69,5 +69,5 @@ apxy stop
 - How to start and stop the APXY proxy
 - How to capture and list traffic
 - How to search and filter requests
-- How to use SQL for traffic analysis
+- How to use jq to analyze traffic
 - How to export requests as cURL commands
