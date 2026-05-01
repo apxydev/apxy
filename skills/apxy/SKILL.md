@@ -29,10 +29,9 @@ Before suggesting commands, be aware of what requires a Pro license so you can o
 | Tier | Features |
 |------|----------|
 | **Free** | Proxy, traffic logs, mock rules (max 3 active), redirects, filters, schema validation, replay, diff, export/import, tools (compose/batch/diagnose), setup |
-| **Pro** | SQL queries (`apxy sql query`), breakpoints, network simulation (`apxy network`), scripts (`apxy script`) |
+| **Pro** | Breakpoints, network simulation (`apxy network`), scripts (`apxy script`) |
 
 **Free alternatives when Pro isn't available:**
-- Instead of SQL → use `apxy logs search` + `jq` filters
 - Instead of breakpoints → add a temporary mock rule to intercept the request
 - Instead of network simulation → use mock `--delay` flag on a specific rule
 - Instead of scripts → use a mock rule with `--headers` to set response headers, or `--status` / `--body` to override the response
