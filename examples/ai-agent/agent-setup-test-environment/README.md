@@ -152,12 +152,6 @@ apxy logs search --query "github"
 apxy logs search --query "users"
 ```
 
-Optional SQL sanity check when licensed:
-
-```bash
-apxy sql query "SELECT host, mocked, COUNT(*) FROM traffic_logs GROUP BY host, mocked"
-```
-
 ### Step 8: Document teardown for the team
 
 **Tell your agent:**
