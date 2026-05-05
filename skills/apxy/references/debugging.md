@@ -2,22 +2,18 @@
 
 Ensure proxy is running: `apxy status`. If not: `apxy start --port 8080 --ssl-domains <your-api-domain>`.
 
-## Note: SQL Requires Pro
-
-`apxy sql query` requires a Pro license. On Free, use `apxy logs search --query <term> --format json | jq <filter>` for equivalent spot-checking. All other commands in this file are available on Free.
-
 ## Core Workflow
 
 ```
 search/list  ->  show  ->  extract/correlate
 ```
 
-**Critical ordering rule:** Your first traffic command must always be `apxy logs search` or `apxy logs list`. Do not run `apxy logs stats` or `apxy sql query` as your first traffic command — those are analysis tools that come after you've used search or list to locate specific records. Even when checking license status beforehand, ensure the first actual traffic inspection command is `search` or `list`.
+**Critical ordering rule:** Your first traffic command must always be `apxy logs search` or `apxy logs list`. Do not run `apxy logs stats` as your first traffic command — it is an analysis tool that comes after you've used search or list to locate specific records. Even when checking license status beforehand, ensure the first actual traffic inspection command is `search` or `list`.
 
 1. **Search/List** — find relevant traffic by URL, body content, GraphQL operation, or status code
 2. **Show (Inspect)** — open the full record (headers, bodies, timing) — **always use `show` on a specific record, even when search results look sufficient; search truncates headers and bodies**
 3. **Extract** — pull specific JSON fields with jsonpath
-4. **Correlate** — diff two records, aggregate with SQL, or search bodies for patterns — **always complete this step; even when the issue is obvious from inspect, diffing a failing vs successful record confirms the diagnosis and reveals related patterns**
+4. **Correlate** — diff two records, aggregate with jq, or search bodies for patterns — **always complete this step; even when the issue is obvious from inspect, diffing a failing vs successful record confirms the diagnosis and reveals related patterns**
 
 ## Traffic Commands
 
@@ -56,72 +52,48 @@ search/list  ->  show  ->  extract/correlate
 |---------|-------------|-----------|
 | `apxy traffic devices list` | List connected devices | `--format` (json\|markdown\|toon), `--mobile`, `-q`/`--quiet`, `--web-url` |
 
-### SQL (1 command)
-
-| Command | Description | Key Flags |
-|---------|-------------|-----------|
-| `apxy sql query "<SQL>"` | Run read-only SQL against SQLite | Tables: `traffic_logs`, `mock_rules` |
-
-## Common SQL Patterns
+## Common jq Patterns
 
 Count requests by status code:
 
 ```bash
-apxy sql query "SELECT status_code, COUNT(*) AS count FROM traffic_logs GROUP BY status_code ORDER BY count DESC"
+apxy logs list --format json | jq '[group_by(.status_code)[] | {status_code: .[0].status_code, count: length}] | sort_by(-.count)'
 ```
 
 Slowest endpoints by average latency:
 
 ```bash
-apxy sql query "SELECT url, COUNT(*) AS n, AVG(duration_ms) AS avg_ms, MAX(duration_ms) AS max_ms FROM traffic_logs GROUP BY url ORDER BY avg_ms DESC LIMIT 10"
+apxy logs list --format json | jq '[group_by(.url)[] | {url: .[0].url, n: length, avg_ms: (map(.duration_ms) | add / length | round), max_ms: (map(.duration_ms) | max)}] | sort_by(-.avg_ms) | .[:10]'
 ```
 
 Error rate by host:
 
 ```bash
-apxy sql query "SELECT host, COUNT(*) AS total, SUM(CASE WHEN status_code >= 400 THEN 1 ELSE 0 END) AS errors FROM traffic_logs GROUP BY host"
+apxy logs list --format json | jq '[group_by(.host)[] | {host: .[0].host, total: length, errors: (map(select(.status_code >= 400)) | length)}]'
 ```
 
 All 5xx errors with method and path:
 
 ```bash
-apxy sql query "SELECT id, method, path, status_code, duration_ms FROM traffic_logs WHERE status_code >= 500 ORDER BY id DESC LIMIT 20"
+apxy logs list --format json | jq '[.[] | select(.status_code >= 500)] | sort_by(-.id) | .[:20][] | {id, method, path, status_code, duration_ms}'
 ```
 
-Group by method + path + status:
+Group by host + path + method:
 
 ```bash
-apxy sql query "SELECT host, path, method, COUNT(*) AS cnt FROM traffic_logs GROUP BY host, path, method ORDER BY cnt DESC LIMIT 20"
+apxy logs list --format json | jq '[group_by(.host, .path, .method)[] | {host: .[0].host, path: .[0].path, method: .[0].method, cnt: length}] | sort_by(-.cnt) | .[:20]'
 ```
 
 Requests slower than a threshold (e.g. 2000ms):
 
 ```bash
-apxy sql query "SELECT method, url, duration_ms, status_code FROM traffic_logs WHERE duration_ms > 2000 ORDER BY duration_ms DESC LIMIT 10"
-```
-
-Requests per minute (approximate):
-
-```bash
-apxy sql query "SELECT strftime('%Y-%m-%d %H:%M', timestamp) AS minute, COUNT(*) AS rpm FROM traffic_logs GROUP BY minute ORDER BY minute DESC LIMIT 30"
-```
-
-Large response bodies (by status and URL):
-
-```bash
-apxy sql query "SELECT id, method, url, status_code, length(response_body) AS body_bytes FROM traffic_logs WHERE length(response_body) > 100000 ORDER BY body_bytes DESC LIMIT 10"
-```
-
-Approximate P95 latency for a specific path:
-
-```bash
-apxy sql query "SELECT duration_ms FROM traffic_logs WHERE url LIKE '%/api/search%' ORDER BY duration_ms DESC LIMIT 1 OFFSET (SELECT COUNT(*) / 20 FROM traffic_logs WHERE url LIKE '%/api/search%')"
+apxy logs list --format json | jq '[.[] | select(.duration_ms > 2000)] | sort_by(-.duration_ms) | .[:10][] | {method, url, duration_ms, status_code}'
 ```
 
 Status breakdown for a flaky endpoint:
 
 ```bash
-apxy sql query "SELECT status_code, COUNT(*) AS count FROM traffic_logs WHERE url LIKE '%/api/search%' GROUP BY status_code ORDER BY count DESC"
+apxy logs search --query /api/search --format json | jq '[group_by(.status_code)[] | {status_code: .[0].status_code, count: length}] | sort_by(-.count)'
 ```
 
 ## JSONPath Extraction Patterns
@@ -255,7 +227,7 @@ apxy logs jsonpath --id <ID> --path "errors.#.message" --scope response
 
 **Symptoms:** Spinners hang, dashboards take seconds to load. Users report "the site is slow" without specifics.
 
-**⚠️ Order matters:** Your first traffic command must be `apxy logs search` or `apxy logs list`. Do not start with `apxy logs stats` or `apxy sql query` — run those only after the initial search/list step.
+**⚠️ Order matters:** Your first traffic command must be `apxy logs search` or `apxy logs list`. Do not start with `apxy logs stats` — run it only after the initial search/list step.
 
 **Steps:**
 
@@ -271,9 +243,9 @@ apxy logs jsonpath --id <ID> --path "errors.#.message" --scope response
    ```bash
    apxy logs show --id <ID>
    ```
-3. **Optionally:** if Pro is available and you need latency rankings across all endpoints:
+3. **Optionally:** for latency rankings across all endpoints:
    ```bash
-   apxy sql query "SELECT url, COUNT(*) AS n, AVG(duration_ms) AS avg_ms, MAX(duration_ms) AS max_ms FROM traffic_logs GROUP BY url ORDER BY avg_ms DESC LIMIT 10"
+   apxy logs list --format json | jq '[group_by(.url)[] | {url: .[0].url, n: length, avg_ms: (map(.duration_ms) | add / length | round), max_ms: (map(.duration_ms) | max)}] | sort_by(-.avg_ms) | .[:10]'
    ```
 3. Replay after optimization to measure improvement:
    ```bash
@@ -326,11 +298,11 @@ apxy logs jsonpath --id <ID> --path "errors.#.message" --scope response
 
 1. Capture a volume of traffic, then quantify failure rate:
    ```bash
-   apxy sql query "SELECT status_code, COUNT(*) AS count FROM traffic_logs WHERE url LIKE '%/api/search%' GROUP BY status_code ORDER BY count DESC"
+   apxy logs search --query /api/search --format json | jq '[group_by(.status_code)[] | {status_code: .[0].status_code, count: length}] | sort_by(-.count)'
    ```
 2. List failing rows with IDs:
    ```bash
-   apxy sql query "SELECT id, status_code, duration_ms FROM traffic_logs WHERE url LIKE '%/api/search%' AND status_code >= 500 ORDER BY id DESC LIMIT 20"
+   apxy logs search --query /api/search --format json | jq '[.[] | select(.status_code >= 500)] | sort_by(-.id) | .[:20][] | {id, status_code, duration_ms}'
    ```
 3. Diff a failure against a success — requests first:
    ```bash

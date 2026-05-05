@@ -122,7 +122,45 @@ Agent shows a warning-style line that all HTTPS is subject to deep inspection. U
 apxy start --mitm-all --bypass-domains "*.bank.com,*.openai.com"
 ```
 
-### Step 6: Stop when finished
+### Step 6 (optional): Manage SSL domains at runtime
+
+Skip this step if you do not need to change which domains are intercepted while the proxy is running.
+
+Tell your agent:
+
+> "Show me which domains APXY is currently intercepting, then enable and disable SSL for api.example.com."
+
+Your agent runs:
+
+```bash
+apxy ssl list
+```
+
+Agent shows the current intercepted domain list.
+
+```
+Intercepted SSL domains:
+  - api.example.com
+  - *.staging.example.com
+```
+
+To add a domain at runtime:
+
+```bash
+apxy ssl enable --domain api.example.com
+```
+
+To remove a domain at runtime:
+
+```bash
+apxy ssl disable --domain api.example.com
+```
+
+Changes take effect immediately — no restart needed.
+
+---
+
+### Step 7: Stop when finished
 
 Tell your agent:
 
@@ -166,7 +204,7 @@ Use the **Trust** or **Install CA** action on the same page. Follow the OS-speci
 
 ### Step 4: Configure interception domains
 
-In the SSL domain list, add `api.example.com` (and any wildcards your team uses). Save or apply changes. Confirm the list matches what you would pass to `--ssl-domains` on the CLI.
+In the SSL domain list, add `api.example.com` (and any wildcards your team uses). Save or apply changes. Confirm the list matches what you would pass to `--ssl-domains` on the CLI. You can also toggle individual domains on or off here at any time without restarting the proxy.
 
 > screenshots/04-ssl-domain-list.png
 
@@ -195,6 +233,7 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 - How to scope interception with `--ssl-domains` versus broad `--mitm-all`
 - How to confirm decryption via `apxy logs list` / `apxy logs show` or the Web UI Traffic view
 - When to prefer narrow domain lists over full MITM for safety and noise control
+- How to manage SSL interception per-domain at runtime with `apxy ssl list`, `apxy ssl enable`, and `apxy ssl disable`
 
 ## Next Steps
 

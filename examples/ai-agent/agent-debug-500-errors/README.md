@@ -46,12 +46,12 @@ Generate traffic through the proxy (your app, integration tests, or `curl`) so t
 
 **Tell your agent:**
 
-> "Use APXY's read-only SQL to list recent requests with status 500 or higher for api.myapp.com. I want id, method, full url, status, and duration_ms, newest first."
+> "List recent requests with status 500 or higher. I want id, method, full url, status, and duration_ms, newest first."
 
 **Your agent runs:**
 
 ```bash
-apxy sql query "SELECT id, method, url, status_code, duration_ms FROM traffic_logs WHERE status_code >= 500 ORDER BY id DESC LIMIT 50"
+apxy logs list --format json | jq '[.[] | select(.status_code >= 500)] | sort_by(-.id) | .[:50][] | {id, method, url, status_code, duration_ms}'
 ```
 
 The agent picks the most relevant row (for example the one matching `/api/orders` or the latest customer-facing failure) and notes its `id` for the next steps.
@@ -102,12 +102,12 @@ If the body is not JSON or the path misses, the agent falls back to the full `ap
 
 **Tell your agent:**
 
-> "Run SQL again to see if other 500s share the same path or host, and summarize whether this looks like one bug or many."
+> "Check if other 500s share the same path or host, and summarize whether this looks like one bug or many."
 
 **Your agent runs:**
 
 ```bash
-apxy sql query "SELECT path, status_code, COUNT(*) AS n FROM traffic_logs WHERE status_code >= 500 GROUP BY path, status_code ORDER BY n DESC"
+apxy logs list --format json | jq '[.[] | select(.status_code >= 500)] | group_by(.path) | map({path: .[0].path, status_code: .[0].status_code, n: length}) | sort_by(-.n)'
 ```
 
 The agent explains the pattern (for example "all 500s are POST /api/orders with the same error.message").
@@ -166,7 +166,7 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 ## What You Learned
 
-- How to drive APXY from an agent using **read-only SQL** on `traffic_logs` for status and latency-aware listings
+- How to drive APXY from an agent using **jq pipelines** on `apxy logs list` output
 - How **`apxy logs show`** and **`apxy logs jsonpath`** narrow huge responses to the fields that explain failures
 - How to **replay** with **`apxy tools request compose`** and prove a fix with **`apxy logs diff --scope response`**
 - That the Web UI mirrors the same capture data for visual confirmation

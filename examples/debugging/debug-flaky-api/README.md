@@ -51,7 +51,7 @@ Encourage varied query strings and auth states so failures are not all identical
 **Your agent runs:**
 
 ```bash
-apxy sql query "SELECT status_code, COUNT(*) AS count FROM traffic_logs WHERE url LIKE '%/api/search%' GROUP BY status_code ORDER BY count DESC"
+apxy logs search --query /api/search --format json | jq '[group_by(.status_code)[] | {status_code: .[0].status_code, count: length}] | sort_by(-.count)'
 ```
 
 Agent reports:
@@ -73,10 +73,10 @@ That ratio turns “sometimes” into a metric you can attach to a ticket.
 **Your agent runs:**
 
 ```bash
-apxy sql query "SELECT id, status_code, duration_ms FROM traffic_logs WHERE url LIKE '%/api/search%' AND status_code >= 500 ORDER BY id DESC LIMIT 20"
+apxy logs search --query /api/search --format json | jq '[.[] | select(.status_code >= 500)] | sort_by(-.id) | .[:20][] | {id, status_code, duration_ms}'
 ```
 
-Pick one `id` as **FAIL_ID** and find a nearby **200** with similar query params (search `logs` or SQL on `url`).
+Pick one `id` as **FAIL_ID** and find a nearby **200** with similar query params (search `logs` by `url`).
 
 ### Step 4: Show full failure and success records
 
