@@ -1,80 +1,119 @@
-# APXY — Network Debugging and API Mocking for Developers and AI Coding Agents
+# APXY
 
-[![Version](https://img.shields.io/badge/version-1.4.0-blue.svg)](https://github.com/apxydev/apxy/releases)
-[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey.svg)]()
+[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey.svg)](#install)
 
-![APXY Console live traffic view](assets/live-traffic.png)
+APXY is a local proxy for HTTP and HTTPS. It shows you every request your app sends and every response it gets back. You can also mock an endpoint, replay a request after a fix, and diff the two responses.
 
-**Capture, inspect, mock, replay, and diff HTTP/HTTPS traffic from a CLI and Web UI. Built for developers and AI coding agents.**
+Use the CLI from your terminal or your AI coding agent. Use the Web UI when you want to click through traffic.
 
-APXY sits between your app and the network so you can see every HTTP/HTTPS request and response. Use the **CLI** for scripting, automation, and AI-assisted debugging, or the **Web UI** for visual inspection and rule management. Mock APIs, replay requests, diff responses, and simulate bad networks from one local proxy.
-
-Website: [apxy.dev](https://apxy.dev)
+![APXY Web UI showing live traffic](assets/live-traffic.png)
 
 ## Install
 
-**Shell script**:
-
-```bash
-curl -fsSL https://apxy.dev/install.sh | bash
-```
-
-**Homebrew** (macOS / Linux):
+Install with Homebrew on macOS or Linux:
 
 ```bash
 brew tap apxydev/apxy https://github.com/apxydev/apxy
 brew install apxy
 ```
 
-## AI Coding Agent Skill
+Or install with the shell script:
 
-Give your AI coding agent full knowledge of APXY's CLI so it can debug traffic, mock APIs, and validate schemas with real network evidence instead of guesswork.
+```bash
+curl -fsSL https://apxy.dev/install.sh | bash
+```
 
-Works with **Claude Code**, **Cursor**, **Codex**, **Gemini CLI**, **GitHub Copilot**, and other agents that support the [skills](https://github.com/vercel-labs/skills) ecosystem.
+## See your first request
 
-**Install the skill:**
+This takes about two minutes. You start the proxy, send one request through it, and look at what APXY captured.
+
+> [!NOTE]
+> APXY records the full body of an HTTPS request only for domains that you turn on. Other HTTPS traffic shows up as a `CONNECT` line with the host name and no body. Turn on a domain with `--ssl-domains` when you start APXY, or later with `apxy ssl enable --domain <host>`.
+
+1. Start the proxy and turn on HTTPS capture for `httpbin.org`:
+
+   ```bash
+   apxy start --ssl-domains httpbin.org
+   ```
+
+   On the first run on macOS, APXY creates a certificate and asks for your password to trust it. It also turns on the system proxy, so your browser and apps go through APXY.
+
+2. In a second terminal, send a request through APXY:
+
+   ```bash
+   apxy run curl https://httpbin.org/get
+   ```
+
+   `apxy run` starts any command with the proxy settings and the certificate already set. Your shell stays unchanged.
+
+3. Look at the request. Open the Web UI at <http://localhost:8082>, or list it in the terminal:
+
+   ```bash
+   apxy logs list --limit 5
+   ```
+
+   You see a `GET` to `https://httpbin.org:443/get` with status `200`.
+
+4. Stop the proxy when you are done:
+
+   ```bash
+   apxy stop
+   ```
+
+   APXY turns the system proxy off again.
+
+On Linux, start with `apxy start --no-system-proxy` and send traffic through `apxy run`.
+
+## What else you can do
+
+The [user guide](docs/user-guide.md) shows the commands for each of these:
+
+- [Find and inspect requests](docs/user-guide.md#traffic-capture--inspection) by URL, header, or body.
+- [Mock an API](docs/user-guide.md#mock-rules) that is broken or not built yet.
+- [Replay a request](docs/user-guide.md#export--replay) after a fix, or export it as a curl command.
+- [Diff two requests](docs/user-guide.md#diff) to see what your fix changed.
+- [Slow down the network](docs/user-guide.md#network-conditions) to test loading states and timeouts.
+
+## Use APXY with your AI coding agent
+
+Your agent cannot see network traffic from your editor. APXY gives it the real requests and responses.
+
+Install the APXY skill. It works with Claude Code, Cursor, Codex, Gemini CLI, GitHub Copilot, and other agents that support [skills](https://github.com/vercel-labs/skills).
 
 ```bash
 npx skills add apxydev/apxy
 ```
 
-Once installed, your agent understands how to:
+Or connect APXY as an MCP server. This command sets up Claude Code:
 
-- Start/stop the proxy and configure HTTPS interception
-- Create mock rules, redirects, interceptors, breakpoints, and scripts
-- Search, filter, diff, replay, and export captured traffic
-- Import OpenAPI schemas and validate traffic against them
-- Run SQL queries on captured requests
-- Set up certificates and mobile device debugging
-- Simulate network conditions (latency, bandwidth, packet loss)
+```bash
+apxy setup mcp --client claude-code --write
+```
 
-**Example prompts you can give your agent:**
+Then ask your agent things like:
 
-> "Start APXY and capture all traffic to api.example.com"
+> "Start APXY and show me every request to api.example.com that returned a 500."
 >
-> "Mock the /api/payments endpoint to return a 200 with a test response"
+> "Mock POST /api/payments to return a 402 card error so I can test the error screen."
 >
-> "Find all requests that returned 500 errors in the last hour"
->
-> "Import my OpenAPI spec and validate recent traffic against it"
->
-> "Set a breakpoint on POST /api/login so I can inspect the request before it's sent"
+> "Replay the failing checkout request and diff it against the one before my fix."
 
-## Templates And Examples
+## Free and Pro
 
-APXY already ships with reusable public assets you can use as starting points or contribute to:
+The Free plan has every feature and needs no account. Each Free proxy session stops after 10 minutes. Run `apxy start` again to start a new session. [APXY Pro](https://apxy.dev/license) removes the time limit.
 
-- [Mock Templates](mock-templates/README.md) — reusable rules for Stripe, GitHub, and OpenAI
-- [Examples](examples/README.md) — debugging, mocking, and AI-agent workflow walkthroughs
-- [Website Templates](https://apxy.dev/templates) — fast install paths for public mock kits
-- [Website Examples](https://apxy.dev/examples) — artifact-style workflow pages built for discovery
+## Learn more
 
-These assets are the fastest way to learn APXY from a real use case instead of a generic setup guide.
+- [Getting started](docs/getting-started.md) has the full install and first-run guide.
+- [User guide](docs/user-guide.md) covers every feature.
+- [Troubleshooting](docs/troubleshooting.md) and the [FAQ](docs/faq.md) answer common problems.
+- [Examples](examples/README.md) walk through real debugging, mocking, and AI agent workflows.
+- [Mock templates](mock-templates/README.md) give you ready-made mocks for Stripe, GitHub, and OpenAI.
+- [apxy.dev/docs](https://apxy.dev/docs) has the online docs.
 
-## Contributing
+## Contribute and get help
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute.
-
-## Reporting Issues
-
-Found a bug or have a feature request? [Open an issue](https://github.com/apxydev/apxy/issues).
+- Read [CONTRIBUTING.md](CONTRIBUTING.md) to add a mock template, an example, or a fix.
+- [Open an issue](https://github.com/apxydev/apxy/issues) to report a bug or ask for a feature.
+- Read [SECURITY.md](SECURITY.md) to report a security problem.
+- Email [support@apxy.dev](mailto:support@apxy.dev) for anything else.
