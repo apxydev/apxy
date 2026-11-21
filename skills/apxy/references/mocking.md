@@ -1,8 +1,8 @@
-# Mocking — API Stubs & Schema Validation
+# Mocking and schema validation
 
-Ensure proxy is running: `apxy status`. If not: `apxy start --port 8080 --ssl-domains <target-domain>`.
+`apxy mock add`, `list`, `enable`, `disable`, `remove`, and `clear` work without a running proxy. A rule you add while no proxy runs applies when the next proxy starts. `apxy mock import` needs a running proxy. For an HTTPS URL, the proxy must decrypt that host, so start it with `--ssl-domains <host>` or `--mitm-all`.
 
-## Mock Rule Commands
+## Mock rule commands
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
@@ -14,11 +14,9 @@ Ensure proxy is running: `apxy status`. If not: `apxy start --port 8080 --ssl-do
 | `apxy mock clear` | Delete all rules | `--dry-run` |
 | `apxy mock import` | Import rules from JSON template | `--file`, `--control-url` |
 
-> **Free tier:** Maximum 3 active mock rules. To rotate: `apxy mock disable --id <OLD>` then add the new rule.
+## Mock rule flags
 
-## Mock Rule Key Flags (Detailed)
-
-**--url** -- URL pattern to match against incoming requests.
+`--url` is the URL pattern to match.
 
 ```bash
 --url "https://api.stripe.com/v1/charges"       # exact URL
@@ -26,33 +24,33 @@ Ensure proxy is running: `apxy status`. If not: `apxy start --port 8080 --ssl-do
 --url "^https://api\\.example\\.com/v[0-9]+/.*$" # regex (use with --match regex)
 ```
 
-**--match** -- Match type: `exact` (default), `wildcard`, or `regex`.
+`--match` is the match type: `exact` (default), `wildcard`, or `regex`.
 
-- `exact` -- URL must match character-for-character.
-- `wildcard` -- `*` matches any substring within a path segment or across segments.
-- `regex` -- Full Go-flavored regex.
+- `exact` matches the URL character for character.
+- `wildcard` lets `*` match any substring, within a path segment or across segments.
+- `regex` takes a Go regular expression.
 
-**--method** -- HTTP method filter (e.g. GET, POST, PUT, DELETE). If omitted, the rule matches any method.
+`--method` limits the rule to one HTTP method, such as GET or POST. Without it, the rule matches any method.
 
 ```bash
 --method POST
 ```
 
-**--header-conditions** -- Request header matchers as JSON or `k=v` pairs. Useful for scenario-specific mocks.
+`--header-conditions` matches request headers, as JSON or `k=v` pairs. Use it to serve a different mock per test scenario.
 
 ```bash
 --header-conditions 'X-APXY-Scenario=card_declined'
 --header-conditions '{"X-APXY-Scenario":"rate_limited"}'
 ```
 
-**--headers** -- Response headers as JSON or `k=v` pairs.
+`--headers` sets response headers, as JSON or `k=v` pairs.
 
 ```bash
 --headers 'Content-Type=application/json,Cache-Control=no-store'
 --headers '{"Access-Control-Allow-Origin":"http://localhost:3000"}'
 ```
 
-**--status** -- Response status code. Defaults to 200.
+`--status` sets the response status code. The default is 200.
 
 ```bash
 --status 201    # created
@@ -60,26 +58,26 @@ Ensure proxy is running: `apxy status`. If not: `apxy start --port 8080 --ssl-do
 --status 500    # server error
 ```
 
-**--body** -- Response body string (typically JSON).
+`--body` sets the response body, usually JSON.
 
 ```bash
 --body '{"id":"ch_test","status":"succeeded"}'
 ```
 
-**--delay** -- Artificial response delay in milliseconds. Simulates slow APIs.
+`--delay` holds the response for that many milliseconds, to test a slow API.
 
 ```bash
 --delay 2000    # 2-second delay
 ```
 
-**--priority** -- Lower values match first. Use to layer scenario-specific rules above default happy-path rules.
+`--priority` orders rules. Lower values match first, so scenario rules can sit above the default rules.
 
 ```bash
 --priority 10   # scenario rules (checked first)
 --priority 50   # default rules (checked after scenario rules)
 ```
 
-## Schema Validation Commands
+## Schema validation commands
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
@@ -90,19 +88,23 @@ Ensure proxy is running: `apxy status`. If not: `apxy start --port 8080 --ssl-do
 | `apxy schema validate-recent` | Validate recent traffic | `--limit` (default 20) |
 | `apxy schema delete` | Delete schema | `--id` (required), `--dry-run` |
 
-## Agent Workflow: Mock for Testing
+## Agent workflow: mock for testing
 
 ```bash
 apxy mock add --name "stub-payment" --url "https://api.stripe.com/v1/charges" \
-  --match wildcard --status 200 --body '{"id":"ch_test","status":"succeeded"}'
+  --method POST --status 200 --body '{"id":"ch_test","status":"succeeded"}'
 apxy mock list
-apxy tools request compose --method POST --url "https://api.stripe.com/v1/charges" --body '{"amount":1000}'
+apxy mark
+apxy run --ssl-domains api.stripe.com -- curl -s -X POST https://api.stripe.com/v1/charges -d amount=1000
+apxy wait --match "POST /v1/charges" --expect "status == 200" --expect "body.status == succeeded"
 apxy mock remove --id <RULE_ID>
 ```
 
-## Agent Workflow: Unblock Frontend (Design-First)
+`apxy wait` exits with 0 when the mock served the request. The record in its output has `"mocked": true`.
 
-Frontend teams shouldn't wait for backend -- mock every endpoint from the agreed API contract so parallel development can start immediately.
+## Agent workflow: unblock a frontend
+
+Mock each endpoint from the agreed API contract. The frontend can then run before the backend exists.
 
 ```bash
 apxy start --port 8080
@@ -115,12 +117,12 @@ apxy mock add --name "create-user" --url "/api/users" --match wildcard --method 
 apxy mock add --name "auth-login" --url "/api/auth/login" --match wildcard --method POST \
   --status 200 --body '{"token":"eyJ...","expires_in":3600}'
 apxy mock list
-# Frontend hits the proxy -- gets realistic responses without any backend running
+# The frontend now gets these responses through the proxy, with no backend running
 ```
 
-## Agent Workflow: Catch Breaking Changes
+## Agent workflow: catch breaking changes
 
-Compare real API responses against your OpenAPI spec -- surface contract violations before users hit them.
+Compare real API responses with your OpenAPI spec to find contract violations.
 
 ```bash
 # Import the spec that the team agreed on
@@ -128,13 +130,13 @@ apxy schema import --name "my-api" --file ./openapi.yaml
 # Run with live validation so every request is checked as it happens
 apxy start --port 8080 --auto-validate
 eval $(apxy env)
-# Exercise the app (or run your test suite) -- violations are flagged automatically
+# Exercise the app or run the test suite. APXY flags each violation as it happens.
 apxy schema validate-recent --limit 50
 # Validate a specific suspicious response manually
 apxy schema validate --record-id <ID> --schema-id <SCHEMA_ID>
 ```
 
-## Agent Workflow: Mock While Fixing
+## Agent workflow: mock while fixing
 
 When a backend endpoint is broken, create a temporary mock so the frontend can keep working while you fix the real service.
 
@@ -168,11 +170,12 @@ Copy the rule ID for cleanup later.
 **Step 4: Verify the mock is serving traffic**
 
 ```bash
+apxy mark
 curl -x http://127.0.0.1:8080 https://api.myapp.com/api/inventory
-apxy logs search --query "inventory"
+apxy wait --match "GET /api/inventory" --expect "status == 200" --expect "body.items exists"
 ```
 
-The newest row should show 200 with the mocked payload.
+Exit code 0 means the mock served the request.
 
 **Step 5: Fix the real backend, then remove the mock**
 
@@ -183,12 +186,13 @@ apxy mock remove --id <RULE_ID>
 **Step 6: Verify the real endpoint works**
 
 ```bash
+apxy mark
 curl -x http://127.0.0.1:8080 https://api.myapp.com/api/inventory
-apxy logs search --query "inventory"
+apxy wait --match "GET /api/inventory" --expect "status == 200" --expect "body.updated_at != 2025-03-27T12:00:00Z"
 ```
 
-Confirm the response is live data, not the static mock.
+Exit code 0 means the real backend answered, not the mock.
 
-## See Also
+## See also
 
 - For vendor-specific mock templates: [mock-templates.md](mock-templates.md)

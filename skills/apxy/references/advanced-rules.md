@@ -1,8 +1,8 @@
-# Advanced Rules -- Network, Scripts, Breakpoints, Redirects, Filters
+# Advanced rules: network, scripts, breakpoints, rewrites, filters
 
-Ensure proxy is running: `apxy status`. Most features in this section require a Pro license.
+These commands change the running proxy. Start one with `apxy start` first, and check it with `apxy status`.
 
-## Network Simulation *(Pro)*
+## Network simulation
 
 Simulate degraded network conditions globally for all proxied traffic.
 
@@ -24,7 +24,7 @@ apxy network set --latency 500 --bandwidth 256 --packet-loss 5
 apxy network clear
 ```
 
-## Script Rules *(Pro)*
+## Script rules
 
 Run JavaScript on matching requests or responses. Provide code inline (`--code`) or from a file (`--file`). Scripts execute at a hook point: `onRequest` (before forwarding) or `onResponse` (before returning to client). The `--match` flag accepts a DSL expression to scope which traffic the script applies to (default: `*` matches all).
 
@@ -54,7 +54,7 @@ apxy script list
 apxy script remove --id <ID>
 ```
 
-## Breakpoint Rules *(Pro)*
+## Breakpoint rules
 
 Pause matching requests or responses for manual inspection before forwarding. Use `--phase` to control when the breakpoint fires: `request` (before upstream), `response` (before client), or `both`. Paused traffic auto-resumes after `--timeout` milliseconds (default 30000). Use `pending` to see what is paused, and `resolve` to resume (optionally modifying status, headers, or body).
 
@@ -74,15 +74,15 @@ Resolve options:
 - Modify and resume: `apxy breakpoint resolve --id <ID> --status 200 --body '{"ok":true}' --headers '{"X-Debug":"true"}'`
 - Drop the request: `apxy breakpoint resolve --id <ID> --drop`
 
-## Redirect Rules
+## Rewrite rules
 
 Rewrite request URLs before forwarding. The `--match` flag controls pattern type: `exact` (full URL match), `wildcard` (glob patterns with `*`), or `regex`.
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `apxy rewrite set` | Add a redirect rule | `--name`, `--from` (source pattern), `--to` (destination), `--match` (exact\|wildcard\|regex) |
-| `apxy rewrite list` | List all redirects | `--format` (json\|toon), `--quiet` |
-| `apxy rewrite remove` | Remove a redirect | `--id` or `--all`, `--dry-run` |
+| `apxy rewrite set` | Add a rewrite rule | `--name`, `--from` (source pattern), `--to` (destination), `--match` (exact\|wildcard\|regex) |
+| `apxy rewrite list` | List all rewrite rules | `--format` (json\|toon), `--quiet` |
+| `apxy rewrite remove` | Remove a rewrite rule | `--id` or `--all`, `--dry-run` |
 
 Examples:
 
@@ -100,7 +100,7 @@ apxy rewrite list
 apxy rewrite remove --id <ID>
 ```
 
-## Filter Rules
+## Filter rules
 
 Block or allow traffic by domain pattern. Use `--type block` to drop matching requests, `--type allow` to permit only matching requests (implicit deny for everything else).
 
@@ -124,7 +124,7 @@ apxy filter list
 apxy filter remove --all
 ```
 
-## Caching Rules
+## Caching rules
 
 Control upstream caching behavior for proxied traffic.
 
@@ -146,7 +146,7 @@ apxy caching disable-cache
 apxy caching enable-cache
 ```
 
-## Agent Workflow: Breakpoint Debugging
+## Agent workflow: breakpoint debugging
 
 ```bash
 apxy breakpoint add --name "pause-login" --match "path contains /login && method == POST" --phase request
@@ -157,7 +157,7 @@ apxy breakpoint resolve --id <ID> --status 200 --body '{"token":"test"}' --heade
 apxy breakpoint remove --all
 ```
 
-## Agent Workflow: Script-Based Modification
+## Agent workflow: change traffic with a script
 
 ```bash
 apxy script add --name "rewrite-body" --code 'response.body = response.body.replace("foo","bar")' --match "host == api.example.com" --hook onResponse
@@ -166,9 +166,9 @@ apxy script list
 apxy script remove --id <ID>
 ```
 
-## Agent Workflow: Simulate Error Scenarios for Resilience Testing
+## Agent workflow: simulate errors for resilience tests
 
-Test how your app handles 3rd-party outages, rate limiting, and timeout conditions -- without actually breaking the real service.
+Test how your app handles third-party outages, rate limits, and timeouts. The real service stays untouched.
 
 ```bash
 # Simulate payment provider outage
@@ -191,14 +191,14 @@ apxy mock clear
 apxy network clear
 ```
 
-## Common Patterns
+## Common patterns
 
 ### Redirect production to staging for safe testing
 
 ```bash
 apxy rewrite set --name "staging" \
   --from "https://api.example.com" --to "https://staging.example.com" --match exact
-# Test your app -- all requests go to staging
+# Test your app. All requests go to staging.
 apxy rewrite remove --all   # restore production routing
 ```
 
@@ -243,13 +243,6 @@ apxy network clear
 apxy caching enable-cache
 ```
 
-## Free Alternatives
-
-If the user is on Free tier:
-- **Instead of breakpoints** → use `apxy mock add` to return a synthetic response for the matching path
-- **Instead of network simulation** → use `--delay <ms>` on a mock rule to slow specific endpoints
-- **Instead of scripts** → use `apxy mock add --headers / --status / --body` for static response overrides (mock rules are Free)
-
-## See Also
+## See also
 
 - For DSL match expression syntax used by `--match` flags: [dsl-reference.md](dsl-reference.md)

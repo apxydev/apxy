@@ -1,6 +1,6 @@
-# DSL Match Expressions
+# Match expressions
 
-Used by breakpoint `--match`, script `--match`, and filter `--target`.
+`apxy wait --match`, `apxy wait --expect`, `apxy breakpoint add --match`, and `apxy script add --match` take these expressions.
 
 ## Fields
 
@@ -11,7 +11,9 @@ Used by breakpoint `--match`, script `--match`, and filter `--target`.
 | `url` | Full request URL | `url startswith https://api.stripe.com` |
 | `method` | HTTP method (GET, POST, etc.) | `method == POST` |
 | `status` | Response status code (response-phase only) | `status >= 400` |
-| `header:<Name>` | Value of a named request/response header | `header:Content-Type contains json` |
+| `header:<Name>` | Value of a named request or response header | `header:Content-Type contains json` |
+| `body.<gjson path>` | A field in the response body. Used by `apxy wait`. | `body.order.id exists` |
+| `req.body.<gjson path>` | A field in the request body. Used by `apxy wait`. | `req.body.sku == A1` |
 
 ## Operators
 
@@ -27,18 +29,23 @@ Used by breakpoint `--match`, script `--match`, and filter `--target`.
 | `<=` | Less than or equal | `status` |
 | `>` | Greater than | `status` |
 | `<` | Less than | `status` |
+| `exists` | The field is present. Takes no value. | `header:*`, `body.*`, `req.body.*` |
 
 ## Combinators
 
 | Combinator | Description |
 |------------|-------------|
-| `&&` | Logical AND — both conditions must match |
-| `\|\|` | Logical OR — either condition matches |
-| `()` | Grouping — control evaluation order |
+| `&&` | Logical AND. Both conditions must match. |
+| `\|\|` | Logical OR. Either condition matches. |
+| `()` | Grouping. Controls the order of evaluation. |
 
 ## Wildcard
 
-`*` — matches all traffic. This is the default for `script --match` when not specified.
+`*` matches all traffic. It is the default for `apxy script add --match`.
+
+## Method and path shorthand
+
+`apxy wait --match` also takes `"METHOD /path"`, such as `"POST /api/checkout"`. It matches when the method and the path are equal.
 
 ## Examples
 
@@ -49,7 +56,7 @@ Used by breakpoint `--match`, script `--match`, and filter `--target`.
 # Match any server error
 "status >= 500"
 
-# Match client errors OR server errors
+# Match client errors or server errors
 "status >= 400"
 
 # Match errors on a specific path
@@ -79,14 +86,23 @@ Used by breakpoint `--match`, script `--match`, and filter `--target`.
 # Match requests with a specific auth header
 "header:Authorization startswith Bearer"
 
-# Match error responses on a specific host (use with breakpoint on response phase)
+# Match error responses on a specific host (use with a response-phase breakpoint)
 "host == api.example.com && status >= 500"
+
+# apxy wait --expect: a response field is present
+"body.order.id exists"
+
+# apxy wait --expect: the request sent the right value
+"req.body.currency == usd"
 ```
 
-## Usage by Command
+## Usage by command
 
 | Command | Flag | Default |
 |---------|------|---------|
-| `apxy breakpoint add` | `--match` (required) | — |
+| `apxy wait` | `--match` (required) | none |
+| `apxy wait` | `--expect` (repeatable) | none |
+| `apxy breakpoint add` | `--match` (required) | none |
 | `apxy script add` | `--match` | `*` (all traffic) |
-| `apxy filter set` | `--target` | — |
+
+`apxy filter set --target` takes a domain pattern such as `*.example.com`, not a match expression.

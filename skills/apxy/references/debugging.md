@@ -1,102 +1,88 @@
-# Debugging — Traffic Inspection & Analysis
+# Debugging: traffic inspection and analysis
 
-Ensure proxy is running: `apxy status`. If not: `apxy start --port 8080 --ssl-domains <your-api-domain>`.
+Capture the client with `apxy run -- <cmd>`, or start a proxy with `apxy start --ssl-domains <your-api-domain>`. Check a running proxy with `apxy status`. `apxy logs replay` sends the request through a running proxy, so start one with `apxy start` before you replay.
 
-## Core Workflow
+## Core workflow
 
-```
-search/list  ->  show  ->  extract/correlate
-```
+1. Search or list. Find the traffic by URL, body content, GraphQL operation, or status code with `apxy logs search` or `apxy logs list`. Run `apxy logs stats` only after this step.
+2. Show. Open the full record with `apxy logs show --id <ID>`. Search results leave out headers and bodies, so always open the record.
+3. Extract. Pull single JSON fields with `apxy logs jsonpath`.
+4. Correlate. Diff a failing record against a passing one, aggregate with jq, or search bodies for a pattern. Do this even when the cause looks obvious. The diff confirms the cause and shows related changes.
+5. Verify. After the fix, run the loop in [SKILL.md](../SKILL.md#prove-a-change-works): `apxy mark`, trigger the code, then `apxy wait --match ... --expect ...`.
 
-**Critical ordering rule:** Your first traffic command must always be `apxy logs search` or `apxy logs list`. Do not run `apxy logs stats` as your first traffic command — it is an analysis tool that comes after you've used search or list to locate specific records. Even when checking license status beforehand, ensure the first actual traffic inspection command is `search` or `list`.
+## Traffic commands
 
-1. **Search/List** — find relevant traffic by URL, body content, GraphQL operation, or status code
-2. **Show (Inspect)** — open the full record (headers, bodies, timing) — **always use `show` on a specific record, even when search results look sufficient; search truncates headers and bodies**
-3. **Extract** — pull specific JSON fields with jsonpath
-4. **Correlate** — diff two records, aggregate with jq, or search bodies for patterns — **always complete this step; even when the issue is obvious from inspect, diffing a failing vs successful record confirms the diagnosis and reveals related patterns**
-
-## Traffic Commands
-
-### Logs (17 commands)
-
-| Command | Description | Key Flags |
+| Command | Description | Key flags |
 |---------|-------------|-----------|
-| `apxy logs list` | List captured traffic records | `--limit` (50), `--offset`, `--format` (json\|markdown\|toon), `-q`/`--quiet` |
-| `apxy logs show` | Show one record in full detail | `--id` (required), `--format` (json\|markdown\|toon) |
-| `apxy logs search` | Search by URL, host, or method | `--query`, `--limit` (20), `--format`, `-q`/`--quiet` |
-| `apxy logs search-bodies` | Full-text search in request/response bodies | `--pattern`, `--scope` (request\|response\|both), `--limit` (20), `--format` |
-| `apxy logs graphql` | Search GraphQL operations | `--operation-name`, `--operation-type` (query\|mutation\|subscription), `--limit` (20), `--format` |
-| `apxy logs jsonpath` | Extract JSON fields via gjson path | `--id`, `--path`, `--scope` (request\|response) |
-| `apxy logs diff` | Compare two captured records | `--id-a`, `--id-b`, `--scope` (request\|response\|both) |
-| `apxy logs label` | Add color label and comment to a record | `--id` (required), `--color` (red\|green\|blue\|yellow\|purple), `--comment` |
-| `apxy logs replay` | Replay a captured request through the proxy | `--id`, `--port` (8080) |
-| `apxy logs export-curl` | Export as client snippet | `--id`, `--format` (curl\|fetch\|httpie\|python) |
-| `apxy logs export-har` | Export captured traffic as HAR 1.2 | `--file`, `--limit` (10000) |
-| `apxy logs import-har` | Import traffic from a HAR file | `--file` (required) |
-| `apxy logs tail` | Live-tail traffic from a running instance | `--format` (text\|json), `--host`, `--port`, `--sse` |
-| `apxy logs sse-events` | List parsed SSE events for a traffic record | `--id`, `--limit`, `--format` (text\|json) |
-| `apxy logs sse-merge` | Merge AI streaming SSE events into one response | `--id`, `--format` (text\|json) |
-| `apxy logs stats` | Show aggregate traffic statistics | `--format` (json\|toon) |
+| `apxy logs list` | List captured records | `--limit` (50), `--offset`, `--quiet` |
+| `apxy logs show` | Show one record in full | `--id` (required) |
+| `apxy logs search` | Search by URL, host, or method | `--query`, `--limit` (20), `--quiet` |
+| `apxy logs search-bodies` | Search request and response bodies | `--pattern`, `--scope` (request\|response\|both), `--limit` (20) |
+| `apxy logs graphql` | Search GraphQL operations | `--operation-name`, `--operation-type` (query\|mutation\|subscription), `--limit` (20) |
+| `apxy logs jsonpath` | Extract JSON fields with a gjson path | `--id`, `--path`, `--scope` (request\|response) |
+| `apxy logs diff` | Compare two records | `--id-a`, `--id-b`, `--scope` (request\|response\|both) |
+| `apxy logs label` | Add a color label and comment to a record | `--id`, `--color` (red\|green\|blue\|yellow\|purple), `--comment` |
+| `apxy logs replay` | Send a captured request again | `--id`, `--port` (8080) |
+| `apxy logs export-curl` | Export a record as a client snippet | `--id`, `--format` (curl\|fetch\|httpie\|python), `--redact` |
+| `apxy logs export-har` | Export traffic as HAR 1.2 | `--file`, `--limit` (10000), `--redact` |
+| `apxy logs import-har` | Import traffic from a HAR file | `--file` |
+| `apxy logs tail` | Stream new traffic from a running proxy | `--host`, `--port`, `--sse` |
+| `apxy logs sse-events` | List the SSE events of a record | `--id`, `--limit` |
+| `apxy logs sse-merge` | Merge streamed AI SSE events into one response | `--id` |
+| `apxy logs ws-frames` | List the WebSocket frames of a record | `--id` |
+| `apxy logs stats` | Show traffic counts by method and status | |
 | `apxy logs clear` | Delete all captured records | `--dry-run` |
+| `apxy recording start` | Resume capture on the running proxy | |
+| `apxy recording stop` | Pause capture on the running proxy | |
+| `apxy wait` | Block until a matching request lands, then check it | `--match`, `--expect`, `--since`, `--timeout` (30s) |
 
-### Recording (2 commands)
+## Common jq patterns
 
-| Command | Description | Key Flags |
-|---------|-------------|-----------|
-| `apxy recording start` | Start traffic capture on the running proxy | `--control-url` (http://localhost:8081) |
-| `apxy recording stop` | Stop traffic capture | `--control-url` (http://localhost:8081) |
-
-### Devices (1 command)
-
-| Command | Description | Key Flags |
-|---------|-------------|-----------|
-| `apxy traffic devices list` | List connected devices | `--format` (json\|markdown\|toon), `--mobile`, `-q`/`--quiet`, `--web-url` |
-
-## Common jq Patterns
+Agent output puts records in `.items`. The `duration` field is in nanoseconds, so divide by 1e6 for milliseconds. Pass a large `--limit`, because `apxy logs list` returns 50 records by default.
 
 Count requests by status code:
 
 ```bash
-apxy logs list --format json | jq '[group_by(.status_code)[] | {status_code: .[0].status_code, count: length}] | sort_by(-.count)'
+apxy logs list --limit 1000 | jq '.items | group_by(.status_code) | map({status_code: .[0].status_code, count: length}) | sort_by(-.count)'
 ```
 
 Slowest endpoints by average latency:
 
 ```bash
-apxy logs list --format json | jq '[group_by(.url)[] | {url: .[0].url, n: length, avg_ms: (map(.duration_ms) | add / length | round), max_ms: (map(.duration_ms) | max)}] | sort_by(-.avg_ms) | .[:10]'
+apxy logs list --limit 1000 | jq '.items | group_by(.url) | map({url: .[0].url, n: length, avg_ms: (map(.duration / 1e6) | add / length | round), max_ms: (map(.duration / 1e6) | max | round)}) | sort_by(-.avg_ms) | .[:10]'
 ```
 
 Error rate by host:
 
 ```bash
-apxy logs list --format json | jq '[group_by(.host)[] | {host: .[0].host, total: length, errors: (map(select(.status_code >= 400)) | length)}]'
+apxy logs list --limit 1000 | jq '.items | group_by(.host) | map({host: .[0].host, total: length, errors: (map(select(.status_code >= 400)) | length)})'
 ```
 
-All 5xx errors with method and path:
+The 20 newest 5xx errors with method and path:
 
 ```bash
-apxy logs list --format json | jq '[.[] | select(.status_code >= 500)] | sort_by(-.id) | .[:20][] | {id, method, path, status_code, duration_ms}'
+apxy logs list --limit 1000 | jq '[.items[] | select(.status_code >= 500)] | sort_by(.timestamp) | reverse | .[:20][] | {id, method, path, status_code, ms: (.duration / 1e6 | round)}'
 ```
 
-Group by host + path + method:
+Group by host, path, and method:
 
 ```bash
-apxy logs list --format json | jq '[group_by(.host, .path, .method)[] | {host: .[0].host, path: .[0].path, method: .[0].method, cnt: length}] | sort_by(-.cnt) | .[:20]'
+apxy logs list --limit 1000 | jq '.items | group_by(.host, .path, .method) | map({host: .[0].host, path: .[0].path, method: .[0].method, cnt: length}) | sort_by(-.cnt) | .[:20]'
 ```
 
-Requests slower than a threshold (e.g. 2000ms):
+Requests slower than 2000 ms:
 
 ```bash
-apxy logs list --format json | jq '[.[] | select(.duration_ms > 2000)] | sort_by(-.duration_ms) | .[:10][] | {method, url, duration_ms, status_code}'
+apxy logs list --limit 1000 | jq '[.items[] | select(.duration > 2e9)] | sort_by(-.duration) | .[:10][] | {method, url, ms: (.duration / 1e6 | round), status_code}'
 ```
 
 Status breakdown for a flaky endpoint:
 
 ```bash
-apxy logs search --query /api/search --format json | jq '[group_by(.status_code)[] | {status_code: .[0].status_code, count: length}] | sort_by(-.count)'
+apxy logs search --query /api/search --limit 500 | jq '.items | group_by(.status_code) | map({status_code: .[0].status_code, count: length}) | sort_by(-.count)'
 ```
 
-## JSONPath Extraction Patterns
+## JSONPath extraction patterns
 
 Extract an error message from a response:
 
@@ -134,9 +120,9 @@ Extract an array of error details:
 apxy logs jsonpath --id <ID> --path "errors.#.message" --scope response
 ```
 
-## Debug Pattern Recipes
+## Debug recipes
 
-### CORS Errors
+### CORS errors
 
 **Symptoms:** Browser console shows "blocked by CORS policy". Preflight `OPTIONS` request fails or returns without `Access-Control-Allow-Origin` header.
 
@@ -146,7 +132,7 @@ apxy logs jsonpath --id <ID> --path "errors.#.message" --scope response
    ```bash
    apxy logs search --query "OPTIONS"
    ```
-2. Inspect the specific preflight record — `show` is the step that reveals the actual response headers returned by the server. Search results only show status codes and metadata; the response headers (where CORS headers live) require `show` to see:
+2. Open the preflight record. Search results show only status codes and metadata. The CORS headers are in the response headers, which only `show` prints:
    ```bash
    apxy logs show --id <OPTIONS_ID>
    ```
@@ -155,7 +141,7 @@ apxy logs jsonpath --id <ID> --path "errors.#.message" --scope response
    ```bash
    apxy logs search --query "<api-host>" --limit 10
    ```
-5. Temporary fix — mock a correct preflight response:
+5. As a temporary fix, mock a correct preflight response:
    ```bash
    apxy mock add --name "cors-preflight" \
      --url "https://api.myapp.com/*" --match wildcard --method OPTIONS \
@@ -165,7 +151,7 @@ apxy logs jsonpath --id <ID> --path "errors.#.message" --scope response
 
 **Fix:** Add correct CORS headers on the server. Remove the mock rule after deploying: `apxy mock remove --id <RULE_ID>`.
 
-### Auth Token Failures
+### Auth token failures
 
 **Symptoms:** Users randomly logged out. API returns 401 after a period of normal use. Refresh token flow may be silently failing.
 
@@ -194,7 +180,7 @@ apxy logs jsonpath --id <ID> --path "errors.#.message" --scope response
 
 **Fix:** Align refresh interval with `expires_in`. Ensure refresh endpoint returns a new `refresh_token`. Check for `invalid_grant` errors in failed refresh responses.
 
-### 5xx Server Errors
+### 5xx server errors
 
 **Symptoms:** API returns 500 / 502 / 503. Error message in response body. Some requests succeed, others fail intermittently.
 
@@ -202,9 +188,9 @@ apxy logs jsonpath --id <ID> --path "errors.#.message" --scope response
 
 1. Search for the failing endpoint to get a list of record IDs and status codes:
    ```bash
-   apxy logs search --query "/api/endpoint" --format json
+   apxy logs search --query "/api/endpoint"
    ```
-2. Inspect a failing record in full — `show` gives you the complete request headers, response headers, and response body. You need this before extracting specific fields, because you must see the full response to know what JSON paths or patterns to target:
+2. Open a failing record in full. `show` prints the request headers, response headers, and response body. Read it before you extract fields, so you know which JSON paths to target:
    ```bash
    apxy logs show --id <FAIL_ID>
    ```
@@ -221,44 +207,44 @@ apxy logs jsonpath --id <ID> --path "errors.#.message" --scope response
    apxy logs search-bodies --pattern "error" --scope response --limit 10
    ```
 
-**Fix:** Read the error message from step 3 — common causes: connection pool exhausted, database down, upstream timeout. Diff (step 4) reveals whether failing requests differ in any request parameter. Deploy fix then replay: `apxy logs replay --id <FAIL_ID>`.
+**Fix:** Read the error message from step 3. Common causes are an exhausted connection pool, a database outage, or an upstream timeout. The diff from step 4 shows whether failing requests differ in a request parameter. After the fix, run `apxy mark`, replay with `apxy logs replay --id <FAIL_ID>`, and check it with `apxy wait --match "<METHOD> <path>" --expect "status < 500"`.
 
-### Slow API Endpoints
+### Slow API endpoints
 
 **Symptoms:** Spinners hang, dashboards take seconds to load. Users report "the site is slow" without specifics.
 
-**⚠️ Order matters:** Your first traffic command must be `apxy logs search` or `apxy logs list`. Do not start with `apxy logs stats` — run it only after the initial search/list step.
-
 **Steps:**
 
-1. **First:** search or list traffic to locate the relevant records. If the user described which feature is slow (e.g. "search is slow"), search for it by keyword:
+1. Search or list traffic to find the records. If the user named the slow feature, such as "search is slow", search for it by keyword:
    ```bash
-   apxy logs search --query "<feature-or-path-keyword>" --format json
+   apxy logs search --query "<feature-or-path-keyword>"
    ```
-   If you don't know the specific path, list recent traffic:
+   If you do not know the path, list recent traffic:
    ```bash
-   apxy logs list --format json --limit 50
+   apxy logs list --limit 50
    ```
-2. **Then:** inspect a specific record from the suspected slow endpoint to check its `duration_ms` and response size:
+2. Open a record from the slow endpoint and check its `duration` (nanoseconds) and `response_body_size`:
    ```bash
    apxy logs show --id <ID>
    ```
-3. **Optionally:** for latency rankings across all endpoints:
+3. Rank all endpoints by latency:
    ```bash
-   apxy logs list --format json | jq '[group_by(.url)[] | {url: .[0].url, n: length, avg_ms: (map(.duration_ms) | add / length | round), max_ms: (map(.duration_ms) | max)}] | sort_by(-.avg_ms) | .[:10]'
+   apxy logs list --limit 1000 | jq '.items | group_by(.url) | map({url: .[0].url, n: length, avg_ms: (map(.duration / 1e6) | add / length | round)}) | sort_by(-.avg_ms) | .[:10]'
    ```
-3. Replay after optimization to measure improvement:
+4. After the change, replay the slow request and check its latency. `--expect` has no duration field, so read `duration` from the record:
    ```bash
-   apxy tools request compose --method GET --url "https://api.myapp.com/api/users"
+   apxy mark
+   apxy logs replay --id <BEFORE_ID>
+   apxy wait --match "GET /api/users" --expect "status == 200" | jq '.data.record.duration / 1e6'
    ```
-4. Diff before and after:
+5. Diff before and after:
    ```bash
    apxy logs diff --id-a <BEFORE_ID> --id-b <AFTER_ID> --scope both
    ```
 
-**Fix:** Add database indexes, fix N+1 queries, add caching, or reduce response payload size. Verify with replay + diff.
+**Fix:** Add database indexes, fix N+1 queries, add caching, or shrink the response. Verify with replay and diff.
 
-### Webhook Delivery Failures
+### Webhook delivery failures
 
 **Symptoms:** Provider dashboard (Stripe, GitHub, etc.) shows failed deliveries. Your server returns 500 on webhook POST. No clear error in application logs.
 
@@ -268,7 +254,7 @@ apxy logs jsonpath --id <ID> --path "errors.#.message" --scope response
    ```bash
    apxy logs search --query "webhook"
    ```
-2. Inspect the failed delivery — check request headers (e.g. `Stripe-Signature`) and response body:
+2. Open the failed delivery. Check the request headers, such as `Stripe-Signature`, and the response body:
    ```bash
    apxy logs show --id <FAIL_ID>
    ```
@@ -276,35 +262,30 @@ apxy logs jsonpath --id <ID> --path "errors.#.message" --scope response
    ```bash
    apxy logs diff --id-a <FAIL_ID> --id-b <SUCCESS_ID> --scope request
    ```
-4. Replay a test payload after fixing:
+4. After the fix, replay the failed delivery and check that it returns 200:
    ```bash
-   apxy tools request compose --method POST \
-     --url "https://api.myapp.com/webhooks/stripe" \
-     --body '{"id":"evt_test","type":"customer.subscription.updated","data":{"object":{}}}' \
-     --headers '{"Content-Type":"application/json"}'
-   ```
-5. Confirm new delivery returns 200:
-   ```bash
-   apxy logs search --query "webhook" --limit 5
+   apxy mark
+   apxy logs replay --id <FAIL_ID>
+   apxy wait --match "POST /webhooks/stripe" --expect "status == 200"
    ```
 
 **Fix:** Fix handler validation, signature verification, or database constraint. Redeploy and trigger "Resend" from provider.
 
-### Flaky / Intermittent API Errors
+### Flaky API errors
 
 **Symptoms:** Endpoint returns 200 most of the time but occasionally 503 or 500. Cannot reproduce on demand.
 
 **Steps:**
 
-1. Capture a volume of traffic, then quantify failure rate:
+1. Capture enough traffic, then count the failures:
    ```bash
-   apxy logs search --query /api/search --format json | jq '[group_by(.status_code)[] | {status_code: .[0].status_code, count: length}] | sort_by(-.count)'
+   apxy logs search --query /api/search --limit 500 | jq '.items | group_by(.status_code) | map({status_code: .[0].status_code, count: length}) | sort_by(-.count)'
    ```
 2. List failing rows with IDs:
    ```bash
-   apxy logs search --query /api/search --format json | jq '[.[] | select(.status_code >= 500)] | sort_by(-.id) | .[:20][] | {id, status_code, duration_ms}'
+   apxy logs search --query /api/search --limit 500 | jq '[.items[] | select(.status_code >= 500)] | .[:20][] | {id, status_code, ms: (.duration / 1e6 | round)}'
    ```
-3. Diff a failure against a success — requests first:
+3. Diff a failure against a success. Start with the requests:
    ```bash
    apxy logs diff --id-a <FAIL_ID> --id-b <SUCCESS_ID> --scope request
    ```
@@ -319,7 +300,7 @@ apxy logs jsonpath --id <ID> --path "errors.#.message" --scope response
 
 **Fix:** If requests are identical but responses differ, the issue is upstream (load balancer, replica lag, timeout). If requests differ (e.g. different query params), investigate the data-dependent code path.
 
-### GraphQL Debugging
+### GraphQL debugging
 
 **Symptoms:** UI field shows `null` but should have data. Network tab only shows `POST /graphql 200` with a large blob.
 
@@ -333,7 +314,7 @@ apxy logs jsonpath --id <ID> --path "errors.#.message" --scope response
    ```bash
    apxy logs graphql --operation-name "GetUser" --limit 10
    ```
-3. Inspect the full record — check `query` string, `variables`, and response `data`/`errors`:
+3. Open the full record. Check the `query` string, the `variables`, and the response `data` and `errors`:
    ```bash
    apxy logs show --id <ID>
    ```
@@ -352,7 +333,7 @@ apxy logs jsonpath --id <ID> --path "errors.#.message" --scope response
 
 **Fix:** If `data.field` is null and no `errors` array, the query likely omits the field in its selection set. If `errors` contains resolver failures, fix the backend resolver. If `variables` are wrong, fix the client query builder.
 
-### Docker Container Traffic
+### Docker container traffic
 
 **Symptoms:** Microservice-to-microservice calls are invisible. Containers talk over the Docker bridge network and never touch the host proxy.
 
@@ -386,7 +367,7 @@ apxy logs jsonpath --id <ID> --path "errors.#.message" --scope response
 
 **Fix:** For persistent debugging, add `HTTP_PROXY` / `HTTPS_PROXY` to your `docker-compose.yml` environment section. Mount the APXY CA cert into containers that make HTTPS calls. Use `NO_PROXY` to exclude services that should not be proxied (e.g. databases).
 
-## See Also
+## See also
 
-- For replay, diff, and regression testing after a fix: [replay-diff.md](replay-diff.md)
-- For API contract validation and catching breaking changes: [mocking.md](mocking.md)
+- Replay, diff, and regression checks after a fix: [replay-diff.md](replay-diff.md)
+- API contract validation and breaking changes: [mocking.md](mocking.md)

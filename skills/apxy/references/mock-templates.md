@@ -1,33 +1,40 @@
-# Vendor Mock Templates
+# Vendor mock templates
 
-## Vendors with Pre-built Templates
+## Vendors with prebuilt templates
 
-These vendors have complete `rules.json` files bundled with the APXY CLI. After installation, find them at `~/.apxy/mock-templates/<vendor>/rules.json` (or the path shown by `apxy tools db info`). Read the file and create each rule using `apxy mock add`, or import the whole file at once with `apxy mock import --file <path>`.
+The APXY repo ships complete `rules.json` files for these vendors in `mock-templates/<vendor>/rules.json`. When APXY is installed as a Claude Code plugin, the files are in the plugin directory, two levels above this skill's folder. Otherwise, download one from GitHub:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/apxydev/apxy/main/mock-templates/stripe/rules.json -o ./stripe-rules.json
+apxy mock import --file ./stripe-rules.json
+```
+
+`apxy mock import` loads every rule in the file and needs a running proxy from `apxy start`. To load only some rules, read the file and create each one with `apxy mock add`.
 
 ### Stripe (api.stripe.com)
 
 SSL: `apxy start --ssl-domains api.stripe.com`
 
-**Pre-built template:** `apxy/mock-templates/stripe/rules.json` (15 rules)
+**Prebuilt template:** `mock-templates/stripe/rules.json` (15 rules)
 
 **Quick start (3 key rules):**
 
 ```bash
-# Create charge -- 200 with charge object
+# Create charge: 200 with charge object
 apxy mock add --name "stripe-create-charge" \
   --url "https://api.stripe.com/v1/charges" \
   --match exact --method POST --status 200 \
   --body '{"id":"ch_test_123","object":"charge","amount":2000,"currency":"usd","status":"succeeded","paid":true,"captured":true,"created":1770000000,"customer":"cus_test_123","payment_intent":"pi_test_123"}' \
   --delay 100 --priority 50
 
-# Create payment intent -- 200 with client_secret
+# Create payment intent: 200 with client_secret
 apxy mock add --name "stripe-create-pi" \
   --url "https://api.stripe.com/v1/payment_intents" \
   --match exact --method POST --status 200 \
   --body '{"id":"pi_test_123","object":"payment_intent","amount":2000,"currency":"usd","status":"requires_payment_method","client_secret":"pi_test_123_secret_abc","created":1770000200,"payment_method_types":["card"]}' \
   --delay 100 --priority 50
 
-# Confirm payment intent -- 200 succeeded
+# Confirm payment intent: 200 succeeded
 apxy mock add --name "stripe-confirm-pi" \
   --url "https://api.stripe.com/v1/payment_intents/*/confirm" \
   --match wildcard --method POST --status 200 \
@@ -37,16 +44,16 @@ apxy mock add --name "stripe-confirm-pi" \
 
 **Error scenarios** (use `X-APXY-Scenario` header to trigger):
 
-- `card_declined` -- 402 on `POST .../payment_intents/*/confirm`
-- `rate_limited` -- 429 on any Stripe path
-- `unauthorized` -- 401 on any Stripe path
-- `idempotency_conflict` -- 409 on `POST .../payment_intents`
+- `card_declined` returns 402 on `POST .../payment_intents/*/confirm`
+- `rate_limited` returns 429 on any Stripe path
+- `unauthorized` returns 401 on any Stripe path
+- `idempotency_conflict` returns 409 on `POST .../payment_intents`
 
 ### GitHub (api.github.com)
 
 SSL: `apxy start --ssl-domains api.github.com`
 
-**Pre-built template:** `apxy/mock-templates/github-api/rules.json` (12 rules)
+**Prebuilt template:** `mock-templates/github-api/rules.json` (12 rules)
 
 **Quick start (3 key rules):**
 
@@ -65,7 +72,7 @@ apxy mock add --name "github-list-repos" \
   --body '[{"id":1001,"node_id":"R_kgDOA-test1","name":"alpha-service","full_name":"testuser/alpha-service","private":false,"owner":{"login":"testuser","id":1},"html_url":"https://github.com/testuser/alpha-service","description":"Core service repo","fork":false,"default_branch":"main"},{"id":1002,"node_id":"R_kgDOA-test2","name":"beta-worker","full_name":"testuser/beta-worker","private":true,"owner":{"login":"testuser","id":1},"html_url":"https://github.com/testuser/beta-worker","description":"Worker repo","fork":false,"default_branch":"main"}]' \
   --delay 50 --priority 50
 
-# Create issue -- 201
+# Create issue: 201
 apxy mock add --name "github-create-issue" \
   --url "https://api.github.com/repos/*/*/issues" \
   --match wildcard --method POST --status 201 \
@@ -75,17 +82,17 @@ apxy mock add --name "github-create-issue" \
 
 **Error scenarios** (use `X-APXY-Scenario` header to trigger):
 
-- `unauthorized` -- 401 on any GitHub path
-- `not_found` -- 404 on any GitHub path
-- `rate_limited` -- 403 with `Retry-After` header
-- `validation_failed` -- 422 on issue create
-- `issues_disabled` -- 410 on issue create
+- `unauthorized` returns 401 on any GitHub path
+- `not_found` returns 404 on any GitHub path
+- `rate_limited` returns 403 with `Retry-After` header
+- `validation_failed` returns 422 on issue create
+- `issues_disabled` returns 410 on issue create
 
 ### OpenAI (api.openai.com)
 
 SSL: `apxy start --ssl-domains api.openai.com`
 
-**Pre-built template:** `apxy/mock-templates/openai/rules.json` (10 rules)
+**Prebuilt template:** `mock-templates/openai/rules.json` (10 rules)
 
 **Quick start (3 key rules):**
 
@@ -114,13 +121,13 @@ apxy mock add --name "openai-models" \
 
 **Error scenarios** (use `X-APXY-Scenario` header to trigger):
 
-- `unauthorized` -- 401 invalid API key
-- `rate_limited` -- 429 with `Retry-After`
-- `server_error` -- 500 internal error
-- `invalid_request` -- 400 on chat/embeddings/responses
-- `not_found` -- 404 on model retrieval
+- `unauthorized` returns 401 invalid API key
+- `rate_limited` returns 429 with `Retry-After`
+- `server_error` returns 500 internal error
+- `invalid_request` returns 400 on chat/embeddings/responses
+- `not_found` returns 404 on model retrieval
 
-## Vendors with Inline Templates
+## Vendors with inline templates
 
 These vendors do not have bundled `rules.json` files yet. Use the `apxy mock add` commands below to create rules manually.
 
@@ -131,21 +138,21 @@ SSL: `apxy start --ssl-domains your-tenant.auth0.com`
 Replace `your-tenant` with your dev tenant slug.
 
 ```bash
-# Token endpoint -- returns access_token
+# Token endpoint: returns access_token
 apxy mock add \
   --name "auth0-token" \
   --url "https://your-tenant.auth0.com/oauth/token" \
   --match exact --method POST --status 200 \
   --body '{"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mock","token_type":"Bearer","expires_in":86400,"scope":"openid profile email"}'
 
-# Userinfo -- returns profile claims
+# Userinfo: returns profile claims
 apxy mock add \
   --name "auth0-userinfo" \
   --url "https://your-tenant.auth0.com/userinfo" \
   --match exact --method GET --status 200 \
   --body '{"sub":"auth0|mock-user-1","email":"dev@example.com","email_verified":true,"name":"Mock User"}'
 
-# JWKS -- signing keys for JWT verification
+# JWKS: signing keys for JWT verification
 apxy mock add \
   --name "auth0-jwks" \
   --url "https://your-tenant.auth0.com/.well-known/jwks.json" \
@@ -167,21 +174,21 @@ SSL: `apxy start --ssl-domains api.twilio.com`
 Replace `ACxxxxxxxx` with your dev Account SID.
 
 ```bash
-# Create message -- 201 queued
+# Create message: 201 queued
 apxy mock add \
   --name "twilio-create-message" \
   --url "https://api.twilio.com/2010-04-01/Accounts/*/Messages.json" \
   --match wildcard --method POST --status 201 \
   --body '{"sid":"SMaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","status":"queued","to":"+1234567890","from":"+1987654321","date_created":"Mon, 01 Jan 2026 12:00:00 +0000","uri":"/2010-04-01/Accounts/ACxxxxxxxx/Messages/SMaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.json"}'
 
-# Fetch message -- 200 delivered
+# Fetch message: 200 delivered
 apxy mock add \
   --name "twilio-get-message" \
   --url "https://api.twilio.com/2010-04-01/Accounts/*/Messages/*.json" \
   --match wildcard --method GET --status 200 \
   --body '{"sid":"SMaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","status":"delivered","to":"+1234567890","from":"+1987654321","error_code":null,"date_sent":"Mon, 01 Jan 2026 12:00:05 +0000"}'
 
-# Send failure -- 400 invalid phone number (use X-APXY-Scenario: send_failed)
+# Send failure: 400 invalid phone number (use X-APXY-Scenario: send_failed)
 apxy mock add \
   --name "twilio-send-failed" \
   --url "https://api.twilio.com/2010-04-01/Accounts/*/Messages.json" \
@@ -198,21 +205,21 @@ SSL: `apxy start --ssl-domains s3.amazonaws.com`
 For virtual-hosted-style buckets, add those hostnames too (e.g. `my-bucket.s3.amazonaws.com`).
 
 ```bash
-# PUT object -- 200 upload success
+# PUT object: 200 upload success
 apxy mock add \
   --name "s3-put-object" \
   --url "https://s3.amazonaws.com/my-bucket/*" \
   --match wildcard --method PUT --status 200 \
   --body '<?xml version="1.0" encoding="UTF-8"?><CopyObjectResult><ETag>&quot;mock-etag-abc123&quot;</ETag></CopyObjectResult>'
 
-# GET object -- 200 download
+# GET object: 200 download
 apxy mock add \
   --name "s3-get-object" \
   --url "https://s3.amazonaws.com/my-bucket/*" \
   --match wildcard --method GET --status 200 \
   --body '{"mock":"This stands in for object bytes; use raw text or base64 per your client tests."}'
 
-# NoSuchKey -- 404 (use X-APXY-Scenario: missing_key)
+# NoSuchKey: 404 (use X-APXY-Scenario: missing_key)
 apxy mock add \
   --name "s3-nosuchkey" \
   --url "https://s3.amazonaws.com/my-bucket/*" \
@@ -221,13 +228,13 @@ apxy mock add \
   --body '<?xml version="1.0" encoding="UTF-8"?><Error><Code>NoSuchKey</Code><Message>The specified key does not exist.</Message><Key>missing.bin</Key><RequestId>MOCKREQUESTID</RequestId><HostId>mockhostid</HostId></Error>' \
   --priority 10
 
-# DELETE object -- 204
+# DELETE object: 204
 apxy mock add \
   --name "s3-delete-object" \
   --url "https://s3.amazonaws.com/my-bucket/*" \
   --match wildcard --method DELETE --status 204 --body ""
 
-# List all buckets -- 200 XML
+# List all buckets: 200 XML
 apxy mock add \
   --name "s3-list-buckets" \
   --url "https://s3.amazonaws.com/" \
@@ -240,28 +247,28 @@ apxy mock add \
 SSL: `apxy start --ssl-domains identitytoolkit.googleapis.com,firestore.googleapis.com`
 
 ```bash
-# Sign in with password -- 200 with idToken
+# Sign in with password: 200 with idToken
 apxy mock add \
   --name "firebase-signin" \
   --url "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword*" \
   --match wildcard --method POST --status 200 \
   --body '{"kind":"identitytoolkit#VerifyPasswordResponse","localId":"mock-local-id","email":"dev@example.com","idToken":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.mock","refreshToken":"mock-refresh-token","expiresIn":"3600","registered":true}'
 
-# Sign up -- 200 new user
+# Sign up: 200 new user
 apxy mock add \
   --name "firebase-signup" \
   --url "https://identitytoolkit.googleapis.com/v1/accounts:signUp*" \
   --match wildcard --method POST --status 200 \
   --body '{"kind":"identitytoolkit#SignupNewUserResponse","localId":"mock-new-user","idToken":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.mock-new","refreshToken":"mock-refresh-new","expiresIn":"3600"}'
 
-# Firestore get document -- 200
+# Firestore get document: 200
 apxy mock add \
   --name "firestore-get-doc" \
   --url "https://firestore.googleapis.com/v1/projects/*/databases/(default)/documents/users/*" \
   --match wildcard --method GET --status 200 \
   --body '{"name":"projects/mock-project/databases/(default)/documents/users/mock-doc","fields":{"title":{"stringValue":"Mock Title"},"count":{"integerValue":"42"}},"createTime":"2026-01-01T00:00:00.000000Z","updateTime":"2026-01-01T00:00:00.000000Z"}'
 
-# Firestore runQuery -- 200 single document result
+# Firestore runQuery: 200 single document result
 apxy mock add \
   --name "firestore-runquery" \
   --url "https://firestore.googleapis.com/v1/projects/*/databases/(default)/documents:runQuery*" \
@@ -276,7 +283,7 @@ SSL: `apxy start --ssl-domains your-store.myshopify.com`
 Replace `your-store` with your dev shop subdomain. Adjust API version (`2024-01`) to match your client.
 
 ```bash
-# Products query -- 200 with product connection
+# Products query: 200 with product connection
 apxy mock add \
   --name "shopify-products" \
   --url "https://your-store.myshopify.com/api/2024-01/graphql.json" \
