@@ -1,6 +1,6 @@
 # User Guide
 
-**Version 1.0.0** | [Getting Started](getting-started.md) | [Troubleshooting](troubleshooting.md) | [FAQ](faq.md) | [Changelog](../CHANGELOG.md)
+[Getting Started](getting-started.md) | [Troubleshooting](troubleshooting.md) | [FAQ](faq.md) | [Changelog](../CHANGELOG.md)
 
 ---
 

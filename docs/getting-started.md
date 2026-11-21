@@ -35,46 +35,49 @@ tar -xzf apxy-<version>-darwin-arm64.tar.gz
 sudo mv apxy /usr/local/bin/
 ```
 
-Verify:
+Verify that the install works. The command prints the installed version.
 
 ```bash
 apxy version
-# APXY v1.0.0
 ```
 
 ---
 
 ## Step 2: Start the proxy
 
+APXY records the full body of an HTTPS request only for domains that you turn on. Other HTTPS traffic shows up as a `CONNECT` line with the host name and no body. Turn on `httpbin.org` for this guide:
+
 ```bash
-apxy start
+apxy start --ssl-domains httpbin.org
 ```
 
-On macOS, this automatically:
+To turn on another domain later, run `apxy ssl enable --domain <host>`.
+
+On macOS, `apxy start` does these things:
 1. Generates a root CA certificate (first run only)
 2. Trusts the CA in your system keychain (prompts for password once)
-3. Enables system-wide HTTP/HTTPS proxy
+3. Enables the system-wide HTTP and HTTPS proxy
 4. Starts the Web UI at `http://localhost:8082`
 
-All traffic on your machine now flows through APXY.
+Browsers and apps that use the system proxy now go through APXY.
 
-On Linux, set proxy environment variables manually:
+On Linux, start without the system proxy:
 
 ```bash
-apxy start --no-system-proxy
-export http_proxy=http://localhost:8080
-export https_proxy=http://localhost:8080
+apxy start --ssl-domains httpbin.org --no-system-proxy
 ```
 
 ---
 
 ## Step 3: Make a request
 
-Open any app, browser, or run a curl command:
+Many terminal tools, curl included, ignore the macOS system proxy. In a second terminal, send the request through `apxy run`. It sets the proxy and the CA certificate for that one command:
 
 ```bash
-curl https://httpbin.org/get
+apxy run curl https://httpbin.org/get
 ```
+
+To route every command in the current shell through APXY, run `eval "$(apxy env)"` first.
 
 ---
 
@@ -120,7 +123,9 @@ Press `Ctrl+C` in the terminal, or from another terminal:
 apxy stop
 ```
 
-This restores your original network settings automatically.
+APXY turns the system proxy off again.
+
+If you ran `eval "$(apxy env)"`, that shell still sends traffic to the stopped proxy. Open a new terminal to get a clean shell.
 
 ---
 
