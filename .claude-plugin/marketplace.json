@@ -1,0 +1,17 @@
+{
+  "name": "apxy",
+  "owner": {
+    "name": "APXY",
+    "email": "support@apxy.dev"
+  },
+  "metadata": {
+    "description": "The APXY Claude Code plugin: the APXY MCP server and a skill for capturing, mocking, and verifying HTTP traffic."
+  },
+  "plugins": [
+    {
+      "name": "apxy",
+      "source": "./",
+      "description": "Capture, inspect, mock, and replay HTTP and HTTPS traffic with the APXY proxy, and verify code changes against real requests."
+    }
+  ]
+}
