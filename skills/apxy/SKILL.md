@@ -1,6 +1,6 @@
 ---
 name: apxy
-description: Capture, inspect, mock, and replay HTTP and HTTPS traffic with the APXY proxy. Use after you change code that sends or serves HTTP requests, to verify the fix with real traffic instead of trusting unit tests alone. Use when debugging fetch, axios, or curl errors, unexpected status codes, CORS errors, auth failures, webhook failures, or a response body that does not match the API docs. Use when the user asks to intercept traffic, mock an endpoint, unblock a frontend, replay or diff a request, slow down the network, or validate traffic against an OpenAPI spec.
+description: "Verify a code change against the real HTTP request it sends, with the APXY proxy. Use after you change code that calls an API or serves HTTP, such as a fetch or axios call, a webhook sender, a checkout or payment call, or an API route. Run apxy mark, then apxy run -- <test or script>, then apxy wait --match \"METHOD /path\" --expect \"<condition>\", and read the exit code: 0 passed, 7 an expect failed and the output shows the actual value, 8 no request matched. Use it when the user asks you to verify, prove, or confirm that code sends the right request, body, header, or status, instead of trusting unit tests or your own report. Also use when debugging fetch, axios, or curl errors, unexpected status codes, CORS errors, auth failures, webhook failures, or a response body that does not match the API docs, and when the user asks to intercept traffic, mock an endpoint, replay or diff a request, slow down the network, or validate traffic against an OpenAPI spec."
 ---
 
 # APXY
@@ -68,7 +68,7 @@ When `apxy wait` exits with 8, check these causes:
 - Go and Ruby clients skip the proxy for localhost. For Go, call `http://localhost.:<port>` with a trailing dot.
 - Go and Rust `native-tls` clients on macOS reject decrypted hosts. Run without `--mitm-all`, or trust the CA once with `apxy certs trust`.
 
-MCP clients get the same loop through the tools `set_mark` and `wait_for_request`. Those tools ship in the next release. The CLI loop works today in APXY v1.4.0 and later.
+MCP clients get the same loop through the tools `set_mark` and `wait_for_request`. Those tools need APXY v1.6.0 or later. The CLI loop works in APXY v1.4.0 and later.
 
 ## Read output as an agent
 

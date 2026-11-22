@@ -1,7 +1,7 @@
 {
   "name": "apxy",
-  "version": "1.5.0",
-  "description": "Capture, inspect, mock, and replay HTTP and HTTPS traffic with the APXY proxy, and verify code changes against real requests.",
+  "version": "1.6.0",
+  "description": "Verify code changes against the real HTTP requests they send. Run the code through the APXY proxy, wait for the request, assert on it, and read pass or fail from the exit code. Also inspects, mocks, and replays HTTP and HTTPS traffic.",
   "author": {
     "name": "APXY",
     "email": "support@apxy.dev",
@@ -9,7 +9,7 @@
   },
   "homepage": "https://apxy.dev",
   "repository": "https://github.com/apxydev/apxy",
-  "keywords": ["proxy", "http", "https", "debugging", "mock", "mcp", "network"],
+  "keywords": ["verify", "testing", "proxy", "http", "https", "debugging", "mock", "mcp", "network"],
   "mcpServers": {
     "apxy": {
       "command": "apxy",

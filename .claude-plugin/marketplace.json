@@ -5,13 +5,13 @@
     "email": "support@apxy.dev"
   },
   "metadata": {
-    "description": "The APXY Claude Code plugin: the APXY MCP server and a skill for capturing, mocking, and verifying HTTP traffic."
+    "description": "The APXY Claude Code plugin. It adds the APXY MCP server and a skill that verifies code changes against the real HTTP requests they send."
   },
   "plugins": [
     {
       "name": "apxy",
       "source": "./",
-      "description": "Capture, inspect, mock, and replay HTTP and HTTPS traffic with the APXY proxy, and verify code changes against real requests."
+      "description": "Verify code changes against the real HTTP requests they send. Run the code through the APXY proxy, wait for the request, assert on it, and read pass or fail from the exit code. Also inspects, mocks, and replays HTTP and HTTPS traffic."
     }
   ]
 }
