@@ -1,6 +1,6 @@
 # APXY CLI command reference
 
-This file lists all 98 APXY commands and their flags. It is generated from the CLI help text.
+This file lists all 102 APXY commands and their flags. It is generated from the CLI help text.
 
 Global flags work on every command: `--config`, `--error-format` (text|json, default text), `--help-format` (default|agent, default default), `--no-project`, `--output` (agent|human), `--verbose`.
 
@@ -26,8 +26,10 @@ Global flags work on every command: `--config`, `--error-format` (text|json, def
 
 | Command | Description | Flags |
 |---------|-------------|-------|
+| `apxy logs ai-usage` | Show LLM token usage and estimated cost from captured AI traffic | `--since`, `--until` |
 | `apxy logs clear` | Delete all captured traffic records | `--dry-run` |
 | `apxy logs diff` | Compare two captured traffic records | `--id-a`, `--id-b`, `--scope` (request\|response\|both, default both) |
+| `apxy logs egress` | Summarize captured traffic by host and check it against an allowlist | `--allowlist`, `--quiet`, `--since` (default all) |
 | `apxy logs export-curl` | Export one traffic record as a reusable client snippet | `--format` (curl\|fetch\|httpie\|python, default curl), `--id`, `--redact`, `--safe` |
 | `apxy logs export-har` | Export captured traffic as a HAR 1.2 file | `--file`, `--limit` (default 10000), `--redact`, `--safe` |
 | `apxy logs graphql` | Search captured GraphQL requests | `--format` (json\|markdown\|toon, default json), `--limit` (default 20), `--operation-name`, `--operation-type` (query\|mutation\|subscription) |
@@ -54,6 +56,7 @@ Global flags work on every command: `--config`, `--error-format` (text|json, def
 | `apxy mock disable` | Disable a mock rule | `--all`, `--dry-run`, `--id` |
 | `apxy mock edit` | Edit a mock response rule | `--body`, `--delay`, `--header-conditions`, `--headers`, `--match` (exact\|wildcard\|regex), `--method`, `--name`, `--priority`, `--status`, `--url` |
 | `apxy mock enable` | Enable a mock rule | `--all`, `--dry-run`, `--id` |
+| `apxy mock from-traffic` | Turn captured traffic into replay mock rules (record once, replay in tests) | `--file`, `--host`, `--id`, `--ignore-field` (default [metadata,user]), `--limit` (default 200), `--miss` (fail\|passthrough, default fail) |
 | `apxy mock import` | Import mock rules from a JSON template file | `--file` |
 | `apxy mock list` | List mock rules | `--format` (json\|toon, default json), `--quiet` |
 | `apxy mock remove` | Remove a mock rule by ID or all mock rules | `--all`, `--dry-run`, `--id` |
@@ -150,6 +153,7 @@ Global flags work on every command: `--config`, `--error-format` (text|json, def
 | Command | Description | Flags |
 |---------|-------------|-------|
 | `apxy init` | Initialize a project-scoped APXY workspace |  |
+| `apxy setup agents` | Add the APXY verify section to AGENTS.md and CLAUDE.md | `--dir`, `--dry-run`, `--remove`, `--target`, `--yes` |
 | `apxy setup mcp` | Configure MCP clients to use APXY | `--all`, `--client`, `--scope`, `--write` |
 | `apxy mcp` | Run the APXY MCP server for AI clients |  |
 | `apxy config export` | Export all configuration to a JSON file | `--file` (default apxy-config.json) |

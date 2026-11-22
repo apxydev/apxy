@@ -1,150 +1,68 @@
 ---
 name: apxy
-description: "Verify a code change against the real HTTP request it sends, with the APXY proxy. Use after you change code that calls an API or serves HTTP, such as a fetch or axios call, a webhook sender, a checkout or payment call, or an API route. Run apxy mark, then apxy run -- <test or script>, then apxy wait --match \"METHOD /path\" --expect \"<condition>\", and read the exit code: 0 passed, 7 an expect failed and the output shows the actual value, 8 no request matched. Use it when the user asks you to verify, prove, or confirm that code sends the right request, body, header, or status, instead of trusting unit tests or your own report. Also use when debugging fetch, axios, or curl errors, unexpected status codes, CORS errors, auth failures, webhook failures, or a response body that does not match the API docs, and when the user asks to intercept traffic, mock an endpoint, replay or diff a request, slow down the network, or validate traffic against an OpenAPI spec."
+description: "Capture and check real HTTP traffic with the APXY proxy. Use after changing code that calls an API or serves HTTP, to prove the real request and response are right instead of trusting tests. Also for debugging HTTP failures (status codes, CORS, auth, webhooks), mocking, replaying or diffing requests, slow-network tests, OpenAPI validation, recording LLM API calls for replay in tests, LLM token cost, and listing which hosts a process contacted."
 ---
 
 # APXY
 
-APXY is a local HTTP and HTTPS proxy. It records every request and response that passes through it. You read the records with the CLI or the MCP tools, and you can mock, rewrite, replay, and diff them.
+APXY is a local proxy that records every HTTP and HTTPS request passing through it. A captured request is evidence of what the code actually sent, which reading the code or a passing unit test cannot give you.
 
-## Install the binary
+## Before you start
 
-Run `command -v apxy`. If it prints nothing, install APXY with Homebrew on macOS or Linux:
-
-```bash
-brew tap apxydev/apxy https://github.com/apxydev/apxy
-brew install apxy
-```
-
-Or install it with the shell script:
-
-```bash
-curl -fsSL https://apxy.dev/install.sh | bash
-```
-
-The MCP server runs `apxy mcp`, so it cannot start until the binary is on your `PATH`. After you install it, run `/mcp` in Claude Code to reconnect the server.
+- If `command -v apxy` prints nothing, ask the user before installing (it adds a binary and a CA certificate): `brew tap apxydev/apxy https://github.com/apxydev/apxy && brew install apxy`, then `/mcp` to reconnect the MCP server.
+- The Free plan stops each proxy session after 10 minutes. A proxy that vanishes, or an MCP `session_expired` result, means the session ended: start again and tell the user.
+- Trigger the code yourself (tests, scripts, curl)? Use the CLI with `apxy run`, which routes only that process. Triggered by someone else (a browser click, an incoming webhook)? Use a running proxy (`apxy start`) and the MCP tools or CLI. Both share data and marks.
 
 ## Prove a change works
 
-Use this loop after you change code that sends or serves HTTP requests. Each attempt checks one real request and returns an exit code.
-
-1. Set a mark with `apxy mark`. `apxy wait` then ignores traffic from earlier attempts.
-2. Trigger the code through APXY with `apxy run -- <cmd>`. It runs one process with the proxy and CA variables set. When no proxy is running, it starts a temporary one on 127.0.0.1. It does not change the system proxy or the system trust store, and it needs no sudo.
-3. Run `apxy wait` with the request to match and the conditions it must meet.
-4. Read the exit code.
-
 ```bash
-apxy mark
-apxy run -- npm test -- checkout.spec.ts
+apxy mark                                    # later waits ignore earlier attempts
+apxy run -- npm test -- checkout.spec.ts     # temporary proxy for this one process
 apxy wait --match "POST /api/checkout" --expect "status == 200" --expect "body.order.id exists"
 echo $?
 ```
 
-When the code you changed is a server, send the request through APXY. curl, Python, and Java clients are captured when they call localhost.
+`apxy run` starts a temporary proxy on 127.0.0.1 when none runs, sets proxy and CA variables for that process only, and needs no sudo. To test a server, send the request through it: `apxy run -- curl -s -X POST http://localhost:3000/api/checkout -d '{"sku":"A1"}'`.
 
-```bash
-apxy mark
-apxy run -- curl -s -X POST http://localhost:3000/api/checkout -d '{"sku":"A1"}'
-apxy wait --match "POST /api/checkout" --expect "status == 201" --expect "req.body.sku == A1"
-```
+| Exit | Meaning | Do |
+|------|---------|----|
+| `0` | Matched, every `--expect` passed | Report success; quote the record ID as evidence |
+| `7` | Matched, an `--expect` failed | Read `data.expectations[].actual`, fix, rerun the loop |
+| `8` | Nothing matched before the timeout | See below |
 
-| Exit code | Meaning | Next step |
-|-----------|---------|-----------|
-| `0` | A request matched and every `--expect` passed. | The change works. Quote the record ID from the output as proof. |
-| `7` | A request matched, but an `--expect` failed. | Read `data.expectations[].actual` in the output. Fix the code and run the loop again. |
-| `8` | No request matched before the timeout. | Run `apxy logs list --limit 20` to see what APXY captured. |
+MCP equivalent: `set_mark`, trigger the code, then `wait_for_request`. Its `outcome` is `passed`, `assertion_failed`, `timeout`, or `session_expired`; a failed check is a normal result, not a tool error.
 
-How `apxy wait` reads its flags:
+`apxy wait` flags:
+- `--match "METHOD /path"` (exact path) or a match expression like `'host == api.stripe.com && path startswith /v1/'` ([dsl-reference.md](references/dsl-reference.md)).
+- `--expect` (repeatable): `status`, `header:<Name>`, `body.<gjson path>` (response), or `req.body.<gjson path>` (request) with `==`, `!=`, `contains`, `startswith`, `endswith`, `matches`, `>`, `>=`, `<`, `<=`, `exists`.
+- `--since <mark>` reads from a named mark. `--timeout` defaults to 30s; `--timeout 0` checks once, for a command that already ran.
 
-- `--match "METHOD /path"` matches the method and the exact path. It also takes a match expression such as `'host == api.stripe.com && path startswith /v1/charges'`.
-- `--expect` is repeatable. Each one is a condition on `status`, `header:<Name>`, `body.<gjson path>`, or `req.body.<gjson path>`. The operators are `==`, `!=`, `contains`, `startswith`, `endswith`, `matches`, `>`, `>=`, `<`, `<=`, and `exists`.
-- `--since <name>` uses a named mark from `apxy mark <name>`. Without it, `wait` uses the default mark, or the time it started.
-- `--timeout` defaults to 30s. `--timeout 0` checks captured traffic once without blocking.
+When nothing matches, run `apxy logs list --limit 20`, then:
+- **HTTPS shows only `CONNECT`, no path:** the host was not decrypted. Add `--ssl-domains <host>` or `--mitm-all` before `--`.
+- **Nothing captured:** the client ignored the proxy. Node before 22.21 and 24.0 to 24.4 do; upgrade. Go and Ruby skip `localhost`; for Go use `http://localhost.:<port>`.
+- **TLS errors:** Go and Rust `native-tls` on macOS reject decrypted hosts. Drop `--mitm-all`, or (after asking) `apxy certs trust`.
+- **Different method or path** than your `--match`: compare with the list.
 
-When `apxy wait` exits with 8, check these causes:
+## Output
 
-- The request went to HTTPS and APXY only recorded a `CONNECT` tunnel with no path. Pass `--ssl-domains <host>` or `--mitm-all` before the `--`, as in `apxy run --ssl-domains api.example.com -- npm test`.
-- Node before 22.21, and Node 24.0 to 24.4, ignore the proxy variables. Upgrade Node.
-- Go and Ruby clients skip the proxy for localhost. For Go, call `http://localhost.:<port>` with a trailing dot.
-- Go and Rust `native-tls` clients on macOS reject decrypted hosts. Run without `--mitm-all`, or trust the CA once with `apxy certs trust`.
+Piped output is a JSON envelope: lists in `.items`, one record in `.data`, a next-step `hint`. Errors go to stderr with a non-zero exit. A record's `duration` is in nanoseconds. Auth headers, cookies, and emails are masked.
 
-MCP clients get the same loop through the tools `set_mark` and `wait_for_request`. Those tools need APXY v1.6.0 or later. The CLI loop works in APXY v1.4.0 and later.
+## Other tasks
 
-## Read output as an agent
-
-When stdout is not a terminal, every command prints a JSON envelope. Lists are in `.items` and single records are in `.data`:
-
-```json
-{"ok": true, "operation": "logs_list", "items": [ ... ], "count": 3, "hint": "apxy logs show --id <id>"}
-```
-
-- `--format` (json, markdown, toon) only changes human output. Agent output ignores it.
-- Pass `--output agent` or `--output human` to force a mode.
-- The `duration` field of a record is in nanoseconds.
-- Agent output masks `Authorization`, `Cookie`, `Set-Cookie`, `X-Api-Key`, and `X-Auth-Token` headers, and email addresses.
-- Errors print as text on stderr, with a non-zero exit code.
-
-## Domain routing
-
-Read the reference file that matches the request:
-
-| User intent | Read this file |
-|---|---|
-| Debug errors, inspect traffic, slow endpoints, CORS, auth failures, GraphQL, flaky APIs, webhooks, Docker | [debugging.md](references/debugging.md) |
-| Mock APIs, stub endpoints, unblock a frontend, schema validation, breaking changes | [mocking.md](references/mocking.md) |
-| Replay requests, diff responses, export curl or HAR, regression checks | [replay-diff.md](references/replay-diff.md) |
+| Task | Read |
+|------|------|
+| Debug failing requests: 4xx/5xx, CORS, auth, slow, webhooks, GraphQL, Docker | [debugging.md](references/debugging.md) |
+| Mock endpoints, unblock a frontend, OpenAPI validation | [mocking.md](references/mocking.md) |
+| Ready-made mocks: Stripe, GitHub, OpenAI, Auth0, Twilio, S3 | [mock-templates.md](references/mock-templates.md) |
+| Replay or diff requests, export curl or HAR | [replay-diff.md](references/replay-diff.md) |
+| Record and replay LLM calls in tests, LLM token cost, hosts contacted | [llm-and-agent-traffic.md](references/llm-and-agent-traffic.md) |
 | Network simulation, breakpoints, scripts, rewrites, filters, caching | [advanced-rules.md](references/advanced-rules.md) |
+| Exact flags | [cli-overview.md](references/cli-overview.md) or `apxy <cmd> --help-format agent` |
 
-For command flags, read [cli-overview.md](references/cli-overview.md).
-For match expression syntax, read [dsl-reference.md](references/dsl-reference.md).
-For vendor mock templates, read [mock-templates.md](references/mock-templates.md).
+## Gotchas
 
-## Quick start
-
-`apxy run` captures one process and needs no setup. Use `apxy start` when you need a long-running proxy for a browser or for many processes.
-
-```bash
-apxy run --ssl-domains api.example.com -- npm run dev    # capture one process
-apxy start --ssl-domains api.example.com                 # proxy :8080, control API :8081, web UI :8082
-apxy logs list --limit 10
-apxy mock add --name stub --url "/api/users" --match wildcard --status 200 --body '{"users":[]}'
-apxy stop
-```
-
-On macOS, `apxy start` turns on the system proxy and asks for a password to trust the CA. Pass `--no-system-proxy --no-trust-ca` to skip both.
-
-## Quick triage
-
-| Problem | First command |
-|---------|---------------|
-| API returns 4xx or 5xx | `apxy logs search --query "api.example.com" \| jq '.items[] \| select(.status_code >= 400)'` |
-| Response body is wrong | `apxy logs show --id <ID>` |
-| Compare a good and a bad request | `apxy logs diff --id-a <GOOD_ID> --id-b <BAD_ID> --scope response` |
-| Mock a broken endpoint | `apxy mock add --name stub --url "/api/path" --match wildcard --status 200 --body '{}'` |
-| Replay a failed request | `apxy logs replay --id <ID>` |
-| Export traffic to share | `apxy logs export-har --file ./traffic.har` |
-| Frontend blocked, backend not ready | `apxy mock add --name <endpoint> --url "/api/path" --match wildcard --status 200 --body '<contract-shape>'` |
-| Check a deploy against the API contract | `apxy schema import --name api --file ./openapi.yaml && apxy schema validate-recent --limit 50` |
-| Check a fix after a refactor | `apxy mark && apxy run -- npm test && apxy wait --match "GET /api/users" --expect "status == 200"` |
-
-## Troubleshooting
-
-| Symptom | Likely cause | Fix |
-|---------|--------------|-----|
-| `apxy start` fails with "address in use" | Another process uses the port | Run `apxy stop`, or pass another `--port` |
-| No traffic captured | The client does not use the proxy | Run the client with `apxy run -- <cmd>`, or load the variables with `eval $(apxy env)` |
-| HTTPS record has no path or body | The domain is not decrypted | Start with `--ssl-domains <domain>` or `--mitm-all`, or run `apxy ssl enable --domain <domain>` |
-| Certificate errors in the client | The client does not trust the APXY CA | Use `apxy run`, which sets the CA variables, or run `apxy certs trust` |
-| Search returns nothing | Wrong query, or a new proxy cleared the logs | Run `apxy logs list --limit 10` to see what is captured |
-| Mock rule does not match | URL pattern or match type is wrong | Run `apxy mock list` and compare the rule's URL and match type with the request |
-
-## Tips
-
-- Pass `--help-format agent` to any command for help written for agents.
-- `apxy browser <url>` opens a browser that routes through APXY.
-- `apxy init` creates a project `.apxy/` directory with its own config, certs, and traffic.
-- A new proxy from `apxy start` or `apxy run` starts with empty traffic logs. Read old traffic before you start another one.
-- `apxy logs replay` sends the request through a running proxy. Start one with `apxy start` first.
-- `logs`, `mock`, and `schema` commands work without a running proxy. `apxy mock import` and `apxy logs replay` are the exceptions.
-- `filter`, `rewrite`, `breakpoint`, `script`, `network`, `caching`, `ssl`, and `recording` commands need a running proxy.
-- On the Free plan, each proxy session stops after 10 minutes, including the temporary proxy from `apxy run`. Run the command again to start a new session.
+- **A new proxy starts with empty logs.** Read what you need before starting another.
+- **`apxy start` runs in the foreground** and, on macOS, enables the system proxy and asks to trust the CA. In scripts: `apxy start --no-system-proxy --no-trust-ca --port P &`, then `until apxy status --quiet --port P; do sleep 0.2; done` (ready in about a second). Stop it with `apxy stop`.
+- **Needs a running proxy:** `filter`, `rewrite`, `breakpoint`, `script`, `network`, `caching`, `ssl`, `recording`, `mock import`, `logs replay`. Reading logs, `mock add`, and `schema` work without one.
+- **Ports:** proxy 8080, control API 8081, web UI 8082 by default. "Address in use" means a proxy already runs.
+- **Browser capture:** `apxy browser <url>`. **Teach the repo's agents this loop:** `apxy setup agents` (edits `AGENTS.md`/`CLAUDE.md`, so only when asked).

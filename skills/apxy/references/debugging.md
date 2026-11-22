@@ -2,6 +2,23 @@
 
 Capture the client with `apxy run -- <cmd>`, or start a proxy with `apxy start --ssl-domains <your-api-domain>`. Check a running proxy with `apxy status`. `apxy logs replay` sends the request through a running proxy, so start one with `apxy start` before you replay.
 
+## Contents
+
+- [Core workflow](#core-workflow)
+- [Traffic commands](#traffic-commands)
+- [Common jq patterns](#common-jq-patterns)
+- [JSONPath extraction patterns](#jsonpath-extraction-patterns)
+- [Debug recipes](#debug-recipes)
+  - [CORS errors](#cors-errors)
+  - [Auth token failures](#auth-token-failures)
+  - [5xx server errors](#5xx-server-errors)
+  - [Slow API endpoints](#slow-api-endpoints)
+  - [Webhook delivery failures](#webhook-delivery-failures)
+  - [Flaky API errors](#flaky-api-errors)
+  - [GraphQL debugging](#graphql-debugging)
+  - [Docker container traffic](#docker-container-traffic)
+- [See also](#see-also)
+
 ## Core workflow
 
 1. Search or list. Find the traffic by URL, body content, GraphQL operation, or status code with `apxy logs search` or `apxy logs list`. Run `apxy logs stats` only after this step.

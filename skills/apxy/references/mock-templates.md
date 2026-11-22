@@ -2,6 +2,19 @@
 
 ## Vendors with prebuilt templates
 
+## Contents
+
+- [Vendors with prebuilt templates](#vendors-with-prebuilt-templates)
+  - [Stripe (api.stripe.com)](#stripe-apistripecom)
+  - [GitHub (api.github.com)](#github-apigithubcom)
+  - [OpenAI (api.openai.com)](#openai-apiopenaicom)
+- [Vendors with inline templates](#vendors-with-inline-templates)
+  - [Auth0 (*.auth0.com)](#auth0-auth0com)
+  - [Twilio (api.twilio.com)](#twilio-apitwiliocom)
+  - [AWS S3 (*.s3.amazonaws.com)](#aws-s3-s3amazonawscom)
+  - [Firebase (*.googleapis.com)](#firebase-googleapiscom)
+  - [Shopify (*.myshopify.com)](#shopify-myshopifycom)
+
 The APXY repo ships complete `rules.json` files for these vendors in `mock-templates/<vendor>/rules.json`. When APXY is installed as a Claude Code plugin, the files are in the plugin directory, two levels above this skill's folder. Otherwise, download one from GitHub:
 
 ```bash
