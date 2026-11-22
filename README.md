@@ -60,7 +60,7 @@ Install the APXY plugin from inside Claude Code:
 /plugin install apxy@apxy
 ```
 
-The plugin adds the APXY MCP server and the APXY skill. The skill tells Claude to run the check above after it changes code that sends or serves HTTP requests. Install the `apxy` binary first, because the MCP server runs `apxy mcp`. The MCP tools `set_mark` and `wait_for_request` run the same check, and they ship in the next APXY release.
+The plugin adds the APXY MCP server and the APXY skill. The skill tells Claude to run the check above after it changes code that sends or serves HTTP requests. Install the `apxy` binary first, because the MCP server runs `apxy mcp`. The MCP tools `set_mark` and `wait_for_request` run the same check. They need APXY v1.6.0 or later.
 
 ### Use with other agents
 

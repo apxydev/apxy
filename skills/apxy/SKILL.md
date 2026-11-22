@@ -68,7 +68,7 @@ When `apxy wait` exits with 8, check these causes:
 - Go and Ruby clients skip the proxy for localhost. For Go, call `http://localhost.:<port>` with a trailing dot.
 - Go and Rust `native-tls` clients on macOS reject decrypted hosts. Run without `--mitm-all`, or trust the CA once with `apxy certs trust`.
 
-MCP clients get the same loop through the tools `set_mark` and `wait_for_request`. Those tools ship in the next release. The CLI loop works today in APXY v1.4.0 and later.
+MCP clients get the same loop through the tools `set_mark` and `wait_for_request`. Those tools need APXY v1.6.0 or later. The CLI loop works in APXY v1.4.0 and later.
 
 ## Read output as an agent
 
