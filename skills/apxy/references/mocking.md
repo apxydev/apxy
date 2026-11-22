@@ -196,3 +196,4 @@ Exit code 0 means the real backend answered, not the mock.
 ## See also
 
 - For vendor-specific mock templates: [mock-templates.md](mock-templates.md)
+- To record real LLM API responses and replay them in tests: [llm-and-agent-traffic.md](llm-and-agent-traffic.md)
