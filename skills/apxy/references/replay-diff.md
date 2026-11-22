@@ -1,155 +1,122 @@
-# Replay & Diff -- Verify Fixes, Export, Regression Test
+# Replay and diff: verify fixes, export, regression checks
 
-Ensure proxy is running: `apxy status`. Need existing captured traffic (at least 1 record): `apxy logs list --limit 1`.
+`apxy logs replay` sends a request through a running proxy. Start one with `apxy start` and keep it running from the first capture until the last replay. A new proxy clears the traffic logs, so the record you want to replay would be gone.
 
-## Core Loop
+## Core loop
 
 ```
-capture -> fix code -> replay -> diff -> prove the fix works
+capture -> fix code -> mark -> replay -> wait -> diff
 ```
 
-1. Traffic is captured while the bug is live (the "before" record).
-2. You fix the code and restart the server.
-3. Replay the original request to get a "after" record.
-4. Diff the two records to see exactly what changed in the response.
+1. Capture the request while the bug is live. This is the "before" record.
+2. Fix the code and restart your server.
+3. Run `apxy mark`, then replay the "before" record with `apxy logs replay --id <ID>`.
+4. Check the new request with `apxy wait --match "<METHOD> <path>" --expect ...`. Exit code 0 means the fix works. The output holds the "after" record ID.
+5. Diff the two records with `apxy logs diff --scope response` to see what changed.
 
 ## Commands
 
-| Command | Description | Key Flags |
+| Command | Description | Key flags |
 |---------|-------------|-----------|
-| `apxy logs replay` | Replay one captured request against the live upstream | `--id` (record ID), `--port` (default 8080) |
-| `apxy logs diff` | Compare two captured traffic records | `--id-a`, `--id-b`, `--scope` (request\|response\|both) |
-| `apxy logs export-curl` | Export one traffic record as a reusable client snippet | `--id`, `--format` (curl\|fetch\|httpie\|python) |
-| `apxy logs export-har` | Export captured traffic as a HAR 1.2 file | `--file` (path, stdout if omitted), `--limit` (default 10000) |
-| `apxy logs import-har` | Import traffic records from a HAR file | `--file` (HAR file path) |
-| `apxy tools request compose` | Send a one-off HTTP request through the proxy | `--method` (default GET), `--url` (req), `--body`, `--headers` (JSON) |
-| `apxy tools request batch` | Send multiple HTTP requests from a JSON file | `--file` (req), `--compare-history`, `--time-range` (min, default 60), `--timeout` (ms, default 10000), `--format` (json\|markdown\|toon) |
-| `apxy tools request diagnose` | Diagnose endpoints using historical traffic records | `--file` (req), `--time-range` (min, default 60), `--match-mode` (exact\|contains\|prefix), `--format` (json\|markdown\|toon) |
+| `apxy logs replay` | Send a captured request again through the running proxy | `--id`, `--port` (8080) |
+| `apxy mark` | Record a point in time for `apxy wait` | optional mark name |
+| `apxy wait` | Block until a matching request lands, then check it | `--match`, `--expect`, `--since`, `--timeout` (30s) |
+| `apxy logs diff` | Compare two records | `--id-a`, `--id-b`, `--scope` (request\|response\|both) |
+| `apxy logs export-curl` | Export one record as a client snippet | `--id`, `--format` (curl\|fetch\|httpie\|python), `--redact` |
+| `apxy logs export-har` | Export traffic as a HAR 1.2 file | `--file` (stdout if omitted), `--limit` (10000), `--redact` |
+| `apxy logs import-har` | Import records from a HAR file | `--file` |
 
-## Export Formats
+## Export formats
 
 ```bash
 apxy logs export-curl --id <ID> --format <FORMAT>
 ```
 
-| Format | Use Case |
-|--------|----------|
-| `curl` | Terminal replay, CI scripts, PR descriptions |
+| Format | Use |
+|--------|-----|
+| `curl` | Terminal, CI scripts, PR descriptions |
 | `fetch` | Browser console, frontend debugging |
-| `httpie` | Human-readable CLI alternative to curl |
-| `python` | Python scripts, Jupyter notebooks, test suites |
+| `httpie` | HTTPie command line |
+| `python` | Python scripts and test suites |
 
-Each format produces a ready-to-run snippet you can paste into a terminal, browser console, script, or PR description.
+Exports mask secrets such as `Authorization` headers when stdout is not a terminal. In a terminal, pass `--redact` to get the same masking.
 
-## Replay vs Compose
+## Replay or send a new request
 
-- **Replay** (`traffic logs replay --id <ID>`) re-sends the exact captured request (method, URL, headers, body) against the live upstream. Fastest way to reproduce.
-- **Compose** (`tools request compose --method ... --url ... --body ...`) builds a new request from scratch. Use when you need to tweak headers or body before sending.
+- `apxy logs replay --id <ID>` sends the captured request again with the same method, URL, headers, and body.
+- To change the request, export it with `apxy logs export-curl --id <ID>`, edit the curl command, and run it with `apxy run -- curl ...`.
 
-Both produce a new traffic record that can be diffed against the original.
+Both create a new record that you can diff against the original.
 
-## Diff Scopes
+## Diff scopes
 
 | Scope | What it compares |
-|-------|-----------------|
-| `request` | Method, URL, headers, body of the request |
-| `response` | Status code, headers, body of the response |
-| `both` | Full request and response (default) |
+|-------|------------------|
+| `request` | Method, URL, headers, and body of the request |
+| `response` | Status code, headers, and body of the response |
+| `both` | The full request and response (default) |
 
-Use `--scope response` when verifying a fix -- you care about what the server returned, not what was sent.
+Use `--scope response` when you verify a fix. The request did not change, so only the response matters.
 
-## Batch Replay with History Comparison
+## Regression check after a change
+
+Run the test suite or a script through APXY. Then check each endpoint that matters with one `apxy wait` per request:
 
 ```bash
-apxy tools request batch --file ./requests.json --compare-history --time-range 60 --format json
+apxy mark
+apxy run -- npm test
+apxy wait --match "GET /api/users" --expect "status == 200" --expect "body.users exists" --timeout 0
+apxy wait --match "POST /api/orders" --expect "status == 201" --expect "body.order.id exists" --timeout 0
 ```
 
-The `--compare-history` flag replays every request in the JSON file and compares live results against historical traffic within `--time-range` minutes. Useful for regression testing multiple endpoints at once.
+`--timeout 0` checks the captured traffic once without blocking, because the tests already finished. Any exit code other than 0 is a regression.
 
-## Diagnose Endpoints
+To find renamed fields, search bodies for the old and the new name:
 
 ```bash
-apxy tools request diagnose --file ./endpoints.json --time-range 120 --match-mode contains
+apxy logs search-bodies --pattern "old_name" --scope response --limit 10
+apxy logs search-bodies --pattern "new_name" --scope response --limit 10
 ```
 
-Analyzes historical traffic for each endpoint in the file and produces a diagnostic report (error rates, latency percentiles, status code distribution).
+## HAR import and export
 
-## HAR Import/Export Details
-
-HAR (HTTP Archive) is the standard format for sharing captured traffic between tools and team members.
-
-**Export** captures up to `--limit` records (default 10000) into a HAR 1.2 file:
+HAR (HTTP Archive) is the standard file format for sharing captured traffic between tools.
 
 ```bash
-# Export to file
+# Export to a file
 apxy logs export-har --file ./traffic.har --limit 5000
 
-# Export to stdout (pipe to other tools)
+# Export to stdout
 apxy logs export-har
 ```
 
-**Import** loads a HAR file into the current APXY traffic database:
+Import loads a HAR file into the current APXY traffic database:
 
 ```bash
 apxy logs import-har --file ./colleague-traffic.har
 ```
 
-After import, all records are available for replay, diff, SQL queries, and search -- just like locally captured traffic.
+Imported records work with search, show, diff, and export like captured ones.
 
-## Compose Request Details
-
-Build and send a custom request through the proxy:
-
-```bash
-# Simple GET
-apxy tools request compose --url "https://api.example.com/health"
-
-# POST with body and headers
-apxy tools request compose --method POST \
-  --url "https://api.example.com/data" \
-  --body '{"key":"value"}' \
-  --headers '{"Authorization":"Bearer tok"}'
-```
-
-The response is captured as a new traffic record that can be diffed, exported, or analyzed.
-
-## Batch Request File Format
-
-The `--file` flag for `request batch` and `request diagnose` expects a JSON array of endpoint specs:
-
-```json
-[
-  {"method": "GET",  "url": "https://api.example.com/users"},
-  {"method": "POST", "url": "https://api.example.com/orders", "body": "{\"item\":\"widget\"}"}
-]
-```
-
-## Common Patterns
+## Common patterns
 
 ### Prove a bug fix before pushing
 
-1. Find the failing record: `apxy logs search --query "api.myapp.com" --format json | jq '.[] | select(.status_code >= 500)'`
-2. Note the record ID (e.g., 7).
-3. Fix the code, restart the server.
-4. Replay: `apxy logs replay --id 7` -- note new ID (e.g., 12).
-5. Diff: `apxy logs diff --id-a 7 --id-b 12 --scope response`
-6. Export evidence: `apxy logs export-curl --id 7` and `--id 12` for the PR.
-
-### Regression test before deploy
-
-1. Capture baseline with `traffic recording start/stop` + `export-har`.
-2. Deploy candidate build.
-3. Batch replay: `request batch --file ./requests.json --compare-history`.
-4. Search for field name drift: `search-bodies --pattern "old_name"` vs `"new_name"`.
-5. SQL query for new error codes.
+1. Start the proxy with `apxy start` and reproduce the bug.
+2. Find the failing record: `apxy logs search --query "api.myapp.com" | jq '.items[] | select(.status_code >= 500) | .id'`
+3. Note the record ID, for example `a1b2c3`.
+4. Fix the code and restart your server.
+5. Run `apxy mark`, then `apxy logs replay --id a1b2c3`.
+6. Check it: `apxy wait --match "POST /api/checkout" --expect "status == 200"`. Note the new record ID from the output, for example `d4e5f6`.
+7. Diff: `apxy logs diff --id-a a1b2c3 --id-b d4e5f6 --scope response`
+8. Export proof for the PR: `apxy logs export-curl --id d4e5f6 --redact`
 
 ### Share a reproducible bug report
 
-1. `apxy logs export-curl --id <ID> --format curl` -- one command anyone can run.
-2. Or export as HAR for full context including headers and timing.
+1. Run `apxy logs export-curl --id <ID> --format curl --redact` to get one command anyone can run.
+2. Or export a HAR file for the full headers and timing.
 
 ## Tips
 
-- Always diff with `--scope response` when proving a bug fix -- the request did not change.
-- Export HAR files to share full traffic context with teammates who have APXY installed.
-- The `request batch` JSON file format matches the output of `export-har` endpoint entries, so you can round-trip between them.
+- Diff with `--scope response` when you prove a bug fix.
+- Share HAR files with teammates who use APXY or any HAR viewer.

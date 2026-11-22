@@ -78,16 +78,29 @@ The [user guide](docs/user-guide.md) shows the commands for each of these:
 
 Your agent cannot see network traffic from your editor. APXY gives it the real requests and responses.
 
-Install the APXY skill. It works with Claude Code, Cursor, Codex, Gemini CLI, GitHub Copilot, and other agents that support [skills](https://github.com/vercel-labs/skills).
+### Use with Claude Code
+
+Install the APXY plugin from inside Claude Code:
+
+```
+/plugin marketplace add apxydev/apxy
+/plugin install apxy@apxy
+```
+
+The plugin adds the APXY MCP server and the APXY skill. The skill teaches Claude to check each code change against a real request with `apxy mark` and `apxy wait`. Install the `apxy` binary first, because the MCP server runs `apxy mcp`.
+
+### Use with other agents
+
+Install the APXY skill. It works with Cursor, Codex, Gemini CLI, GitHub Copilot, and other agents that support [skills](https://github.com/vercel-labs/skills).
 
 ```bash
 npx skills add apxydev/apxy
 ```
 
-Or connect APXY as an MCP server. This command sets up Claude Code:
+Or connect APXY as an MCP server. This command prints the setup for each supported client:
 
 ```bash
-apxy setup mcp --client claude-code --write
+apxy setup mcp --all
 ```
 
 Then ask your agent things like:
