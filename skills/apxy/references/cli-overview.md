@@ -2,7 +2,7 @@
 
 This file lists all 105 APXY commands and their flags. It is generated from the CLI help text.
 
-Global flags work on every command: `--config`, `--error-format` (text|json, default text), `--help-format` (default|agent, default default; only formats the output of `--help`), `--no-project`, `--output` (agent|human), `--verbose`.
+Global flags work on every command: `--config`, `--error-format` (text|json, default text), `--help-format` (default|agent, default default; shows JSON help; add `--help` too for versions before v1.8.0), `--no-project`, `--output` (agent|human), `--verbose`.
 
 `--control-url` points a command at the control API of a running proxy. The default is `http://127.0.0.1:8081`.
 

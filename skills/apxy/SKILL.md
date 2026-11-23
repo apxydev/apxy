@@ -66,7 +66,7 @@ Piped output is a JSON envelope: lists in `.items`, one record in `.data`, a nex
 
 - **A new proxy starts with empty logs.** Read what you need before starting another.
 - **`apxy start` runs in the foreground** and, on macOS, enables the system proxy and asks to trust the CA. In scripts: `apxy start --no-system-proxy --no-trust-ca --port P &`, then `until apxy status --quiet --port P; do sleep 0.2; done` (ready in about a second). Stop it with `apxy stop`.
-- **Always keep `--help` when reading help.** `--help-format agent` only formats it: `apxy start --help-format agent` starts the proxy and turns on the system proxy.
+- **Always keep `--help` when reading help.** Before v1.8.0, `--help-format agent` only formatted it, so `apxy start --help-format agent` started the proxy and turned on the system proxy.
 - **Needs a running proxy:** `dns`, `filter`, `rewrite`, `breakpoint`, `script`, `network`, `caching`, `ssl`, `recording`, `mock import`, `logs replay`. Reading logs, `mock add`, and `schema` work without one.
 - **Ports:** proxy 8080, control API 8081, web UI 8082 by default. "Address in use" means a proxy already runs.
 - **Browser capture:** `apxy browser <url>`. **Teach the repo's agents this loop:** `apxy setup agents` (edits `AGENTS.md`/`CLAUDE.md`, so only when asked).
