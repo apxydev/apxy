@@ -20,7 +20,7 @@ We will acknowledge receipt within 48 hours and aim to provide a fix or mitigati
 
 This policy covers:
 - The APXY binary (proxy, CLI, Web UI)
-- The install script (`scripts/install.sh`)
+- The install script served at `https://apxy.dev/install.sh` (source: the apxy-website repo)
 - Any published release artifacts on GitHub Releases
 
 This policy does **not** cover:
