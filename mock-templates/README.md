@@ -14,41 +14,18 @@ Pre-built mock rules for popular APIs. Use these as realistic starting points fo
 
 Templates are plain `MockRule` arrays. You can inspect them, import a subset, or copy individual rules into your own config.
 
-### Option 1: Import Selected Rules Via CLI
+### Option 1: Import with the CLI
 
 ```bash
 # Download a template
 curl -O https://raw.githubusercontent.com/apxydev/apxy/main/mock-templates/stripe/rules.json
 
-# Import a subset. On the Free plan, keep it to 3 active rules at a time.
-jq -c '.[]' rules.json | while read -r rule; do
-  args=(
-    apxy mock add
-    --name "$(echo "$rule" | jq -r '.name')"
-    --url "$(echo "$rule" | jq -r '.url_pattern')"
-    --match "$(echo "$rule" | jq -r '.match_type')"
-    --status "$(echo "$rule" | jq -r '.response_status')"
-    --body "$(echo "$rule" | jq -r '.response_body')"
-    --delay "$(echo "$rule" | jq -r '.delay_ms // 0')"
-    --priority "$(echo "$rule" | jq -r '.priority // 0')"
-  )
+# Import every rule in the file
+apxy mock import --file rules.json
 
-  method="$(echo "$rule" | jq -r '.method // empty')"
-  response_headers="$(echo "$rule" | jq -c '.response_headers // {}')"
-  header_conditions="$(echo "$rule" | jq -c '.header_conditions // {}')"
-
-  if [ -n "$method" ]; then
-    args+=(--method "$method")
-  fi
-  if [ "$response_headers" != "{}" ]; then
-    args+=(--headers "$response_headers")
-  fi
-  if [ "$header_conditions" != "{}" ]; then
-    args+=(--header-conditions "$header_conditions")
-  fi
-
-  "${args[@]}"
-done
+# Or import a subset: keep only the rules you want, then import that file
+jq '[.[] | select(.name | test("charge"; "i"))]' rules.json > charges.json
+apxy mock import --file charges.json
 ```
 
 ### Option 2: Copy individual rules

@@ -73,27 +73,12 @@ Yes. Run `apxy start --no-system-proxy` and set `http_proxy`/`https_proxy` envir
 # Download a template
 curl -O https://raw.githubusercontent.com/apxydev/apxy/main/mock-templates/stripe/rules.json
 
-# Import selected rules. Templates may use response headers and header conditions.
-jq -c '.[]' rules.json | while read -r rule; do
-  args=(
-    apxy mock add
-    --name "$(echo "$rule" | jq -r '.name')"
-    --url "$(echo "$rule" | jq -r '.url_pattern')"
-    --match "$(echo "$rule" | jq -r '.match_type')"
-    --status "$(echo "$rule" | jq -r '.response_status')"
-    --body "$(echo "$rule" | jq -r '.response_body')"
-  )
+# Import every rule in the file
+apxy mock import --file rules.json
 
-  method="$(echo "$rule" | jq -r '.method // empty')"
-  response_headers="$(echo "$rule" | jq -c '.response_headers // {}')"
-  header_conditions="$(echo "$rule" | jq -c '.header_conditions // {}')"
-
-  if [ -n "$method" ]; then args+=(--method "$method"); fi
-  if [ "$response_headers" != "{}" ]; then args+=(--headers "$response_headers"); fi
-  if [ "$header_conditions" != "{}" ]; then args+=(--header-conditions "$header_conditions"); fi
-
-  "${args[@]}"
-done
+# Or import a subset: keep only the rules you want, then import that file
+jq '[.[] | select(.name | test("charge"; "i"))]' rules.json > charges.json
+apxy mock import --file charges.json
 ```
 
-On the Free plan, only keep a few rules active at once. For provider-specific notes and scenario headers like `X-APXY-Scenario`, see [mock-templates/README.md](../mock-templates/README.md).
+For provider-specific notes and scenario headers like `X-APXY-Scenario`, see [mock-templates/README.md](../mock-templates/README.md).

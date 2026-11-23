@@ -2,7 +2,7 @@
 
 Push your client and server integration past the happy path: dropped packets, unavailable backends, and agonizing delays so retries, circuit breakers, and error UI earn their keep.
 
-**Difficulty**: Intermediate | **Time**: ~10 minutes | **Features used**: Network simulation (packet loss), Mock rules, SSL interception | **Requires**: Pro
+**Difficulty**: Intermediate | **Time**: ~10 minutes | **Features used**: Network simulation (packet loss), Mock rules, SSL interception | **Requires**: Free
 
 ## Scenario
 
@@ -117,7 +117,7 @@ apxy network clear
 
 ```bash
 apxy network clear
-apxy tools request compose --method GET --url "https://api.myapp.com/api/health"
+apxy run -- curl https://api.myapp.com/api/health
 ```
 
 ---

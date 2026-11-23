@@ -2,21 +2,17 @@
 
 Production is returning 500s and log aggregation is noisy. Route traffic through APXY, then have your coding agent query captured traffic, pull error payloads with jsonpath, and turn that into a concrete fix you can ship.
 
-**Difficulty**: Intermediate | **Time**: ~15 minutes | **Features used**: SQL queries, Traffic inspection, JSONPath extraction, SSL interception | **Requires**: Free
+**Difficulty**: Intermediate | **Time**: ~15 minutes | **Features used**: Traffic inspection, JSONPath extraction, SSL interception | **Requires**: Free
 
 ## Scenario
 
-Your app is throwing 500 errors in production. Instead of manually digging through logs, tell your AI agent to use APXY to find all server errors, inspect the payloads, identify the root cause, and suggest a fix. You stay in the loop for the actual code change; the agent does the forensic work across SQL, full record views, structured extraction, and a verification replay.
+Your app is throwing 500 errors in production. Instead of manually digging through logs, tell your AI agent to use APXY to find all server errors, inspect the payloads, identify the root cause, and suggest a fix. You stay in the loop for the actual code change; the agent does the forensic work across traffic filters, full record views, structured extraction, and a verification replay.
 
 ## Prerequisites
 
 - APXY installed (`apxy version` works)
 - macOS or Linux
 - AI coding agent with the APXY skill installed (see [Using APXY as a Claude Code / Cursor Skill](../agent-skill-reference/))
-
-### Plan note
-
-**`apxy sql`** is a **Pro** feature in licensed builds. On **Free**, have your agent use **`apxy logs search --query "500"`** (or status tokens your UI surfaces) instead of SQL, then **`apxy logs show`** on each candidate id. Upgrade or use Pro for ad-hoc aggregates.
 
 ## Before You Start
 
@@ -42,7 +38,7 @@ Generate traffic through the proxy (your app, integration tests, or `curl`) so t
 
 > Primary path: natural language to your agent; the agent runs APXY CLI commands and reports back.
 
-### Step 1: List recent server errors with SQL
+### Step 1: List recent server errors
 
 **Tell your agent:**
 
@@ -125,8 +121,9 @@ Based on the agent's summary (nil dereference, constraint violation, timeout fro
 **Your agent runs:**
 
 ```bash
-apxy tools request compose --method POST --url https://api.myapp.com/api/orders \
-  --body '{"customer_id":"cust_42","items":[{"sku":"WIDGET-1","qty":2}]}'
+apxy run -- curl -X POST https://api.myapp.com/api/orders \
+  -H "Content-Type: application/json" \
+  -d '{"customer_id":"cust_42","items":[{"sku":"WIDGET-1","qty":2}]}'
 ```
 
 The agent uses the real body from `apxy logs show` when available so the replay matches production. The new exchange appears as a new traffic id (for example `58`).
@@ -149,7 +146,7 @@ The agent summarizes: status code change, error object removed, expected success
 
 ## Track B: Web UI Workflow
 
-You can follow the same investigation in the Web UI while the proxy runs. Open the local dashboard (default **http://localhost:8082** unless you changed the port), go to **Traffic**, and sort or filter for status **500** to match the SQL from Track A.
+You can follow the same investigation in the Web UI while the proxy runs. Open the local dashboard (default **http://localhost:8082** unless you changed the port), go to **Traffic**, and sort or filter for status **500** to match the filter from Track A.
 
 Click a row to inspect the full request and response side by side; the UI is equivalent to `apxy logs show`. When you need structured fields, the agent can still run `apxy logs jsonpath` for you, or you can read the formatted JSON in the response panel. After your fix, use **Compose** to replay a request and **Diff** to compare two records visually -- the same before/after story as `apxy logs diff` on the CLI.
 
@@ -168,7 +165,7 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 - How to drive APXY from an agent using **jq pipelines** on `apxy logs list` output
 - How **`apxy logs show`** and **`apxy logs jsonpath`** narrow huge responses to the fields that explain failures
-- How to **replay** with **`apxy tools request compose`** and prove a fix with **`apxy logs diff --scope response`**
+- How to **replay** with **`apxy run -- curl`** and prove a fix with **`apxy logs diff --scope response`**
 - That the Web UI mirrors the same capture data for visual confirmation
 
 ---

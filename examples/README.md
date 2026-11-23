@@ -60,7 +60,7 @@ Pick the track that fits your workflow. Both cover the same material.
 | [Catching API Regressions Before Deployment](replay-and-diff/regression-testing-with-diff/) | Intermediate | ~15 min | Free |
 | [Creating a Reproducible Bug Report](replay-and-diff/export-and-share-bug/) | Beginner | ~5 min | Free |
 | [Exporting Requests as cURL, Fetch, HTTPie, and Python](replay-and-diff/export-to-multiple-formats/) | Beginner | ~5 min | Free |
-| [Saving and Restoring Debug Sessions](replay-and-diff/session-save-restore/) | Intermediate | ~10 min | Pro |
+| [Saving and Restoring Debug Sessions](replay-and-diff/session-save-restore/) | Intermediate | ~10 min | Free |
 | [Sharing a Debug Artifact with Your Team](replay-and-diff/share-debug-artifact/) | Beginner | ~5 min | Free |
 
 ## AI Agent Workflows
@@ -78,8 +78,8 @@ Pick the track that fits your workflow. Both cover the same material.
 
 | Example | Difficulty | Time | Tier |
 |---------|-----------|------|------|
-| [Testing Your App on Slow Connections](network-simulation/simulate-slow-network/) | Beginner | ~10 min | Pro |
-| [Testing Resilience to Network Problems](network-simulation/simulate-network-failures/) | Intermediate | ~10 min | Pro |
+| [Testing Your App on Slow Connections](network-simulation/simulate-slow-network/) | Beginner | ~10 min | Free |
+| [Testing Resilience to Network Problems](network-simulation/simulate-network-failures/) | Intermediate | ~10 min | Free |
 | [Handling API Rate Limits Gracefully](network-simulation/simulate-rate-limiting/) | Intermediate | ~10 min | Free |
 | [Filtering Out Noisy Third-Party Traffic](network-simulation/block-third-party-requests/) | Beginner | ~5 min | Free |
 
@@ -88,9 +88,9 @@ Pick the track that fits your workflow. Both cover the same material.
 | Example | Difficulty | Time | Tier |
 |---------|-----------|------|------|
 | [Pointing Your App at Different Environments](rules-and-scripting/redirect-api-to-staging/) | Beginner | ~5 min | Free |
-| [Pausing and Editing Live Requests](rules-and-scripting/breakpoint-inspect-modify/) | Intermediate | ~10 min | Pro |
-| [Auto-Injecting Auth Headers with Scripts](rules-and-scripting/script-add-auth-header/) | Intermediate | ~10 min | Pro |
-| [Modifying API Responses with Scripts](rules-and-scripting/script-transform-response/) | Advanced | ~15 min | Pro |
+| [Pausing and Editing Live Requests](rules-and-scripting/breakpoint-inspect-modify/) | Intermediate | ~10 min | Free |
+| [Auto-Injecting Auth Headers with Scripts](rules-and-scripting/script-add-auth-header/) | Intermediate | ~10 min | Free |
+| [Modifying API Responses with Scripts](rules-and-scripting/script-transform-response/) | Advanced | ~15 min | Free |
 
 ## Advanced
 

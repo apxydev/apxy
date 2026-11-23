@@ -15,10 +15,6 @@ Your app is slow but you are not sure which API calls dominate wall time. Ask yo
 - AI coding agent with the APXY skill installed (see [Using APXY as a Claude Code / Cursor Skill](../agent-skill-reference/))
 - Enough captured traffic through the proxy to make aggregates meaningful (synthetic load or real usage)
 
-### Plan note
-
-All steps below use **`apxy logs`** commands available on the **Free** tier. No SQL or Pro features are required.
-
 ## Before You Start
 
 Start the proxy with SSL enabled for the domains in this example:

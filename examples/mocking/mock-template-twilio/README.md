@@ -198,7 +198,7 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 ## Next Steps
 
 - Add mocks for `Calls.json` or `IncomingPhoneNumbers` using the same pattern
-- Share a `rules.json` in [apxy-public](https://github.com/apxydev/apxy-public) when your team stabilizes payloads
+- Share a `rules.json` in [mock-templates](https://github.com/apxydev/apxy/tree/main/mock-templates) when your team stabilizes payloads
 - [SSL Setup Guide](../../getting-started/ssl-setup-guide/) -- trust CA on additional machines
 - [API Mocking](../../api-mocking/) -- general mock patterns
 - [Replay and Diff](../../replay-and-diff/) -- diff a captured real Twilio response against your mock

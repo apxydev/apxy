@@ -44,7 +44,7 @@ Copy the official APXY skill markdown into the location your agent expects:
 
 > "I've added the APXY skill to this repo under [path]. Read it before running any apxy commands."
 
-Use the path you actually created. If your org ships skills from **`apxy-public`** or the main **`apxy`** repo, clone or submodule that file so it stays updated with releases.
+Use the path you actually created. If your org ships skills from the main **`apxy`** repo, clone or submodule that file so it stays updated with releases.
 
 ### Step 2: Wire the skill into your agent bootstrap
 
@@ -144,7 +144,7 @@ apxy mock remove --id RULE_ID_FROM_LIST
 
 ### Step 9: Keep the skill version-aligned
 
-When you upgrade APXY, diff release notes for new commands (for example additional **`traffic`** or **`tools`** subcommands) and update the skill markdown so the agent does not hallucinate flags.
+When you upgrade APXY, diff release notes for new commands (for example new **`logs`** or **`mock`** subcommands) and update the skill markdown so the agent does not hallucinate flags.
 
 ---
 

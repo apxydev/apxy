@@ -88,7 +88,7 @@ Agent reports response size, headers (`content-encoding`, pagination), and timin
 **Your agent runs:**
 
 ```bash
-apxy tools request compose --method GET --url "https://api.myapp.com/api/users"
+apxy run -- curl https://api.myapp.com/api/users
 ```
 
 Agent prints status, timing, and a truncated body. Run again after deploy or DB index change.
@@ -165,7 +165,7 @@ Go to **Tools** -> **Compose**, paste the URL, send **GET**, compare duration to
 
 - Using `apxy logs list --format json | jq` with `.duration_ms` to rank real user-driven traffic
 - Connecting aggregate slowness to a single `apxy logs show` story (body size, status, timing)
-- Retesting with `apxy tools request compose` and comparing runs via `apxy logs diff`
+- Retesting with `apxy run -- curl` and comparing runs via `apxy logs diff`
 - Optional `replay` for byte-for-byte reproduction of a slow call
 
 ## Next Steps

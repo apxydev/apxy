@@ -15,8 +15,6 @@ You are a frontend developer building a user dashboard. The backend team has not
 - AI coding agent with APXY skill installed
 - Optional but recommended: add `127.0.0.1 api.myapp.com` to `/etc/hosts` so your app and `curl` resolve the mock host to your machine through the proxy
 
-**Free tier:** You can have up to **three active** mock rules at once on the Free plan. This walkthrough defines five rules for a complete CRUD story. Either upgrade to Pro for unlimited rules, or keep only the three rules you are actively testing and `apxy mock disable` the rest (see Step 7).
-
 ## Before You Start
 
 Start the proxy with SSL enabled for the domains in this example:
@@ -123,22 +121,6 @@ curl -sS "https://api.myapp.com/api/users/42"
 
 Agent shows JSON matching your rules and may show traffic in `apxy logs list` if logging is enabled.
 
-### Step 7 (Free tier): Rotate active rules
-
-If you hit the active-rule limit, pause rules you are not testing:
-
-**Tell your agent:**
-
-> "Disable the PUT and DELETE mock rules so I stay within the Free tier limit."
-
-**Your agent runs:**
-
-```bash
-apxy mock list
-apxy mock disable --id <put-rule-id>
-apxy mock disable --id <delete-rule-id>
-```
-
 ---
 
 ## Track B: Web UI Workflow
@@ -218,7 +200,6 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 - How to combine **exact** and **wildcard** URL patterns for collection vs resource paths
 - How `--priority` orders overlapping patterns (lower number is tried first)
 - How `--delay` simulates network latency for UI loading states
-- How the Free plan limits concurrent active mocks and how to disable rules you are not using
 - How to mirror the same setup in **Rules → Mock Rules** in the Web UI
 
 ## Next Steps

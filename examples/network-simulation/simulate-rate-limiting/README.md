@@ -110,7 +110,7 @@ apxy mock remove --all
 **Your agent runs:**
 
 ```bash
-apxy tools request compose --method GET --url "https://api.example.com/api/v1/status"
+apxy run -- curl https://api.example.com/api/v1/status
 ```
 
 ---

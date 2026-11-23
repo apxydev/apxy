@@ -80,7 +80,7 @@ endpoint explicitly:
 **Your agent runs:**
 
 ```bash
-apxy tools request compose --method GET --url https://api.myapp.com/api/users
+apxy run -- curl https://api.myapp.com/api/users
 ```
 
 Repeat with the right method, URL, headers, and body for each endpoint in your
@@ -117,7 +117,7 @@ Alternatively, for a hand-tuned replay:
 **Your agent runs:**
 
 ```bash
-apxy tools request compose --method GET --url https://api.myapp.com/api/users
+apxy run -- curl https://api.myapp.com/api/users
 ```
 
 Note the **new** record IDs after each replay (for example baseline `1` → new
@@ -221,4 +221,4 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 - [The Capture → Replay → Diff Loop](../README.md) — single-bug proof with before/after
 - [Creating a Reproducible Bug Report](../export-and-share-bug/) — export one failing request for teammates
-- [Saving and Restoring Debug Sessions](../session-save-restore/) — hand off full context (Pro)
+- [Saving and Restoring Debug Sessions](../session-save-restore/) — hand off full context

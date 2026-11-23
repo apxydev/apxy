@@ -62,23 +62,13 @@ Mobile setup available on LAN at port 8083
 
 Note the **proxy host** (`192.168.1.42`) and **proxy port** (`8080` unless you passed `--port` to `apxy start`). Your device Wi‑Fi proxy must use this host and port. The **mobile setup** line is a separate LAN port (often `Web UI port + 1` when the UI binds to localhost) so your phone can open setup pages without changing `--listen-addr`.
 
-### Step 2: Print mobile setup instructions (and optional QR)
+### Step 2: Open the mobile setup page (and QR code)
 
-Tell your agent:
-
-> "Show me the full mobile setup steps and a QR code for the setup page."
-
-Your agent runs:
-
-```bash
-apxy setup mobile setup --port 8080 --qr
-```
-
-`--port` must match the proxy listen port from Step 1. Agent prints an ASCII QR code (when LAN IP detection works) and step-by-step text for iOS and Android.
+Open the Web UI at **http://localhost:8082** and go to **Setup → Mobile Setup**. It shows your LAN IP, the proxy port, a QR code for the setup page, and step-by-step text for iOS and Android.
 
 **Prefer the LAN mobile URL from proxy startup:** open `http://<LAN-IP>:<mobile-setup-port>/mobile-setup` in the phone browser, where `<mobile-setup-port>` is the value from `Mobile setup available on LAN at port ...` in Step 1 (example: `8083` when the Web UI is on `8082`).
 
-After the device Wi‑Fi proxy points at APXY, Safari/Chrome on the phone can also open **`http://apxy.proxy/ssl`** to download the CA -- this hostname is resolved via the proxy to the cert endpoint (same flow printed by `apxy setup mobile setup`).
+After the device Wi‑Fi proxy points at APXY, Safari/Chrome on the phone can also open **`http://apxy.proxy/ssl`** to download the CA -- this hostname is resolved via the proxy to the cert endpoint (same flow shown on the Mobile Setup page).
 
 ### Step 3: Configure the device Wi‑Fi proxy
 
@@ -90,7 +80,7 @@ Tell your agent:
 
 > "Summarize iOS vs Android proxy fields so I can double-check my device."
 
-Agent repeats the table from `apxy setup mobile setup` output with your actual LAN IP filled in.
+Agent repeats the iOS and Android fields from the Mobile Setup page with your actual LAN IP filled in.
 
 ### Step 4: Install and trust the CA on the device
 
@@ -199,7 +189,7 @@ Remember to clear the device Wi‑Fi proxy.
 
 Watch the full walkthrough: *[YouTube link -- coming soon]*
 
-- LAN proxy + `apxy setup mobile setup`: 0:00 - 3:30
+- LAN proxy + Mobile Setup page: 0:00 - 3:30
 - CA install iOS/Android: 3:30 - 6:30
 - Inspecting traffic in UI + CLI: 6:30 - 10:00
 
@@ -207,7 +197,7 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 ## What You Learned
 
-- How to pair `apxy start` with `apxy setup mobile setup` for IP, port, and QR
+- How to pair `apxy start` with the Mobile Setup page for IP, port, and QR
 - How to configure iOS and Android Wi‑Fi manual HTTP proxies toward your dev machine
 - How to install APXY's CA so HTTPS from the device decrypts inside APXY
 - How to list and inspect mobile-originated requests with `apxy logs list` / `apxy logs show` or the **Traffic** tab

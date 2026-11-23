@@ -79,119 +79,21 @@ Response body (binary, 187 bytes):
 
 That confirms you are dealing with encoded Protobuf rather than plain JSON.
 
-### Step 3: Register your `.proto` definition
+### Step 3: Decode in the Web UI
 
-Keep your schema next to the repo you are debugging (for example `./protos/orders.proto`) so the agent and Web UI can reuse the same source of truth.
-
-**Tell your agent:**
-
-> "Register our orders API proto file with APXY under the name orders_v1."
-
-**Your agent runs:**
-
-```bash
-apxy tools protobuf add-schema --name orders_v1 --file ./protos/orders.proto
-```
-
-**Example output**
-
-```text
-Schema added: orders_v1 (ID: 9f3e2a1b)
-```
-
-You can list what is registered anytime:
-
-```bash
-apxy tools protobuf list-schemas
-```
-
-**Example output**
-
-```json
-[
-  {
-    "id": "9f3e2a1b",
-    "name": "orders_v1",
-    "added_at": "2026-03-27T14:22:01Z"
-  }
-]
-```
-
-### Step 4: Decode the response body to structured wire data
-
-**Tell your agent:**
-
-> "Decode the Protobuf response body for record a1b2c3d4."
-
-**Your agent runs:**
-
-```bash
-apxy tools protobuf decode --id a1b2c3d4 --scope response
-```
-
-APXY walks the Protobuf wire format and prints each field’s number, wire type, and best-effort value (strings and varints are readable; nested messages appear as length-delimited segments you can map back to your `.proto`).
-
-**Example output**
-
-```json
-[
-  {
-    "field": 1,
-    "wire_type": 2,
-    "value": "ORD-88421"
-  },
-  {
-    "field": 2,
-    "wire_type": 0,
-    "value": 3
-  },
-  {
-    "field": 3,
-    "wire_type": 2,
-    "value": "(42 bytes binary)"
-  },
-  {
-    "field": 4,
-    "wire_type": 2,
-    "value": "SHIPPED"
-  }
-]
-```
-
-Cross-check field numbers against `orders.proto` (for example field `1` = `order_id`, field `4` = `fulfillment_state`) so the agent can narrate “order ORD-88421 is SHIPPED” instead of staring at hex.
-
-To decode a client-sent body instead, switch scope:
-
-```bash
-apxy tools protobuf decode --id a1b2c3d4 --scope request
-```
-
-### Step 5: Search traffic, then decode matching records
-
-**Tell your agent:**
-
-> "Find captures whose path or host mentions checkout, then decode the Protobuf response for the most recent hit."
-
-**Your agent runs:**
+The CLI has no Protobuf decoder. Note the record ID from Step 2 and continue with Track B: register your `.proto` file and decode the record in the Web UI. To narrow many captures down first, have your agent search:
 
 ```bash
 apxy logs search --query "checkout" --limit 10
-apxy tools protobuf decode --id <ID_FROM_SEARCH> --scope response
 ```
-
-**Tell your agent:**
-
-> "In the decoded JSON, which field holds the customer-visible order state?"
-
-The agent maps wire `field` indices to names from your registered `.proto` and reports the human-readable `value` entries (or nested binary lengths that need another message type from the same file).
 
 ---
 
 ## Track B: Web UI Workflow
 
-### Step 1: Register schemas (Analyze → Protobuf)
+### Step 1: Register schemas (Analysis & Tools → Protobuf)
 
-Open **http://localhost:8082** (or the port shown when you started the proxy). In the sidebar, go to **Analyze → Protobuf** (or **Tools → Protobuf**, depending on your build). Upload the same **`.proto`** file you use in Track A (`./protos/orders.proto`). The decode dialog will remind you to do this first if no schemas are registered.
+Open **http://localhost:8082** (or the port shown when you started the proxy). In the sidebar, go to **Analysis & Tools → Protobuf**. Upload the same **`.proto`** file you use in Track A (`./protos/orders.proto`). The decode dialog will remind you to do this first if no schemas are registered.
 
 > screenshots/01-web-protobuf-schema-upload.png
 
@@ -209,15 +111,9 @@ Click a row. Open the **Request** tab: headers should show `Content-Type` values
 
 ### Step 4: Decode Protobuf from the record
 
-Open the row actions menu on the traffic detail view. Choose **Decode Protobuf** (this entry appears when the content type looks like Protobuf or gRPC). In the dialog, pick **Request** or **Response** scope, then click **Decode**. The panel shows structured decode output (aligned with the CLI wire decode).
+Open the row actions menu on the traffic detail view. Choose **Decode Protobuf** (this entry appears when the content type looks like Protobuf or gRPC). In the dialog, pick **Request** or **Response** scope, then click **Decode**. The panel shows the decoded fields.
 
 > screenshots/04-decode-protobuf-dialog.png
-
-### Step 5: Compare with CLI
-
-For tickets and agent prompts, copy the record ID and run **`apxy tools protobuf decode`** so the output matches what you saw in the dialog.
-
-> screenshots/05-protobuf-cli-vs-ui.png
 
 ---
 
@@ -227,7 +123,7 @@ For tickets and agent prompts, copy the record ID and run **`apxy tools protobuf
 
 - 0:00 — Why Protobuf bodies look binary in capture tools
 - 2:00 — SSL for api.myapp.com and reproducing a Protobuf call
-- 5:00 — `traffic logs show` vs `tools protobuf decode`
+- 5:00 — Finding the record with `apxy logs show`
 - 9:00 — Registering `.proto` and mapping field numbers to names
 - 12:00 — Web UI: Traffic → Response → Decode Protobuf
 
@@ -236,8 +132,8 @@ For tickets and agent prompts, copy the record ID and run **`apxy tools protobuf
 ## What You Learned
 
 - Recognizing Protobuf and gRPC traffic from `Content-Type` and non-printable bodies in **`apxy logs show`**
-- Registering schema files with **`apxy tools protobuf add-schema`** and listing them with **`list-schemas`**
-- Turning wire bytes into inspectable structures via **`apxy tools protobuf decode`** (`--scope request` or `response`)
+- Registering `.proto` files under **Analysis & Tools → Protobuf** in the Web UI
+- Turning wire bytes into readable fields with **Decode Protobuf** on a traffic record
 - Combining **`apxy logs search`** with decode to filter many captures down to the one message you need
 
 ---
