@@ -1,8 +1,8 @@
 # APXY CLI command reference
 
-This file lists all 102 APXY commands and their flags. It is generated from the CLI help text.
+This file lists all 105 APXY commands and their flags. It is generated from the CLI help text.
 
-Global flags work on every command: `--config`, `--error-format` (text|json, default text), `--help-format` (default|agent, default default), `--no-project`, `--output` (agent|human), `--verbose`.
+Global flags work on every command: `--config`, `--error-format` (text|json, default text), `--help-format` (default|agent, default default; only formats the output of `--help`), `--no-project`, `--output` (agent|human), `--verbose`.
 
 `--control-url` points a command at the control API of a running proxy. The default is `http://127.0.0.1:8081`.
 
@@ -10,7 +10,7 @@ Global flags work on every command: `--config`, `--error-format` (text|json, def
 
 | Command | Description | Flags |
 |---------|-------------|-------|
-| `apxy start` | Start the local APXY proxy | `--auto-validate`, `--bypass-domains`, `--cert-dir` (default ~/.apxy/certs), `--control-port`, `--listen-addr` (default 127.0.0.1), `--max-body` (default 10485760), `--mitm-all`, `--network-service`, `--no-block-quic`, `--no-mdns`, `--no-system-proxy`, `--no-trust-ca`, `--port` (default 8080), `--project-dir`, `--proxy-listen-addr`, `--ssl-domains`, `--upstream-proxy`, `--web-port` |
+| `apxy start` | Start the local APXY proxy | `--auto-validate`, `--bypass-domains`, `--cert-dir` (default ~/.apxy/certs), `--control-port`, `--insecure-upstream`, `--listen-addr` (default 127.0.0.1), `--max-body` (default 10485760), `--mitm-all`, `--network-service`, `--no-block-quic`, `--no-mdns`, `--no-system-proxy`, `--no-trust-ca`, `--port` (default 8080), `--project-dir`, `--proxy-listen-addr`, `--ssl-domains`, `--tls-keylog`, `--upstream-proxy`, `--web-port` |
 | `apxy stop` | Stop the local APXY proxy and disable system proxy settings |  |
 | `apxy status` | Show whether the local APXY proxy is running | `--format` (json\|toon, default json), `--port` (default 8080), `--quiet` |
 | `apxy run` | Run a command with proxy + CA env vars routed through APXY | `apxy start` flags before `--`, such as `--port`, `--ssl-domains`, `--mitm-all` |
@@ -71,6 +71,14 @@ Global flags work on every command: `--config`, `--error-format` (text|json, def
 | `apxy rewrite list` | List rewrite rules | `--format` (json\|toon, default json), `--quiet` |
 | `apxy rewrite remove` | Remove a rewrite rule by ID or all rewrite rules | `--all`, `--dry-run`, `--id` |
 | `apxy rewrite set` | Add a rewrite rule that rewrites matching request URLs | `--from`, `--match` (exact\|wildcard\|regex, default exact), `--name`, `--to` |
+
+## DNS overrides
+
+| Command | Description | Flags |
+|---------|-------------|-------|
+| `apxy dns list` | List DNS overrides | `--quiet` |
+| `apxy dns remove` | Remove the DNS override for a hostname | `--host` |
+| `apxy dns set` | Point a hostname at an IP address | `--host`, `--ip` |
 
 ## Filter rules
 

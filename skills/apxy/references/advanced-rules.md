@@ -1,4 +1,4 @@
-# Advanced rules: network, scripts, breakpoints, rewrites, filters
+# Advanced rules: network, DNS, scripts, breakpoints, rewrites, filters
 
 These commands change the running proxy. Start one with `apxy start` first, and check it with `apxy status`.
 
@@ -23,6 +23,26 @@ apxy network set --latency 500 --bandwidth 256 --packet-loss 5
 # Remove all network simulation
 apxy network clear
 ```
+
+## DNS overrides
+
+Send a hostname's traffic to another IP without editing `/etc/hosts` (v1.7.0 or later). The Host header and TLS SNI keep the original name, so the server behaves as if it were the real one. Use it to run a client against staging or a local build.
+
+```bash
+apxy dns set --host api.example.com --ip 10.0.0.5
+apxy dns set --host "*.staging.example.com" --ip 10.0.0.6   # an exact host wins over a wildcard
+apxy dns list
+apxy dns remove --host api.example.com
+```
+
+- Overrides persist across proxy restarts, so remove them when you finish.
+- The origin's certificate is still checked against the original name. A local server with a self-signed certificate needs `--insecure-upstream`.
+- They are refused when the proxy runs with `--upstream-proxy`, because the upstream proxy resolves names.
+- To change the URL instead of the IP, use a rewrite rule.
+
+## TLS key log
+
+`apxy start --tls-keylog keys.log` (or `apxy run --tls-keylog keys.log -- <cmd>`) writes TLS session secrets for both sides of decrypted connections, so Wireshark can read a packet capture. `SSLKEYLOGFILE` works too. The file holds secrets: keep it private and delete it when you finish. v1.7.0 or later.
 
 ## Script rules
 
@@ -241,6 +261,7 @@ apxy rewrite remove --all
 apxy filter remove --all
 apxy network clear
 apxy caching enable-cache
+apxy dns list | jq -r '.items[].host' | xargs -n1 apxy dns remove --host
 ```
 
 ## See also

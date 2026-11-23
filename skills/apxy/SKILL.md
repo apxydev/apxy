@@ -1,6 +1,6 @@
 ---
 name: apxy
-description: "Capture and check real HTTP traffic with the APXY proxy. Use after changing code that calls an API or serves HTTP, to prove the real request and response are right instead of trusting tests. Also for debugging HTTP failures (status codes, CORS, auth, webhooks), mocking, replaying or diffing requests, slow-network tests, OpenAPI validation, recording LLM API calls for replay in tests, LLM token cost, and listing which hosts a process contacted."
+description: "Capture and check real HTTP traffic with the APXY proxy. Use after changing code that calls an API or serves HTTP, to prove the real request and response are right instead of trusting tests. Also for checking SSE, LLM, and WebSocket streams, debugging HTTP failures (status codes, CORS, auth, webhooks), DNS overrides, mocking, replaying or diffing requests, slow-network tests, OpenAPI validation, recording LLM API calls for replay in tests, LLM token cost, and listing which hosts a process contacted."
 ---
 
 # APXY
@@ -35,12 +35,14 @@ MCP equivalent: `set_mark`, trigger the code, then `wait_for_request`. Its `outc
 `apxy wait` flags:
 - `--match "METHOD /path"` (exact path) or a match expression like `'host == api.stripe.com && path startswith /v1/'` ([dsl-reference.md](references/dsl-reference.md)).
 - `--expect` (repeatable): `status`, `header:<Name>`, `body.<gjson path>` (response), or `req.body.<gjson path>` (request) with `==`, `!=`, `contains`, `startswith`, `endswith`, `matches`, `>`, `>=`, `<`, `<=`, `exists`.
+- **Streams** (v1.8.0 or later): `--expect` also reads SSE events and WebSocket frames, as in `'sse.data == "[DONE]"'`, `'sse.text contains "Hello"'` (LLM deltas joined), or `'ws.server.data.type == order_created'`. While the stream is open, `wait` keeps checking until it passes, the stream ends, or the timeout. See [streams](references/dsl-reference.md#stream-fields).
 - `--since <mark>` reads from a named mark. `--timeout` defaults to 30s; `--timeout 0` checks once, for a command that already ran.
 
 When nothing matches, run `apxy logs list --limit 20`, then:
 - **HTTPS shows only `CONNECT`, no path:** the host was not decrypted. Add `--ssl-domains <host>` or `--mitm-all` before `--`.
 - **Nothing captured:** the client ignored the proxy. Node before 22.21 and 24.0 to 24.4 do; upgrade. Go and Ruby skip `localhost`; for Go use `http://localhost.:<port>`.
 - **TLS errors:** Go and Rust `native-tls` on macOS reject decrypted hosts. Drop `--mitm-all`, or (after asking) `apxy certs trust`.
+- **`status` is 502 with header `X-Apxy-Error: upstream_certificate`:** APXY refused the origin's certificate (expired, self-signed, or wrong host; localhost is exempt). That is a real finding, so report it. Only for a server you trust, add `--insecure-upstream` before `--`.
 - **Different method or path** than your `--match`: compare with the list.
 
 ## Output
@@ -56,13 +58,15 @@ Piped output is a JSON envelope: lists in `.items`, one record in `.data`, a nex
 | Ready-made mocks: Stripe, GitHub, OpenAI, Auth0, Twilio, S3 | [mock-templates.md](references/mock-templates.md) |
 | Replay or diff requests, export curl or HAR | [replay-diff.md](references/replay-diff.md) |
 | Record and replay LLM calls in tests, LLM token cost, hosts contacted | [llm-and-agent-traffic.md](references/llm-and-agent-traffic.md) |
-| Network simulation, breakpoints, scripts, rewrites, filters, caching | [advanced-rules.md](references/advanced-rules.md) |
-| Exact flags | [cli-overview.md](references/cli-overview.md) or `apxy <cmd> --help-format agent` |
+| Network simulation, DNS overrides, breakpoints, scripts, rewrites, filters, caching, TLS key log | [advanced-rules.md](references/advanced-rules.md) |
+| Which MCP tool does what | [mcp-tools.md](references/mcp-tools.md) |
+| Exact flags | [cli-overview.md](references/cli-overview.md) or `apxy <cmd> --help --help-format agent` |
 
 ## Gotchas
 
 - **A new proxy starts with empty logs.** Read what you need before starting another.
 - **`apxy start` runs in the foreground** and, on macOS, enables the system proxy and asks to trust the CA. In scripts: `apxy start --no-system-proxy --no-trust-ca --port P &`, then `until apxy status --quiet --port P; do sleep 0.2; done` (ready in about a second). Stop it with `apxy stop`.
-- **Needs a running proxy:** `filter`, `rewrite`, `breakpoint`, `script`, `network`, `caching`, `ssl`, `recording`, `mock import`, `logs replay`. Reading logs, `mock add`, and `schema` work without one.
+- **Always keep `--help` when reading help.** `--help-format agent` only formats it: `apxy start --help-format agent` starts the proxy and turns on the system proxy.
+- **Needs a running proxy:** `dns`, `filter`, `rewrite`, `breakpoint`, `script`, `network`, `caching`, `ssl`, `recording`, `mock import`, `logs replay`. Reading logs, `mock add`, and `schema` work without one.
 - **Ports:** proxy 8080, control API 8081, web UI 8082 by default. "Address in use" means a proxy already runs.
 - **Browser capture:** `apxy browser <url>`. **Teach the repo's agents this loop:** `apxy setup agents` (edits `AGENTS.md`/`CLAUDE.md`, so only when asked).
