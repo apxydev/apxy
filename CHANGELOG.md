@@ -2,6 +2,21 @@
 
 User-facing changes in each APXY release, newest first.
 
+## APXY 1.8.0: Check SSE and WebSocket streams, HTTP/2, and verified server certificates (2026-11-23)
+
+### ✨ New
+- `apxy wait --expect` and the `wait_for_request` MCP tool can check streams. For SSE: `sse.data`, `sse.event`, `sse.count`, `sse.last.data`, and `sse.text`, which joins OpenAI, Anthropic, and Gemini deltas into the full answer. For WebSocket: `ws.server.data`, `ws.client.data`, their `.last` forms, and frame counts. JSON paths work in both, as in `--expect 'ws.server.data.type == order_created'`. While the stream is open, APXY keeps checking until every expectation passes, the stream ends, or the timeout passes.
+- HTTP/2: when the client and the server both support it, APXY uses HTTP/2 on both sides of a decrypted connection. Captures, mocks, and streams work over it.
+- `apxy start --insecure-upstream` and `apxy run --insecure-upstream` accept any server certificate.
+
+### ⚠️ Changed
+- APXY now checks the certificate of each server whose traffic it decrypts, except on localhost. A bad certificate returns a `502` with `X-Apxy-Error: upstream_certificate` and the reason. Before, APXY accepted any certificate, so a check could pass on a server that real clients reject. Use `--insecure-upstream` for a server you trust.
+
+### 🐞 Bug Fixes
+- `--help-format agent` shows help and never runs the command. Before, `apxy start --help-format agent` without `--help` started the proxy and turned on the system proxy.
+- `apxy run --port` no longer takes the control API or web UI port of a running APXY for a proxy.
+- WebSocket frames captured in the same millisecond keep their order.
+
 ## APXY 1.7.0: Replay, diff, and breakpoints over MCP, plus DNS overrides and a TLS key log (2026-11-23)
 
 ### ✨ New
