@@ -137,7 +137,7 @@ On Linux, start with `apxy start --no-system-proxy` and send traffic through `ap
 
 ## Free and Pro
 
-The Free plan has every feature and needs no account. Each Free proxy session stops after 10 minutes. Run `apxy start` again to start a new session. [APXY Pro](https://apxy.dev/license) removes the time limit.
+The Free plan has every feature and needs no account. Each Free proxy session stops after 10 minutes. Run `apxy start` again to start a new session. [APXY Pro](https://apxy.dev/#pricing) removes the time limit.
 
 ## Learn more
 
