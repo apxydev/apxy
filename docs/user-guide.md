@@ -143,10 +143,10 @@ apxy ssl list
 
 ```bash
 # Count requests by host
-apxy logs list --format json | jq '[group_by(.host)[] | {host: .[0].host, count: length}] | sort_by(-.count)'
+apxy logs list --limit 1000 | jq '.items | [group_by(.host)[] | {host: .[0].host, count: length}] | sort_by(-.count)'
 
 # Find requests slower than 1000ms
-apxy logs list --format json | jq '[.[] | select(.duration_ms > 1000) | {method, url, duration_ms}] | sort_by(-.duration_ms)'
+apxy logs list --limit 1000 | jq '.items | [.[] | select(.duration > 1e9) | {method, url, ms: (.duration / 1e6 | round)}] | sort_by(-.ms)'
 ```
 
 ### Body Search & JSONPath

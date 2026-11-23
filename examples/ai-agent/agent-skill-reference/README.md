@@ -6,7 +6,7 @@ Give your coding agent first-class access to APXY: install the skill once, verif
 
 ## Scenario
 
-You want your AI coding agent to use APXY for HTTP/HTTPS debugging: searching captures, showing full records, diffing responses, adding mocks, and (when licensed) running SQL. This guide installs the **APXY skill** so the model knows command names, flags, and safe patterns. Every other tutorial under **`examples/ai-agent/`** assumes you completed this step.
+You want your AI coding agent to use APXY for HTTP/HTTPS debugging: searching captures, showing full records, diffing responses, adding mocks, and checking requests with `apxy wait`. This guide installs the **APXY skill** so the model knows command names, flags, and safe patterns. Every other tutorial under **`examples/ai-agent/`** assumes you completed this step.
 
 ## Prerequisites
 
@@ -174,7 +174,7 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 ## Next Steps
 
-- [Let Your AI Agent Find and Fix Server Errors](../agent-debug-500-errors/) -- SQL + jsonpath incident flow
+- [Let Your AI Agent Find and Fix Server Errors](../agent-debug-500-errors/) -- jq + jsonpath incident flow
 - [AI Agent Creates Mocks to Unblock While Fixing](../agent-mock-while-fixing/) -- team unblocking pattern
 - [AI Agent Validates a Fix with Replay+Diff](../agent-compare-before-after/) -- proof after your patch
 - [SSL Setup Guide](../../getting-started/ssl-setup-guide/) -- required before HTTPS bodies are visible

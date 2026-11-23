@@ -42,12 +42,12 @@ Generate traffic through the proxy (your app, integration tests, or `curl`) so t
 
 **Tell your agent:**
 
-> "List recent requests with status 500 or higher. I want id, method, full url, status, and duration_ms, newest first."
+> "List recent requests with status 500 or higher. I want id, method, full url, status, and duration, newest first."
 
 **Your agent runs:**
 
 ```bash
-apxy logs list --format json | jq '[.[] | select(.status_code >= 500)] | sort_by(-.id) | .[:50][] | {id, method, url, status_code, duration_ms}'
+apxy logs list --limit 1000 | jq '.items | [.[] | select(.status_code >= 500)] | sort_by(.timestamp) | reverse | .[:50][] | {id, method, url, status_code, ms: (.duration / 1e6 | round)}'
 ```
 
 The agent picks the most relevant row (for example the one matching `/api/orders` or the latest customer-facing failure) and notes its `id` for the next steps.
@@ -103,7 +103,7 @@ If the body is not JSON or the path misses, the agent falls back to the full `ap
 **Your agent runs:**
 
 ```bash
-apxy logs list --format json | jq '[.[] | select(.status_code >= 500)] | group_by(.path) | map({path: .[0].path, status_code: .[0].status_code, n: length}) | sort_by(-.n)'
+apxy logs list --limit 1000 | jq '.items | [.[] | select(.status_code >= 500)] | group_by(.path) | map({path: .[0].path, status_code: .[0].status_code, n: length}) | sort_by(-.n)'
 ```
 
 The agent explains the pattern (for example "all 500s are POST /api/orders with the same error.message").

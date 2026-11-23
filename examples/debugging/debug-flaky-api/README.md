@@ -2,11 +2,11 @@
 
 Aggregate many `/api/search` calls, group by status, then diff a **503** against a **200** to spot header, body, or timing differences that explain “works most of the time.”
 
-**Difficulty**: Intermediate | **Time**: ~15 minutes | **Features used**: SQL queries, Traffic diff, Body search, SSL interception | **Requires**: Free
+**Difficulty**: Intermediate | **Time**: ~15 minutes | **Features used**: Traffic inspection, Traffic diff, Body search, SSL interception | **Requires**: Free
 
 ## Scenario
 
-Your `/api/search` endpoint returns **200** most of the time but occasionally **503**. Support tickets are vague; you cannot reproduce on demand. You need APXY to record a volume of real traffic from testers or staging, then use SQL to quantify how often each status appears and pull concrete **500-series** rows for side-by-side comparison with successes.
+Your `/api/search` endpoint returns **200** most of the time but occasionally **503**. Support tickets are vague; you cannot reproduce on demand. You need APXY to record a volume of real traffic from testers or staging, then use `jq` to quantify how often each status appears and pull concrete **500-series** rows for side-by-side comparison with successes.
 
 ## Prerequisites
 
@@ -51,7 +51,7 @@ Encourage varied query strings and auth states so failures are not all identical
 **Your agent runs:**
 
 ```bash
-apxy logs search --query /api/search --format json | jq '[group_by(.status_code)[] | {status_code: .[0].status_code, count: length}] | sort_by(-.count)'
+apxy logs search --query /api/search --limit 500 | jq '.items | [group_by(.status_code)[] | {status_code: .[0].status_code, count: length}] | sort_by(-.count)'
 ```
 
 Agent reports:
@@ -73,7 +73,7 @@ That ratio turns “sometimes” into a metric you can attach to a ticket.
 **Your agent runs:**
 
 ```bash
-apxy logs search --query /api/search --format json | jq '[.[] | select(.status_code >= 500)] | sort_by(-.id) | .[:20][] | {id, status_code, duration_ms}'
+apxy logs search --query /api/search --limit 500 | jq '.items | [.[] | select(.status_code >= 500)] | sort_by(.timestamp) | reverse | .[:20][] | {id, status_code, ms: (.duration / 1e6 | round)}'
 ```
 
 Pick one `id` as **FAIL_ID** and find a nearby **200** with similar query params (search `logs` by `url`).
@@ -180,7 +180,7 @@ Go to **Traffic** -> **Stats** (or summary widgets)—distribution of status cod
 *[Link TBD]*
 
 - 0:00 — Capturing enough volume for intermittent bugs
-- 3:00 — SQL `GROUP BY status_code` pattern
+- 3:00 — Grouping by `status_code` with `jq`
 - 6:00 — `diff` with `--scope request` then `response`
 - 9:00 — Web UI correlation
 
@@ -188,8 +188,8 @@ Go to **Traffic** -> **Stats** (or summary widgets)—distribution of status cod
 
 ## What You Learned
 
-- Quantifying flakiness with `GROUP BY status_code` on `traffic_logs`
-- Selecting concrete failure rows with SQL (`id`, `duration_ms`)
+- Quantifying flakiness by grouping on `status_code` with `jq`
+- Selecting concrete failure rows (`id`, duration) with `jq`
 - Using `apxy logs diff` to separate “bad request” from “bad infrastructure”
 - Optional `search-bodies` to grep captured responses for error tokens
 

@@ -158,5 +158,5 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 ## Next Steps
 
 - [Replay and Diff (full tutorial)](../../replay-and-diff/) -- extended narrative and UI screenshots
-- [Let Your AI Agent Find and Fix Server Errors](../agent-debug-500-errors/) -- SQL and jsonpath-led diagnosis before the fix
+- [Let Your AI Agent Find and Fix Server Errors](../agent-debug-500-errors/) -- jq and jsonpath-led diagnosis before the fix
 - [AI Agent Analyzes Slow Endpoints](../agent-diagnose-api-performance/) -- when the bug is latency, not status codes

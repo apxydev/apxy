@@ -8,7 +8,7 @@ APXY is a network debugging and API mocking proxy for HTTPS traffic. It is desig
 
 ### How is APXY different from Charles Proxy or Proxyman?
 
-APXY offers a full CLI, SQL queries over traffic data, and a Web UI, all built around repeatable debugging workflows for developers and AI coding agents.
+APXY offers a full CLI, an MCP server, and a Web UI, all built around repeatable debugging workflows for developers and AI coding agents.
 
 ### What platforms are supported?
 

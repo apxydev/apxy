@@ -2,11 +2,11 @@
 
 You can drive APXY entirely from the CLI or an AI agent -- but the Web UI brings live traffic, visual rule editors, request composition, and diffing into one place. This tour walks every major surface so you know where to click when you want speed over terminal commands.
 
-**Difficulty**: Beginner | **Time**: ~10 minutes | **Features used**: Traffic inspection, Mock rules, Filter rules, Redirect rules, Compose, Diff, SSL settings, SQL queries | **Requires**: Free
+**Difficulty**: Beginner | **Time**: ~10 minutes | **Features used**: Traffic inspection, Mock rules, Filter rules, Redirect rules, Compose, Diff, SSL settings | **Requires**: Free
 
 ## Scenario
 
-You already run `apxy start` and occasionally ask your agent to list logs. You want the full picture: the live traffic stream, how mock and filter rules look in a table editor, redirect rules, the compose panel for ad-hoc requests, side-by-side diffs, SSL settings, and the extras (network simulation, breakpoints, scripts, SQL). After this tour you can choose CLI or UI per task without hunting for features.
+You already run `apxy start` and occasionally ask your agent to list logs. You want the full picture: the live traffic stream, how mock and filter rules look in a table editor, redirect rules, the compose panel for ad-hoc requests, side-by-side diffs, SSL settings, and the extras (network simulation, breakpoints, scripts). After this tour you can choose CLI or UI per task without hunting for features.
 
 ## Prerequisites
 
@@ -107,7 +107,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy logs list --format json | jq '[group_by(.status_code)[] | {status_code: .[0].status_code, count: length}] | sort_by(-.count)'
+apxy logs list --limit 1000 | jq '.items | [group_by(.status_code)[] | {status_code: .[0].status_code, count: length}] | sort_by(-.count)'
 ```
 
 Agent shows a table of status codes and their frequencies from captured traffic.

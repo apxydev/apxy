@@ -107,9 +107,9 @@ These examples predate the themed organization above. They still work but may ov
 
 | Example | Description |
 |---------|-------------|
-| [Basic Debugging](basic-debugging/) | Capture, search, inspect, SQL queries, export |
+| [Basic Debugging](basic-debugging/) | Capture, search, inspect, export |
 | [API Mocking](api-mocking/) | Mock endpoints with exact/regex/POST matching |
-| [AI Agent Workflow](ai-agent-workflow/) | Agent-driven debugging with SQL analysis |
+| [AI Agent Workflow](ai-agent-workflow/) | Agent-driven debugging with MCP tools and the CLI |
 
 ---
 

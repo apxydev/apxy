@@ -44,10 +44,10 @@ apxy logs show --id <record-id-from-list>
 
 ```bash
 # Count requests by status code
-apxy logs list --format json | jq '[group_by(.status_code)[] | {status_code: .[0].status_code, count: length}] | sort_by(-.count)'
+apxy logs list --limit 1000 | jq '.items | [group_by(.status_code)[] | {status_code: .[0].status_code, count: length}] | sort_by(-.count)'
 
 # Find the slowest request
-apxy logs list --format json | jq 'sort_by(-.duration_ms) | .[0] | {method, url, duration_ms}'
+apxy logs list --limit 1000 | jq '.items | sort_by(-.duration) | .[0] | {method, url, ms: (.duration / 1e6 | round)}'
 ```
 
 ### 5. Export a request as cURL
