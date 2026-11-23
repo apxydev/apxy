@@ -5,6 +5,7 @@ Thumbs.db
 # IDE
 .idea/
 .vscode/
+.cursor/
 *.swp
 *.swo
 
@@ -14,6 +15,9 @@ data/
 logs/
 firebase-debug.log
 *.db
+
+# Local agent tool state
+.omx/
 
 # OpenSpec
 openspec/
