@@ -201,4 +201,4 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 - [API Mocking](mocking/mock-backend-for-frontend/) -- Mock API endpoints to unblock frontend development
 - [The Capture -> Replay -> Diff Loop](replay-and-diff/regression-testing-with-diff/) -- Verify code fixes by replaying and diffing requests
-- [AI Agent Workflow](ai-agent/agent-debug-500-errors/) -- Advanced agent-driven debugging with SQL analysis
+- [AI Agent Workflow](ai-agent/agent-debug-500-errors/) -- Advanced agent-driven debugging

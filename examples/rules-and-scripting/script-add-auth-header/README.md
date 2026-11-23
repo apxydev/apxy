@@ -2,7 +2,7 @@
 
 Run a small JavaScript hook on every matching request so `Authorization` (or any header) is set consistently—no more pasting tokens into five different tools.
 
-**Difficulty**: Intermediate | **Time**: ~10 minutes | **Features used**: JavaScript scripting, Request hooks, SSL interception | **Requires**: Pro
+**Difficulty**: Intermediate | **Time**: ~10 minutes | **Features used**: JavaScript scripting, Request hooks, SSL interception | **Requires**: Free
 
 ## Scenario
 
@@ -15,7 +15,6 @@ Use a short-lived dev token in examples; never commit real secrets. Prefer envir
 - APXY installed (`apxy version` works)
 - macOS or Linux
 - AI coding agent with APXY skill installed
-- **Pro** license (proxy scripts are a Pro capability)
 - Node or any editor to create a `.js` file (the script runs inside APXY’s engine, not Node)
 
 ## Before You Start

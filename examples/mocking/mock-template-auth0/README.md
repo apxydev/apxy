@@ -33,7 +33,7 @@ If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../get
 **Template status:** Auth0 is a **community / bring-your-own-rules** example. Options:
 
 1. Create `rules.json` beside this README (array of rule objects) and `apxy mock import --file ./rules.json`.
-2. Watch [apxy-public](https://github.com/apxydev/apxy-public) for a shared Auth0 template and download it when available.
+2. Watch [mock-templates](https://github.com/apxydev/apxy/tree/main/mock-templates) for a shared Auth0 template and download it when available.
 
 ### What you will mock
 
@@ -224,7 +224,7 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 - How to enable TLS interception for a tenant-specific Auth0 hostname
 - How to stub the four pillars of OIDC client setup: token, userinfo, JWKS, discovery
 - How to layer success vs error responses using header conditions and priorities
-- That a shared `rules.json` may land in [apxy-public](https://github.com/apxydev/apxy-public) later for one-command import
+- That a shared `rules.json` may land in [mock-templates](https://github.com/apxydev/apxy/tree/main/mock-templates) later for one-command import
 
 ## Next Steps
 

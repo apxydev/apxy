@@ -219,4 +219,4 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 - Mirror Admin API on `admin.shopify.com` with a second domain in `--ssl-domains`
 - Snapshot a real `products` response and trim to your selection set
 - [API Mocking](../../api-mocking/) -- general mocking
-- Share templates via [apxy-public](https://github.com/apxydev/apxy-public) when stable
+- Share templates via [mock-templates](https://github.com/apxydev/apxy/tree/main/mock-templates) when stable

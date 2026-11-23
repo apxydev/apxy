@@ -4,7 +4,7 @@ After an hour of deep debugging—hundreds of captures, mock rules, and SSL
 settings—you can freeze the entire session to a JSON file and let a teammate
 thaw it on their laptop without re-enacting your steps.
 
-**Difficulty**: Intermediate | **Time**: ~10 minutes | **Features used**: Session export/import, Settings management, SSL interception | **Requires**: Pro
+**Difficulty**: Intermediate | **Time**: ~10 minutes | **Features used**: Session export/import, Settings management, SSL interception | **Requires**: Free
 
 ## Scenario
 
@@ -15,14 +15,13 @@ device trust. You need to **save** that whole debugging context, send one file
 to a colleague, and have them **restore** it so they continue exactly where you
 left off.
 
-Settings export/import is a **Pro** (or Personal) capability: it bundles the
+Settings export/import bundles the
 parts of APXY state that live behind the control plane, not just raw SQLite
 copies.
 
 ## Prerequisites
 
 - APXY installed (`apxy version` works)
-- **Pro** license (settings import/export is gated)
 - macOS or Linux
 - AI coding agent with APXY skill installed
 - Proxy **running** when exporting/importing settings via the control API (use
@@ -80,7 +79,7 @@ in the ticket or Slack thread.
 **Your agent runs:**
 
 ```bash
-apxy setup settings export --file debug-session-2024.json
+apxy config export --file debug-session-2024.json
 ```
 
 If your agent connects to a non-default control API, it may pass the same
@@ -112,7 +111,7 @@ On the receiving side, after installing APXY and starting the proxy:
 **Your agent runs:**
 
 ```bash
-apxy setup settings import --file debug-session-2024.json
+apxy config import --file debug-session-2024.json
 ```
 
 Import **replaces** the current settings snapshot. Your teammate should export
@@ -159,7 +158,7 @@ to capture a mental picture of names and volume before export.
 
 ### Step 2: Export (CLI or future UI hook)
 
-Today, **settings export** is invoked from the CLI (`setup settings export`).
+Today, **settings export** is invoked from the CLI (`apxy config export`).
 Run the export from a terminal while the Web UI reflects the session you see.
 
 > screenshots/02-terminal-settings-export.png
@@ -192,9 +191,8 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 ## What You Learned
 
-- Which operations require **Pro** for settings round-trip
-- How `setup settings export --file` snapshots control-plane settings
-- How `setup settings import --file` restores them—and overwrites local settings
+- How `apxy config export --file` snapshots control-plane settings
+- How `apxy config import --file` restores them—and overwrites local settings
 - Why traffic identity may still need HAR/DB coordination
 - How to validate restoration with `rules mock list` and Compose smoke tests
 

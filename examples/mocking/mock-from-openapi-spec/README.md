@@ -16,8 +16,6 @@ Backend published `openapi.yaml` for the new **Orders** API under `https://api.m
 - An OpenAPI 3 file in this folder or nearby, for example `./openapi.yaml`, describing `https://api.myapp.com` paths
 - Optional: `/etc/hosts` mapping for `api.myapp.com`
 
-**Note:** `apxy mock import` from a JSON template is a **Pro** feature. On Free, add mocks with `apxy mock add` as shown below.
-
 ## Before You Start
 
 Start the proxy with SSL enabled for the domains in this example:

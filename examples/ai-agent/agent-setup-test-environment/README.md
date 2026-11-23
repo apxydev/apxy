@@ -15,10 +15,6 @@ You are starting a feature that depends on **Stripe**, **GitHub**, and **api.mya
 - AI coding agent with the APXY skill installed (see [Using APXY as a Claude Code / Cursor Skill](../agent-skill-reference/))
 - This repository (or a copy of its **`mock-templates/`** files) on disk so import paths resolve
 
-### Plan note
-
-**`apxy mock import`** is a **Pro** feature in licensed builds. On **Free**, open the same JSON under **`mock-templates/`** and have your agent create each rule with **`apxy mock add --name ... --url ...`** using the URL, method, status, and body from each template entry. **`apxy sql`** (if used for verification) is also **Pro**; use **`apxy logs search`** on Free.
-
 ## Before You Start
 
 Start the proxy with SSL enabled for **all** hostnames this feature will call:

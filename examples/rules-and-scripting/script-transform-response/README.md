@@ -2,7 +2,7 @@
 
 Strip or mask sensitive fields in JSON responses before they reach your browser or app—keep real backends, hide PII during demos and screen shares.
 
-**Difficulty**: Advanced | **Time**: ~15 minutes | **Features used**: JavaScript scripting, Response hooks, SSL interception | **Requires**: Pro
+**Difficulty**: Advanced | **Time**: ~15 minutes | **Features used**: JavaScript scripting, Response hooks, SSL interception | **Requires**: Free
 
 ## Scenario
 
@@ -15,7 +15,6 @@ This walkthrough uses a minimal mask. Production-grade masking might recurse nes
 - APXY installed (`apxy version` works)
 - macOS or Linux
 - AI coding agent with APXY skill installed
-- **Pro** license (proxy scripts are a Pro capability)
 - Familiarity with JSON and basic JavaScript error handling
 
 ## Before You Start

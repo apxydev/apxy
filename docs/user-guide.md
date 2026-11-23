@@ -35,7 +35,12 @@ apxy start --web-port 0       # Disable Web UI
 | **Redirects** | Rewrite URLs (map remote) |
 | **SSL** | Enable/disable HTTPS interception per domain |
 | **Network** | Simulate latency, throttling, and packet loss |
-| **Interceptors** | Dynamic request/response modification rules |
+| **Breakpoints** | Pause a matching request or response, edit it, then resume or drop it |
+| **Scripts** | JavaScript that changes requests or responses as they pass through |
+| **Protobuf** | Upload `.proto` schemas and decode Protobuf bodies |
+| **Schema** | Import an OpenAPI schema and check captured traffic against it |
+| **Agent Activity** | What your AI coding agent did through APXY |
+| **Mobile Setup** | QR code and steps to route a phone through APXY |
 | **Sessions** | Pause/resume recording, clear traffic |
 
 Supports dark/light theme toggle and a command palette for quick navigation.
@@ -107,8 +112,8 @@ apxy rewrite remove --id <rule-id>
 ```bash
 apxy logs export-curl --id <record-id>    # Export as cURL
 apxy logs replay --id <record-id>         # Re-send the request
-apxy tools request compose --method POST --url "https://api.example.com/data" \
-  --body '{"key": "value"}'
+apxy run -- curl -X POST "https://api.example.com/data" \
+  -H "Content-Type: application/json" -d '{"key": "value"}'   # Send a new request through APXY
 ```
 
 ### Network Conditions
@@ -138,10 +143,10 @@ apxy ssl list
 
 ```bash
 # Count requests by host
-apxy logs list --format json | jq '[group_by(.host)[] | {host: .[0].host, count: length}] | sort_by(-.count)'
+apxy logs list --limit 1000 | jq '.items | [group_by(.host)[] | {host: .[0].host, count: length}] | sort_by(-.count)'
 
 # Find requests slower than 1000ms
-apxy logs list --format json | jq '[.[] | select(.duration_ms > 1000) | {method, url, duration_ms}] | sort_by(-.duration_ms)'
+apxy logs list --limit 1000 | jq '.items | [.[] | select(.duration > 1e9) | {method, url, ms: (.duration / 1e6 | round)}] | sort_by(-.ms)'
 ```
 
 ### Body Search & JSONPath
@@ -163,14 +168,16 @@ apxy logs diff --id-a <record-1> --id-b <record-2> --scope response
 apxy logs graphql --operation-name "GetUser" --limit 10
 ```
 
-### Dynamic Interceptors
+### Scripts
+
+A script defines `handle(ctx)`, changes `ctx.headers` or `ctx.body`, and returns `ctx`.
 
 ```bash
-apxy rules interceptor set --name "Add header" \
-  --match 'host == "api.example.com"' \
-  --action modify --description "Add auth header"
-apxy rules interceptor list
-apxy rules interceptor remove --id <rule-id>
+apxy script add --name "add-auth-header" --hook onRequest \
+  --match "host == api.example.com" \
+  --code 'function handle(ctx) { ctx.headers["Authorization"] = "Bearer test-token"; return ctx; }'
+apxy script list
+apxy script remove --id <script-id>
 ```
 
 ---
@@ -201,7 +208,7 @@ export https_proxy=http://localhost:8080
 
 ```bash
 eval $(apxy env)                    # Inject into current shell
-apxy env --open                     # Open new terminal with env set
+apxy shell                          # Open a shell with env set
 eval $(apxy env --lang node)        # Node.js only
 apxy env --script ./proxy-env.sh    # Write to file
 ```

@@ -15,10 +15,6 @@ Your app is slow but you are not sure which API calls dominate wall time. Ask yo
 - AI coding agent with the APXY skill installed (see [Using APXY as a Claude Code / Cursor Skill](../agent-skill-reference/))
 - Enough captured traffic through the proxy to make aggregates meaningful (synthetic load or real usage)
 
-### Plan note
-
-All steps below use **`apxy logs`** commands available on the **Free** tier. No SQL or Pro features are required.
-
 ## Before You Start
 
 Start the proxy with SSL enabled for the domains in this example:
@@ -39,18 +35,18 @@ If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../get
 
 ## Track A: Agent + CLI Workflow
 
-> APXY log entries include the fields **`url`**, **`path`**, **`host`**, **`method`**, **`status_code`**, and **`duration_ms`**. The `jq` commands below work against `apxy logs list --format json` output.
+> APXY log entries include the fields **`url`**, **`path`**, **`host`**, **`method`**, **`status_code`**, and **`duration`** (nanoseconds). The `jq` commands below read the `items` array that `apxy logs list` prints when its output is piped.
 
 ### Step 1: Baseline -- slowest URLs by average latency
 
 **Tell your agent:**
 
-> "Show the top 10 URLs by average duration_ms with call count and max latency so we see chronic slowness, not one-off spikes."
+> "Show the top 10 URLs by average duration with call count and max latency so we see chronic slowness, not one-off spikes."
 
 **Your agent runs:**
 
 ```bash
-apxy logs list --format json | jq '[group_by(.url)[] | {url: .[0].url, n: length, avg_ms: (map(.duration_ms) | add / length | round), max_ms: (map(.duration_ms) | max)}] | sort_by(-.avg_ms) | .[:10]'
+apxy logs list --limit 1000 | jq '.items | [group_by(.url)[] | {url: .[0].url, n: length, avg_ms: (map(.duration / 1e6) | add / length | round), max_ms: (map(.duration / 1e6) | max | round)}] | sort_by(-.avg_ms) | .[:10]'
 ```
 
 The agent interprets results: high **`avg_ms`** with large **`n`** is a priority; high **`max_ms`** with low **`n`** may be cold start or rare timeouts.
@@ -64,7 +60,7 @@ The agent interprets results: high **`avg_ms`** with large **`n`** is a priority
 **Your agent runs:**
 
 ```bash
-apxy logs list --format json | jq '[.[] | select(.status_code >= 400)] | group_by(.url + " " + (.status_code | tostring)) | map({url: .[0].url, status_code: .[0].status_code, n: length}) | sort_by(-.n) | .[:20]'
+apxy logs list --limit 1000 | jq '.items | [.[] | select(.status_code >= 400)] | group_by(.url + " " + (.status_code | tostring)) | map({url: .[0].url, status_code: .[0].status_code, n: length}) | sort_by(-.n) | .[:20]'
 ```
 
 The agent connects slow endpoints from Step 1 with error-heavy URLs here (retries, cascading failures).
@@ -78,7 +74,7 @@ The agent connects slow endpoints from Step 1 with error-heavy URLs here (retrie
 **Your agent runs:**
 
 ```bash
-apxy logs list --format json | jq '[group_by(.host)[] | {host: .[0].host, n: length, avg_ms: (map(.duration_ms) | add / length | round), max_ms: (map(.duration_ms) | max)}] | sort_by(-.avg_ms) | .[:15]'
+apxy logs list --limit 1000 | jq '.items | [group_by(.host)[] | {host: .[0].host, n: length, avg_ms: (map(.duration / 1e6) | add / length | round), max_ms: (map(.duration / 1e6) | max | round)}] | sort_by(-.avg_ms) | .[:15]'
 ```
 
 Useful when the browser or mobile app hits both your API and CDNs or third parties through the same proxy.
@@ -92,19 +88,19 @@ Useful when the browser or mobile app hits both your API and CDNs or third parti
 **Your agent runs:**
 
 ```bash
-apxy logs search --query /api/search --format json | jq '{n: length, avg_ms: (map(.duration_ms) | add / length | round), max_ms: (map(.duration_ms) | max)}'
+apxy logs search --query /api/search --limit 500 | jq '.items | {n: length, avg_ms: (map(.duration / 1e6) | add / length | round), max_ms: (map(.duration / 1e6) | max | round)}'
 ```
 
 ### Step 5: Find the single slowest recent call (optional drill-down)
 
 **Tell your agent:**
 
-> "Give me id, method, url, duration_ms for the slowest request overall in the database."
+> "Give me id, method, url, duration for the slowest request overall in the database."
 
 **Your agent runs:**
 
 ```bash
-apxy logs list --format json | jq '[sort_by(-.duration_ms) | .[:5][] | {id, method, url, duration_ms, status_code}]'
+apxy logs list --limit 1000 | jq '.items | [sort_by(-.duration) | .[:5][] | {id, method, url, ms: (.duration / 1e6 | round), status_code}]'
 ```
 
 ### Step 6: Deep inspect a suspect record
@@ -146,7 +142,7 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 ## What You Learned
 
-- How to profile APIs by grouping and sorting on **`duration_ms`** and **`status_code`** with `jq`
+- How to profile APIs by grouping and sorting on **`duration`** and **`status_code`** with `jq`
 - How to pivot from aggregate analysis to **`apxy logs show`** on a specific **id**
 - Where the Web UI gives a visual parallel to the same data
 

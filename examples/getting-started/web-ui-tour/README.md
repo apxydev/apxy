@@ -2,11 +2,11 @@
 
 You can drive APXY entirely from the CLI or an AI agent -- but the Web UI brings live traffic, visual rule editors, request composition, and diffing into one place. This tour walks every major surface so you know where to click when you want speed over terminal commands.
 
-**Difficulty**: Beginner | **Time**: ~10 minutes | **Features used**: Traffic inspection, Mock rules, Filter rules, Redirect rules, Compose, Diff, SSL settings, SQL queries | **Requires**: Free
+**Difficulty**: Beginner | **Time**: ~10 minutes | **Features used**: Traffic inspection, Mock rules, Filter rules, Redirect rules, Compose, Diff, SSL settings | **Requires**: Free
 
 ## Scenario
 
-You already run `apxy start` and occasionally ask your agent to list logs. You want the full picture: the live traffic stream, how mock and filter rules look in a table editor, redirect rules, the compose panel for ad-hoc requests, side-by-side diffs, SSL settings, and the extras (network simulation, breakpoints, scripts, SQL). After this tour you can choose CLI or UI per task without hunting for features.
+You already run `apxy start` and occasionally ask your agent to list logs. You want the full picture: the live traffic stream, how mock and filter rules look in a table editor, redirect rules, the compose panel for ad-hoc requests, side-by-side diffs, SSL settings, and the extras (network simulation, breakpoints, scripts). After this tour you can choose CLI or UI per task without hunting for features.
 
 ## Prerequisites
 
@@ -30,8 +30,6 @@ apxy start --ssl-domains httpbin.org
 
 If you haven't set up APXY's CA certificate yet, see
 [SSL Setup Guide](../ssl-setup-guide/) first.
-
-**Free tier note:** Traffic, mock/filter/redirect rules, Compose, Diff, and SSL work on Free. **Breakpoints**, **Network** simulation, **Scripts**, and **SQL** may prompt for a Pro upgrade in the UI -- if so, skim those steps to see where they live and continue with the rest of the tour.
 
 ---
 
@@ -95,12 +93,12 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy tools request compose --method POST --url "https://httpbin.org/post" --body '{"hello":"world"}' --headers '{"Content-Type":"application/json"}'
+apxy run -- curl -X POST https://httpbin.org/post -H "Content-Type: application/json" -d '{"hello":"world"}'
 ```
 
-Agent prints status, timing, and a truncated response body. The same exchange appears in traffic logs.
+Agent prints the response body. The same exchange appears in traffic logs.
 
-### Step 5: Query traffic with SQL
+### Step 5: Count requests by status code
 
 Tell your agent:
 
@@ -109,7 +107,7 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy logs list --format json | jq '[group_by(.status_code)[] | {status_code: .[0].status_code, count: length}] | sort_by(-.count)'
+apxy logs list --limit 1000 | jq '.items | [group_by(.status_code)[] | {status_code: .[0].status_code, count: length}] | sort_by(-.count)'
 ```
 
 Agent shows a table of status codes and their frequencies from captured traffic.
@@ -208,13 +206,7 @@ Go to **SSL**. Confirm `httpbin.org` (or your `--ssl-domains` entries) appear in
 
 > screenshots/11-ssl-domains.png
 
-### Step 12: SQL tab -- query captured metadata
-
-Go to **SQL**. Run a read-only query such as counting rows from the requests table or filtering by `host` (use the schema hints in the UI sidebar if present). Confirm results align with what you see in **Traffic**.
-
-> screenshots/12-sql-query.png
-
-### Step 13: Stop the proxy
+### Step 12: Stop the proxy
 
 Tell your agent:
 
@@ -234,7 +226,7 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 - Dashboard + Traffic deep dive: 0:00 - 3:00
 - Rules (mock, filter, redirect) + Compose + Diff: 3:00 - 7:00
-- SSL, Network, Breakpoints, Scripts, SQL: 7:00 - 10:00
+- SSL, Network, Breakpoints, Scripts: 7:00 - 10:00
 
 ---
 
@@ -244,7 +236,7 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 - How mock, filter, and redirect rules are represented and validated in the UI
 - How to send one-off requests from **Compose** and compare responses in **Diff**
 - Where SSL interception domains are reviewed alongside CLI flags
-- That **Network**, **Breakpoints**, **Scripts**, and **SQL** exist for advanced workflows without leaving the browser
+- That **Network**, **Breakpoints**, and **Scripts** exist for advanced workflows without leaving the browser
 
 ## Next Steps
 

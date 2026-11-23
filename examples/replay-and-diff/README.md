@@ -108,8 +108,9 @@ Tell your agent:
 Your agent runs:
 
 ```bash
-apxy tools request compose --method POST --url https://api.myapp.com/api/orders \
-  --body '{"customer_id": "cust_42", "items": [{"sku": "WIDGET-1", "qty": 2}]}'
+apxy run -- curl -X POST https://api.myapp.com/api/orders \
+  -H "Content-Type: application/json" \
+  -d '{"customer_id": "cust_42", "items": [{"sku": "WIDGET-1", "qty": 2}]}'
 ```
 
 The new request goes through the proxy and gets captured as a new record (e.g., ID 12).

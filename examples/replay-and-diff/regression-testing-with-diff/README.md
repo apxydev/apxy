@@ -3,7 +3,7 @@
 Ship with confidence by replaying a curated slice of real traffic against your
 candidate build and diffing every response against a known-good baseline.
 
-**Difficulty**: Intermediate | **Time**: ~15 minutes | **Features used**: Request replay, Traffic diff, SQL queries, SSL interception | **Requires**: Free
+**Difficulty**: Intermediate | **Time**: ~15 minutes | **Features used**: Request replay, Traffic diff, SSL interception | **Requires**: Free
 
 ## Scenario
 
@@ -12,7 +12,7 @@ you want to replay a set of captured requests against the new version and diff
 the responses to catch any unintended changes: status codes that drift, fields
 that disappear, or error payloads that appear where success used to be.
 
-This workflow combines SQL-style traffic selection, deterministic replay (via
+This workflow combines traffic search, deterministic replay (via
 Compose or built-in replay), and pairwise diffs so regressions show up as
 concrete text, not gut feel.
 
@@ -64,7 +64,7 @@ apxy logs search --query api.myapp.com --limit 20
 ```
 
 Note the record IDs you care about (for example `1` for `GET /api/users` and
-`5` for `POST /api/orders`). Use `apxy logs list --format json | jq` if you need to filter by path prefix, method, or time window.
+`5` for `POST /api/orders`). Use `apxy logs list | jq '.items'` if you need to filter by path prefix, method, or time window.
 
 ### Step 2: Establish baseline responses (before the new version)
 
@@ -80,7 +80,7 @@ endpoint explicitly:
 **Your agent runs:**
 
 ```bash
-apxy tools request compose --method GET --url https://api.myapp.com/api/users
+apxy run -- curl https://api.myapp.com/api/users
 ```
 
 Repeat with the right method, URL, headers, and body for each endpoint in your
@@ -117,7 +117,7 @@ Alternatively, for a hand-tuned replay:
 **Your agent runs:**
 
 ```bash
-apxy tools request compose --method GET --url https://api.myapp.com/api/users
+apxy run -- curl https://api.myapp.com/api/users
 ```
 
 Note the **new** record IDs after each replay (for example baseline `1` → new
@@ -211,7 +211,7 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 ## What You Learned
 
-- How to narrow captured traffic to one host (and beyond) with `apxy logs search` and `apxy logs list --format json | jq`
+- How to narrow captured traffic to one host (and beyond) with `apxy logs search` and `apxy logs list | jq '.items'`
 - How to establish baseline captures, switch builds, and replay the same calls
 - How to compare arbitrary record pairs with `traffic logs diff` and `--scope`
 - How to use the Web UI Traffic + Diff tabs for regression review
@@ -221,4 +221,4 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 
 - [The Capture → Replay → Diff Loop](../README.md) — single-bug proof with before/after
 - [Creating a Reproducible Bug Report](../export-and-share-bug/) — export one failing request for teammates
-- [Saving and Restoring Debug Sessions](../session-save-restore/) — hand off full context (Pro)
+- [Saving and Restoring Debug Sessions](../session-save-restore/) — hand off full context

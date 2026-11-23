@@ -91,10 +91,10 @@ Redact secrets before sharing externally.
 **Your agent runs:**
 
 ```bash
-apxy tools request compose --method POST \
-  --url "https://api.myapp.com/webhooks/stripe" \
-  --body '{"id":"evt_test_123","type":"customer.subscription.updated","data":{"object":{}}}' \
-  --headers '{"Content-Type":"application/json","Stripe-Signature":"t=...,v1=..."}'
+apxy run -- curl -X POST https://api.myapp.com/webhooks/stripe \
+  -H "Content-Type: application/json" \
+  -H "Stripe-Signature: t=...,v1=..." \
+  -d '{"id":"evt_test_123","type":"customer.subscription.updated","data":{"object":{}}}'
 ```
 
 Use a **test** signature from Stripe docs or regenerate via Stripe CLI; do not reuse production signing secrets in chat logs.
@@ -171,7 +171,7 @@ Go to **Compose** -> POST a test body after fixes; confirm new row is **200**.
 
 - Using `apxy logs search --query "webhook"` to isolate integration traffic
 - Reading provider headers and JSON bodies with `apxy logs show`
-- Reproducing failures with `apxy tools request compose` (with test credentials)
+- Reproducing failures with `apxy run -- curl` (with test credentials)
 - Using `apxy logs diff` to contrast failing vs succeeding deliveries
 
 ## Next Steps

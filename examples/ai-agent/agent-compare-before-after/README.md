@@ -65,8 +65,9 @@ Apply your code or config change and restart the service. Tell the agent when th
 **Your agent runs:**
 
 ```bash
-apxy tools request compose --method POST --url https://api.myapp.com/api/orders \
-  --body '{"customer_id":"cust_42","items":[{"sku":"WIDGET-1","qty":2}]}'
+apxy run -- curl -X POST https://api.myapp.com/api/orders \
+  -H "Content-Type: application/json" \
+  -d '{"customer_id":"cust_42","items":[{"sku":"WIDGET-1","qty":2}]}'
 ```
 
 Use the exact body from Step 1. If the original used headers (for example `Authorization`), the agent adds the appropriate flags supported by `request compose` for your APXY version. The response is captured as a **new** id (for example `12`).
@@ -115,8 +116,9 @@ If a second fix is needed, replay again to get a new id and diff `7` vs the new 
 **Your agent runs:**
 
 ```bash
-apxy tools request compose --method POST --url https://api.myapp.com/api/orders \
-  --body '{"customer_id":"cust_42","items":[{"sku":"WIDGET-1","qty":2}]}'
+apxy run -- curl -X POST https://api.myapp.com/api/orders \
+  -H "Content-Type: application/json" \
+  -d '{"customer_id":"cust_42","items":[{"sku":"WIDGET-1","qty":2}]}'
 apxy logs diff --id-a 7 --id-b <new-id> --scope response
 ```
 
@@ -147,7 +149,7 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 ## What You Learned
 
 - How **`apxy logs show`** pins the canonical failing request for replay
-- How **`apxy tools request compose`** reproduces the call after your fix
+- How **`apxy run -- curl`** reproduces the call after your fix
 - How **`apxy logs diff --id-a ... --id-b ... --scope response`** turns subjective "fixed" into a concrete comparison
 - How optional **`apxy logs export-curl`** shares evidence with reviewers
 
@@ -156,5 +158,5 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 ## Next Steps
 
 - [Replay and Diff (full tutorial)](../../replay-and-diff/) -- extended narrative and UI screenshots
-- [Let Your AI Agent Find and Fix Server Errors](../agent-debug-500-errors/) -- SQL and jsonpath-led diagnosis before the fix
+- [Let Your AI Agent Find and Fix Server Errors](../agent-debug-500-errors/) -- jq and jsonpath-led diagnosis before the fix
 - [AI Agent Analyzes Slow Endpoints](../agent-diagnose-api-performance/) -- when the bug is latency, not status codes

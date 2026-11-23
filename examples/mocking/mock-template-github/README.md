@@ -194,4 +194,4 @@ Watch the full walkthrough: *[YouTube link -- coming soon]*
 - [SSL Setup Guide](../../getting-started/ssl-setup-guide/) -- trust CA on additional machines
 - [API Mocking](../../api-mocking/) -- baseline mock concepts
 - [Replay and Diff](../../replay-and-diff/) -- diff mock vs captured real GitHub traffic
-- Contribute extra scenarios to [apxy-public](https://github.com/apxydev/apxy-public) if you publish shared templates
+- Contribute extra scenarios to [mock-templates](https://github.com/apxydev/apxy/tree/main/mock-templates) if you publish shared templates

@@ -2,7 +2,7 @@
 
 Stop an HTTP request in place, inspect headers and body like a debugger, tweak the values that matter, then resume—ideal when reproducing a bad client payload without redeploying.
 
-**Difficulty**: Intermediate | **Time**: ~10 minutes | **Features used**: Breakpoints, Traffic inspection, SSL interception | **Requires**: Pro
+**Difficulty**: Intermediate | **Time**: ~10 minutes | **Features used**: Breakpoints, Traffic inspection, SSL interception | **Requires**: Free
 
 ## Scenario
 
@@ -15,7 +15,6 @@ Because editing paused payloads is highly interactive, **Track B (Web UI)** is t
 - APXY installed (`apxy version` works)
 - macOS or Linux
 - AI coding agent with APXY skill installed
-- **Pro** license (breakpoints are a Pro capability)
 
 ## Before You Start
 

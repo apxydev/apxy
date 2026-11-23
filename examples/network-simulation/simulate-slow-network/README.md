@@ -2,7 +2,7 @@
 
 See how your product behaves when the network is not a gigabit fiber link—before real users on 3G, rural broadband, or satellite complain about spinners that never end.
 
-**Difficulty**: Beginner | **Time**: ~10 minutes | **Features used**: Network simulation (latency, bandwidth), SSL interception | **Requires**: Pro
+**Difficulty**: Beginner | **Time**: ~10 minutes | **Features used**: Network simulation (latency, bandwidth), SSL interception | **Requires**: Free
 
 ## Scenario
 

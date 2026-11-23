@@ -2,7 +2,7 @@
 
 Rank captured requests by duration, open the slowest ones, then replay through the proxy to confirm improvements after you optimize code or queries.
 
-**Difficulty**: Intermediate | **Time**: ~10 minutes | **Features used**: SQL queries, Request replay, Traffic diff, SSL interception | **Requires**: Free
+**Difficulty**: Intermediate | **Time**: ~10 minutes | **Features used**: Traffic inspection, Request replay, Traffic diff, SSL interception | **Requires**: Free
 
 ## Scenario
 
@@ -42,16 +42,16 @@ If you haven't set up APXY's CA certificate yet, see [SSL Setup Guide](../../get
 
 No command required until capture exists.
 
-### Step 2: Query the slowest requests with SQL
+### Step 2: Find the slowest requests
 
 **Tell your agent:**
 
-> "List the 10 slowest captured requests by duration_ms."
+> "List the 10 slowest captured requests by duration."
 
 **Your agent runs:**
 
 ```bash
-apxy logs list --format json | jq '[sort_by(-.duration_ms) | .[:10][] | {method, url, status_code, duration_ms}]'
+apxy logs list --limit 1000 | jq '.items | [sort_by(-.duration) | .[:10][] | {method, url, status_code, ms: (.duration / 1e6 | round)}]'
 ```
 
 Agent shows a table, for example:
@@ -88,7 +88,7 @@ Agent reports response size, headers (`content-encoding`, pagination), and timin
 **Your agent runs:**
 
 ```bash
-apxy tools request compose --method GET --url "https://api.myapp.com/api/users"
+apxy run -- curl https://api.myapp.com/api/users
 ```
 
 Agent prints status, timing, and a truncated body. Run again after deploy or DB index change.
@@ -155,7 +155,7 @@ Go to **Tools** -> **Compose**, paste the URL, send **GET**, compare duration to
 
 *[Link TBD]*
 
-- 0:00 — `traffic sql query` for top slow URLs
+- 0:00 — `apxy logs list` and `jq` for top slow URLs
 - 3:00 — Deep dive with `logs show` and replay/compose
 - 5:30 — Web UI sort and timing panel
 
@@ -163,13 +163,13 @@ Go to **Tools** -> **Compose**, paste the URL, send **GET**, compare duration to
 
 ## What You Learned
 
-- Using `apxy logs list --format json | jq` with `.duration_ms` to rank real user-driven traffic
+- Using `apxy logs list | jq '.items'` with `.duration` (nanoseconds) to rank real user-driven traffic
 - Connecting aggregate slowness to a single `apxy logs show` story (body size, status, timing)
-- Retesting with `apxy tools request compose` and comparing runs via `apxy logs diff`
+- Retesting with `apxy run -- curl` and comparing runs via `apxy logs diff`
 - Optional `replay` for byte-for-byte reproduction of a slow call
 
 ## Next Steps
 
 - [Replay and Diff](../../replay-and-diff/) — Systematic before/after verification
 - [Debug Flaky API](../debug-flaky-api/) — When slowness is intermittent, not monotonic
-- [AI Agent Workflow](../../ai-agent-workflow/) — Deeper agent + SQL patterns
+- [AI Agent Workflow](../../ai-agent-workflow/) — Deeper agent-driven debugging patterns
