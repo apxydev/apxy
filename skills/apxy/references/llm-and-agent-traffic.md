@@ -1,8 +1,23 @@
 # LLM and agent traffic
 
-Three jobs that come up when code calls LLM APIs or when a coding agent runs commands: replay LLM responses in tests, see what LLM calls cost, and see which hosts a process contacted. All three need APXY v1.6.0 or later. Each one works on traffic that is already captured, so start by capturing the run with `apxy mark` and `apxy run`.
+Four jobs that come up when code calls LLM APIs or when a coding agent runs commands: check a streamed answer, replay LLM responses in tests, see what LLM calls cost, and see which hosts a process contacted. Checking a streamed answer needs APXY v1.8.0 or later, and the others v1.6.0. Each one works on traffic that is already captured, so start by capturing the run with `apxy mark` and `apxy run`.
 
 LLM APIs are HTTPS, so APXY must decrypt the provider's host to see bodies and token counts. Pass `--ssl-domains <host>` (or `--mitm-all`) to `apxy run` or `apxy start`.
+
+## Check a streamed answer
+
+Prove that a chat endpoint streamed a complete, correct answer, not only that it returned 200.
+
+```bash
+apxy mark
+apxy run -- npm test -- chat.spec.ts
+apxy wait --match "POST /api/chat" \
+  --expect "status == 200" \
+  --expect 'sse.last.data == "[DONE]"' \
+  --expect 'sse.text contains "refund"'
+```
+
+`sse.text` joins the OpenAI, Anthropic, or Gemini deltas into the full answer, so a phrase split across chunks still matches. `sse.data.<gjson path>` reads one JSON field of any event. The output has a `stream` summary with the kind, the number of events, and `closed`. A `closed: false` with exit 7 means the stream was still open at the timeout. All fields: [dsl-reference.md](dsl-reference.md#stream-fields). To read the events themselves: `apxy logs sse-events --id <ID>`, or `apxy logs sse-merge --id <ID>` for the joined answer.
 
 ## Record LLM calls once, replay them in tests
 

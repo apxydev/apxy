@@ -17,6 +17,8 @@ Capture the client with `apxy run -- <cmd>`, or start a proxy with `apxy start -
   - [Flaky API errors](#flaky-api-errors)
   - [GraphQL debugging](#graphql-debugging)
   - [Docker container traffic](#docker-container-traffic)
+  - [SSE and WebSocket streams](#sse-and-websocket-streams)
+  - [Origin certificate errors](#origin-certificate-errors)
 - [See also](#see-also)
 
 ## Core workflow
@@ -383,6 +385,22 @@ apxy logs jsonpath --id <ID> --path "errors.#.message" --scope response
    ```
 
 **Fix:** For persistent debugging, add `HTTP_PROXY` / `HTTPS_PROXY` to your `docker-compose.yml` environment section. Mount the APXY CA cert into containers that make HTTPS calls. Use `NO_PROXY` to exclude services that should not be proxied (e.g. databases).
+
+### SSE and WebSocket streams
+
+1. Find the record: `apxy logs list`, then read what it carried with `apxy logs sse-events --id <ID>` or `apxy logs ws-frames --id <ID>`.
+2. Assert on it: `apxy wait --match "GET /ws" --expect 'ws.server.data.type == order_created' --expect "ws.server.count >= 2"`. Fields: [dsl-reference.md](dsl-reference.md#stream-fields).
+3. Exit 7 prints the last event or frame as the actual value, and whether the stream ended. An open stream that never sends the event points at the server. An ended one points at whoever closed it.
+
+### Origin certificate errors
+
+APXY checks the origin's certificate the way a browser does, except for localhost (v1.8.0 or later). A failed check returns 502 with header `X-Apxy-Error: upstream_certificate`, and the body names the host and the reason.
+
+```bash
+apxy wait --match 'header:X-Apxy-Error == upstream_certificate' --since 5m --timeout 0
+```
+
+The same request fails without APXY too, so report the certificate problem. For a staging server with a known self-signed certificate, pass `--insecure-upstream` to `apxy run` or `apxy start`. Never use it to hide an unexpected failure.
 
 ## See also
 

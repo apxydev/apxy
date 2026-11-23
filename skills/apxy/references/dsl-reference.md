@@ -15,21 +15,40 @@
 | `body.<gjson path>` | A field in the response body. Used by `apxy wait`. | `body.order.id exists` |
 | `req.body.<gjson path>` | A field in the request body. Used by `apxy wait`. | `req.body.sku == A1` |
 
+## Stream fields
+
+Only `apxy wait --expect` and the MCP `wait_for_request` tool read these (v1.8.0 or later). `sse.*` needs an SSE response, and `ws.*` a WebSocket. HTTPS streams must be decrypted (`--ssl-domains` or `--mitm-all`).
+
+| Field | Description |
+|-------|-------------|
+| `sse.count` | Number of events |
+| `sse.event`, `sse.data` | Type or data of any event. An event without a type is `message`. |
+| `sse.data.<gjson path>` | A JSON field in any event's data |
+| `sse.last.event`, `sse.last.data`, `sse.last.data.<gjson path>` | The last event |
+| `sse.text` | All event data joined into one text. OpenAI, Anthropic, and Gemini deltas become the full answer. |
+| `ws.count`, `ws.client.count`, `ws.server.count` | Number of data frames: both directions, sent by the client, or sent by the server |
+| `ws.client.data`, `ws.server.data`, with optional `.<gjson path>` | Any frame in that direction |
+| `ws.client.last.data`, `ws.server.last.data`, with optional `.<gjson path>` | The last frame in that direction |
+
+- **Any and none.** A field over many events or frames holds when any of them satisfies the condition. `!=` holds when none equals the value, so `sse.event != error` means no error event, and it also holds on an empty stream.
+- **Waiting.** A failing expectation is checked again while the stream is open. It fails for good (exit 7) once the stream ends or `--timeout` passes. A check for something that must not happen passes as soon as it holds, so pair it with one that marks the end: `--expect 'sse.event != error' --expect 'sse.last.data == "[DONE]"'`.
+- **Frames are separate.** A WebSocket message split across continuation frames is not joined.
+
 ## Operators
 
 | Operator | Description | Works With |
 |----------|-------------|------------|
-| `==` | Exact equality | All fields |
+| `==` | Equality, ignoring case | All fields |
 | `!=` | Not equal | All fields |
-| `contains` | Substring match | `host`, `path`, `url`, `header:*` |
-| `startswith` | Prefix match | `host`, `path`, `url`, `header:*` |
-| `endswith` | Suffix match | `host`, `path`, `url`, `header:*` |
-| `matches` | Regex match | `host`, `path`, `url`, `header:*` |
-| `>=` | Greater than or equal | `status` |
-| `<=` | Less than or equal | `status` |
-| `>` | Greater than | `status` |
-| `<` | Less than | `status` |
-| `exists` | The field is present. Takes no value. | `header:*`, `body.*`, `req.body.*` |
+| `contains` | Substring match, ignoring case | All fields |
+| `startswith` | Prefix match, ignoring case | All fields |
+| `endswith` | Suffix match, ignoring case | All fields |
+| `matches` | Regex match | All fields |
+| `>=` | Greater than or equal | Fields with a whole-number value |
+| `<=` | Less than or equal | Fields with a whole-number value |
+| `>` | Greater than | Fields with a whole-number value |
+| `<` | Less than | Fields with a whole-number value |
+| `exists` | The field is present. Takes no value. | `header:*`, `body.*`, `req.body.*`, and stream event and data fields (not counts or `sse.text`) |
 
 ## Combinators
 
@@ -94,6 +113,13 @@
 
 # apxy wait --expect: the request sent the right value
 "req.body.currency == usd"
+
+# apxy wait --expect: the LLM stream finished and said the right thing
+"sse.last.data == [DONE]"
+"sse.text contains refund"
+
+# apxy wait --expect: the server pushed the event over the WebSocket
+"ws.server.data.type == order_created"
 ```
 
 ## Usage by command
