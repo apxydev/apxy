@@ -2,6 +2,18 @@
 
 User-facing changes in each APXY release, newest first.
 
+## APXY 1.8.1: Pro licenses renew on their own (2026-11-25)
+
+### ⚡ Improvements
+- `apxy start` and `apxy license status` renew your Pro license when they run, and a running proxy checks it about once a day. You stay on Pro for up to 7 days offline.
+- When the server rejects a license (revoked, expired, or removed from this device), APXY tells you why. A network or server error no longer counts as a rejection.
+
+### ⚠️ Changed
+- APXY only accepts licenses signed for the device they are used on. If Pro turns into Free after you update, run `apxy license activate --key "<key>"` once. Your key is in the [Polar customer portal](https://polar.sh/qnc/portal).
+
+### 🐞 Bug Fixes
+- Pro no longer turns into Free 7 days after activation.
+
 ## APXY 1.8.0: Check SSE and WebSocket streams, HTTP/2, and verified server certificates (2026-11-23)
 
 ### ✨ New
