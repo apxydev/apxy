@@ -2,6 +2,11 @@
 
 User-facing changes in each APXY release, newest first.
 
+## APXY 1.9.0: Redesign UI (2026-11-25)
+
+### ✨ New
+- Redesign UI
+
 ## APXY 1.8.1: Pro licenses renew on their own (2026-11-25)
 
 ### ⚡ Improvements
