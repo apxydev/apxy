@@ -2,6 +2,12 @@
 
 User-facing changes in each APXY release, newest first.
 
+## APXY 1.9.1: Phones show up under Devices (2026-11-26)
+
+### 🐞 Bug Fixes
+- A phone or app that only uses HTTPS now shows up under Devices, and selecting it lists its requests.
+- Import cURL in Compose reads the request body correctly, including commands copied from a browser.
+
 ## APXY 1.9.0: Redesign UI (2026-11-25)
 
 ### ✨ New
