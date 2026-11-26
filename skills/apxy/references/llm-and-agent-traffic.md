@@ -1,6 +1,6 @@
 # LLM and agent traffic
 
-Four jobs that come up when code calls LLM APIs or when a coding agent runs commands: check a streamed answer, replay LLM responses in tests, see what LLM calls cost, and see which hosts a process contacted. Checking a streamed answer needs APXY v1.8.0 or later, and the others v1.6.0. Each one works on traffic that is already captured, so start by capturing the run with `apxy mark` and `apxy run`.
+Four jobs that come up when code calls LLM APIs or when a coding agent runs commands: check a streamed answer, replay LLM responses in tests, see what LLM calls cost, and see which hosts a process contacted. Each one works on traffic that is already captured, so start by capturing the run with `apxy mark` and `apxy run`.
 
 LLM APIs are HTTPS, so APXY must decrypt the provider's host to see bodies and token counts. Pass `--ssl-domains <host>` (or `--mitm-all`) to `apxy run` or `apxy start`.
 

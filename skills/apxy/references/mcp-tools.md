@@ -54,5 +54,3 @@ The APXY MCP server (`apxy mcp`, set up with `apxy setup mcp`) has 38 tools. The
 | `list_pending_breakpoints` | | What is paused now |
 | `resolve_breakpoint` | `id`*, `status`, `headers`, `body`, `drop` | Continue, change, or drop it. An unresolved one continues after its timeout. |
 | `list_breakpoint_rules`, `remove_breakpoint_rule` | `id`* (remove) | Manage rules |
-
-Replay, diff, export, breakpoints, DNS overrides, and `validate_recent_traffic` need v1.7.0 or later. Stream expectations in `wait_for_request` need v1.8.0.

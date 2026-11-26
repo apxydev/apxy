@@ -163,7 +163,7 @@ apxy logs jsonpath --id <ID> --path "errors.#.message" --scope response
 5. As a temporary fix, mock a correct preflight response:
    ```bash
    apxy mock add --name "cors-preflight" \
-     --url "https://api.myapp.com/*" --match wildcard --method OPTIONS \
+     --url "^https://api\.myapp\.com/" --match regex --method OPTIONS \
      --status 204 \
      --headers '{"Access-Control-Allow-Origin":"http://localhost:3000","Access-Control-Allow-Methods":"GET, POST, PUT, DELETE, OPTIONS","Access-Control-Allow-Headers":"Content-Type, Authorization","Access-Control-Max-Age":"86400"}'
    ```
@@ -394,7 +394,7 @@ apxy logs jsonpath --id <ID> --path "errors.#.message" --scope response
 
 ### Origin certificate errors
 
-APXY checks the origin's certificate the way a browser does, except for localhost (v1.8.0 or later). A failed check returns 502 with header `X-Apxy-Error: upstream_certificate`, and the body names the host and the reason.
+APXY checks the origin's certificate the way a browser does, except for localhost. A failed check returns 502 with header `X-Apxy-Error: upstream_certificate`, and the body names the host and the reason.
 
 ```bash
 apxy wait --match 'header:X-Apxy-Error == upstream_certificate' --since 5m --timeout 0

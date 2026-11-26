@@ -2,7 +2,7 @@
 
 This file lists all 105 APXY commands and their flags. It is generated from the CLI help text.
 
-Global flags work on every command: `--config`, `--error-format` (text|json, default text), `--help-format` (default|agent, default default; shows JSON help; add `--help` too for versions before v1.8.0), `--no-project`, `--output` (agent|human), `--verbose`.
+Global flags work on every command: `--config`, `--error-format` (text|json, default text), `--help-format` (default|agent, default default; shows JSON help and never runs the command), `--no-project`, `--output` (agent|human), `--verbose`.
 
 `--control-url` points a command at the control API of a running proxy. The default is `http://127.0.0.1:8081`.
 
@@ -172,7 +172,7 @@ Global flags work on every command: `--config`, `--error-format` (text|json, def
 | `apxy license status` | Show the current license status |  |
 | `apxy upgrade` | Upgrade apxy to the latest version |  |
 | `apxy audit clear` | Delete all audit log entries | `--dry-run` |
-| `apxy audit export` | Export audit log entries as JSONL |  |
+| `apxy audit export` | Export audit log entries as JSONL | `--output` (file path, default stdout) |
 | `apxy audit list` | List audit log entries | `--category`, `--format` (default table), `--limit` (default 50), `--source` |
 | `apxy audit stats` | Show audit log statistics |  |
 

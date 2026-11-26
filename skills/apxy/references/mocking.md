@@ -27,8 +27,10 @@
 `--match` is the match type: `exact` (default), `wildcard`, or `regex`.
 
 - `exact` matches the URL character for character.
-- `wildcard` lets `*` match any substring, within a path segment or across segments.
-- `regex` takes a Go regular expression.
+- `wildcard` lets `*` match any characters except `/`, so it stays inside one path segment: `/users/*` matches `/users/42` but not `/users/42/orders`.
+- `regex` takes a Go regular expression and is not anchored. Use it to match any depth: `--url "^/api/" --match regex` catches every path under `/api/`.
+
+The pattern is checked against the full URL, the path, and the path with its query, so `/api/users` matches a request to any host.
 
 `--method` limits the rule to one HTTP method, such as GET or POST. Without it, the rule matches any method.
 
@@ -110,7 +112,7 @@ Mock each endpoint from the agreed API contract. The frontend can then run befor
 apxy start --port 8080
 eval $(apxy env)
 # Mock each endpoint from the OpenAPI contract
-apxy mock add --name "get-users" --url "/api/users" --match wildcard --status 200 \
+apxy mock add --name "get-users" --url "/api/users" --match wildcard --method GET --status 200 \
   --body '{"users":[{"id":1,"name":"Alice"}]}'
 apxy mock add --name "create-user" --url "/api/users" --match wildcard --method POST \
   --status 201 --body '{"id":2,"name":"Bob"}'
@@ -119,6 +121,8 @@ apxy mock add --name "auth-login" --url "/api/auth/login" --match wildcard --met
 apxy mock list
 # The frontend now gets these responses through the proxy, with no backend running
 ```
+
+Give each rule a `--method` when two rules share a URL. A rule without one matches every method, so it can answer the POST meant for the other rule.
 
 ## Agent workflow: catch breaking changes
 
@@ -171,11 +175,11 @@ Copy the rule ID for cleanup later.
 
 ```bash
 apxy mark
-curl -x http://127.0.0.1:8080 https://api.myapp.com/api/inventory
+apxy run --ssl-domains api.myapp.com -- curl -s https://api.myapp.com/api/inventory
 apxy wait --match "GET /api/inventory" --expect "status == 200" --expect "body.items exists"
 ```
 
-Exit code 0 means the mock served the request.
+Exit code 0 means the mock served the request. `apxy run` decrypts the host and makes curl trust the APXY CA. A plain `curl -x` does neither, so it never reaches the mock. If a proxy already runs, `apxy run` reuses it and ignores `--ssl-domains`; run `apxy ssl enable --domain api.myapp.com` first.
 
 **Step 5: Fix the real backend, then remove the mock**
 
@@ -187,7 +191,7 @@ apxy mock remove --id <RULE_ID>
 
 ```bash
 apxy mark
-curl -x http://127.0.0.1:8080 https://api.myapp.com/api/inventory
+apxy run --ssl-domains api.myapp.com -- curl -s https://api.myapp.com/api/inventory
 apxy wait --match "GET /api/inventory" --expect "status == 200" --expect "body.updated_at != 2025-03-27T12:00:00Z"
 ```
 

@@ -1,6 +1,6 @@
 # Advanced rules: network, DNS, scripts, breakpoints, rewrites, filters
 
-These commands change the running proxy. Start one with `apxy start` first, and check it with `apxy status`.
+With a running proxy, these commands change it at once. With none, the rule is saved and applies when the next proxy starts. `network`, `breakpoint pending`, and `breakpoint resolve` need a running proxy (`apxy start`; check it with `apxy status`).
 
 ## Network simulation
 
@@ -26,7 +26,7 @@ apxy network clear
 
 ## DNS overrides
 
-Send a hostname's traffic to another IP without editing `/etc/hosts` (v1.7.0 or later). The Host header and TLS SNI keep the original name, so the server behaves as if it were the real one. Use it to run a client against staging or a local build.
+Send a hostname's traffic to another IP without editing `/etc/hosts`. The Host header and TLS SNI keep the original name, so the server behaves as if it were the real one. Use it to run a client against staging or a local build.
 
 ```bash
 apxy dns set --host api.example.com --ip 10.0.0.5
@@ -42,11 +42,18 @@ apxy dns remove --host api.example.com
 
 ## TLS key log
 
-`apxy start --tls-keylog keys.log` (or `apxy run --tls-keylog keys.log -- <cmd>`) writes TLS session secrets for both sides of decrypted connections, so Wireshark can read a packet capture. `SSLKEYLOGFILE` works too. The file holds secrets: keep it private and delete it when you finish. v1.7.0 or later.
+`apxy start --tls-keylog keys.log` (or `apxy run --tls-keylog keys.log -- <cmd>`) writes TLS session secrets for both sides of decrypted connections, so Wireshark can read a packet capture. `SSLKEYLOGFILE` works too. The file holds secrets: keep it private and delete it when you finish.
 
 ## Script rules
 
-Run JavaScript on matching requests or responses. Provide code inline (`--code`) or from a file (`--file`). Scripts execute at a hook point: `onRequest` (before forwarding) or `onResponse` (before returning to client). The `--match` flag accepts a DSL expression to scope which traffic the script applies to (default: `*` matches all).
+Run JavaScript on matching requests or responses. Provide code inline (`--code`) or from a file (`--file`). The script must define `function handle(ctx)` and return `ctx`. APXY calls it for each matching request and applies the fields you changed. A script without `handle` changes nothing, and no error says so. `--hook` picks when it runs (default `onResponse`), and `--match` takes a match expression (default `*`, all traffic).
+
+| Hook | `ctx` fields to read | Fields you can change |
+|------|---------------------|-----------------------|
+| `onRequest`, before forwarding | `method`, `url`, `host`, `path`, `headers`, `body` | `headers`, `body` |
+| `onResponse`, before the client gets it | `method`, `url`, `host`, `path`, `request_headers`, `request_body`, `status_code`, `response_headers`, `response_body` | `response_headers`, `response_body`, `status_code` |
+
+Bodies are strings. Headers can be added or changed, not removed. The helpers `jsonParse`, `jsonStringify`, `base64Encode`, and `base64Decode` exist; `require` does not. A script stops after 5 seconds.
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
@@ -59,15 +66,22 @@ Run JavaScript on matching requests or responses. Provide code inline (`--code`)
 Examples:
 
 ```bash
-# Inline: rewrite response body
-apxy script add --name "rewrite-body" \
-  --code 'response.body = response.body.replace("foo","bar")' \
-  --match "host == api.example.com" --hook onResponse
+# Inline: rewrite the response body
+apxy script add --name "rewrite-body" --hook onResponse --match "host == api.example.com" \
+  --code 'function handle(ctx) { ctx.response_body = ctx.response_body.replace("foo", "bar"); return ctx }'
 
-# File: inject auth token on every request to /api
-apxy script add --name "add-auth" \
-  --file ./scripts/inject-token.js --hook onRequest \
-  --match "path contains /api"
+# Inline: answer 503 for one path
+apxy script add --name "fail-health" --hook onResponse --match "path == /health" \
+  --code 'function handle(ctx) { ctx.status_code = 503; return ctx }'
+
+# File: add an auth header to every request under /api
+cat > ./inject-token.js <<'EOF'
+function handle(ctx) {
+  ctx.headers["Authorization"] = "Bearer dev-token";
+  return ctx;
+}
+EOF
+apxy script add --name "add-auth" --file ./inject-token.js --hook onRequest --match "path contains /api"
 
 # List and remove
 apxy script list
@@ -96,7 +110,9 @@ Resolve options:
 
 ## Rewrite rules
 
-Rewrite request URLs before forwarding. The `--match` flag controls pattern type: `exact` (full URL match), `wildcard` (glob patterns with `*`), or `regex`.
+Rewrite request URLs before forwarding. `--match` sets how `--from` is read: `exact` (the full URL, or only its scheme and host to catch every path), `wildcard` (`*` matches any characters, `/` included), or `regex`.
+
+`--to` is used as written. A `--to` with only a scheme and host keeps the request's path and query. A `--to` with a path replaces the whole path and keeps the query. `*` and `$1` in `--to` are not substituted, so `--to https://api.example.com/v2/*` sends every match to the literal path `/v2/*`. An HTTPS `--from` needs its host decrypted (`--ssl-domains` or `--mitm-all`).
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
@@ -111,9 +127,13 @@ Examples:
 apxy rewrite set --name "staging" \
   --from "https://api.example.com" --to "https://staging.example.com" --match exact
 
-# Redirect all v1 paths to v2
-apxy rewrite set --name "v2-api" \
-  --from "https://api.example.com/v1/*" --to "https://api.example.com/v2/*" --match wildcard
+# Send every /v1/ request to a local build; the path and query stay the same
+apxy rewrite set --name "local-v1" \
+  --from "https://api.example.com/v1/*" --to "http://localhost:3000" --match wildcard
+
+# Send every /v1/ request to one fixed URL; the path is replaced, the query kept
+apxy rewrite set --name "v2-users" \
+  --from "https://api.example.com/v1/*" --to "https://api.example.com/v2/users" --match wildcard
 
 # List and remove
 apxy rewrite list
@@ -180,8 +200,8 @@ apxy breakpoint remove --all
 ## Agent workflow: change traffic with a script
 
 ```bash
-apxy script add --name "rewrite-body" --code 'response.body = response.body.replace("foo","bar")' --match "host == api.example.com" --hook onResponse
-apxy script add --name "add-auth" --file ./scripts/inject-token.js --hook onRequest --match "path contains /api"
+apxy script add --name "rewrite-body" --hook onResponse --match "host == api.example.com" \
+  --code 'function handle(ctx) { ctx.response_body = ctx.response_body.replace("foo", "bar"); return ctx }'
 apxy script list
 apxy script remove --id <ID>
 ```
@@ -192,18 +212,18 @@ Test how your app handles third-party outages, rate limits, and timeouts. The re
 
 ```bash
 # Simulate payment provider outage
-apxy mock add --name "stripe-down" --url "*/v1/*" --match wildcard --status 503 \
+apxy mock add --name "stripe-down" --url "^https://api\.stripe\.com/v1/" --match regex --status 503 \
   --body '{"error":{"message":"Service temporarily unavailable"}}'
 
 # Simulate rate limiting
-apxy mock add --name "rate-limit" --url "/api/*" --match wildcard --status 429 \
+apxy mock add --name "rate-limit" --url "^/api/" --match regex --status 429 \
   --body '{"error":"Too Many Requests","retry_after":60}'
 
 # Simulate slow upstream (2s latency) to test timeouts
 apxy network set --latency 2000
 
 # Simulate auth token expiry mid-session
-apxy mock add --name "expire-token" --url "/api/*" --match wildcard \
+apxy mock add --name "expire-token" --url "^/api/" --match regex \
   --status 401 --body '{"error":"Token expired"}'
 
 # Clear all simulated conditions when done

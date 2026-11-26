@@ -2,6 +2,19 @@
 
 User-facing changes in each APXY release, newest first.
 
+## APXY 1.10.0: Your agent knows APXY as soon as it connects (2026-11-26)
+
+### ✨ New
+- `apxy mcp` now serves the apxy skill over MCP. Claude Code (2.1.331 or later) loads it as `apxy:apxy` as soon as you add the APXY MCP server, with nothing else to install, and the skill always matches your apxy version.
+- `apxy setup skills` installs the same skill as files for agents that don't load skills over MCP, such as Codex, Cursor, `claude -p`, and CI. `apxy setup mcp --client codex --write` now installs it too, and installed copies update themselves when apxy updates.
+- `apxy mcp --no-skills` serves tools only, for setups that already ship the skill as files.
+
+### 🐞 Bug Fixes
+- `apxy rewrite remove --all`, `apxy filter remove --all`, and `apxy breakpoint remove --all` work while a proxy is running, instead of failing with an internal server error.
+- Removing, enabling, or disabling breakpoints now takes effect on the running proxy right away. Before, a removed breakpoint could still pause requests until the next start.
+- Next-step hints and the Free session message now name commands that exist.
+- The skill's script, rewrite, and mock examples now work as written.
+
 ## APXY 1.9.1: Phones show up under Devices (2026-11-26)
 
 ### 🐞 Bug Fixes

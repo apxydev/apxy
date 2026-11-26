@@ -17,7 +17,7 @@
 
 ## Stream fields
 
-Only `apxy wait --expect` and the MCP `wait_for_request` tool read these (v1.8.0 or later). `sse.*` needs an SSE response, and `ws.*` a WebSocket. HTTPS streams must be decrypted (`--ssl-domains` or `--mitm-all`).
+Only `apxy wait --expect` and the MCP `wait_for_request` tool read these. `sse.*` needs an SSE response, and `ws.*` a WebSocket. HTTPS streams must be decrypted (`--ssl-domains` or `--mitm-all`).
 
 | Field | Description |
 |-------|-------------|

@@ -15,7 +15,7 @@
   - [Firebase (*.googleapis.com)](#firebase-googleapiscom)
   - [Shopify (*.myshopify.com)](#shopify-myshopifycom)
 
-The APXY repo ships complete `rules.json` files for these vendors in `mock-templates/<vendor>/rules.json`. When APXY is installed as a Claude Code plugin, the files are in the plugin directory, two levels above this skill's folder. Otherwise, download one from GitHub:
+The APXY repo ships complete `rules.json` files for these vendors in `mock-templates/<vendor>/rules.json`. Download one from GitHub:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/apxydev/apxy/main/mock-templates/stripe/rules.json -o ./stripe-rules.json
@@ -28,7 +28,7 @@ apxy mock import --file ./stripe-rules.json
 
 SSL: `apxy start --ssl-domains api.stripe.com`
 
-**Prebuilt template:** `mock-templates/stripe/rules.json` (15 rules)
+**Prebuilt template:** `mock-templates/stripe/rules.json` (16 rules)
 
 **Quick start (3 key rules):**
 
@@ -192,7 +192,8 @@ apxy mock add \
   --name "twilio-create-message" \
   --url "https://api.twilio.com/2010-04-01/Accounts/*/Messages.json" \
   --match wildcard --method POST --status 201 \
-  --body '{"sid":"SMaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","status":"queued","to":"+1234567890","from":"+1987654321","date_created":"Mon, 01 Jan 2026 12:00:00 +0000","uri":"/2010-04-01/Accounts/ACxxxxxxxx/Messages/SMaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.json"}'
+  --body '{"sid":"SMaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","status":"queued","to":"+1234567890","from":"+1987654321","date_created":"Mon, 01 Jan 2026 12:00:00 +0000","uri":"/2010-04-01/Accounts/ACxxxxxxxx/Messages/SMaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.json"}' \
+  --priority 50
 
 # Fetch message: 200 delivered
 apxy mock add \
@@ -208,44 +209,45 @@ apxy mock add \
   --match wildcard --method POST \
   --status 400 \
   --body '{"code":21211,"message":"Invalid To Phone Number","status":400}' \
-  --priority 10
+  --header-conditions 'X-APXY-Scenario=send_failed' --priority 10
 ```
 
 ### AWS S3 (*.s3.amazonaws.com)
 
 SSL: `apxy start --ssl-domains s3.amazonaws.com`
 
-For virtual-hosted-style buckets, add those hostnames too (e.g. `my-bucket.s3.amazonaws.com`).
+For virtual-hosted-style buckets, add those hostnames too (e.g. `my-bucket.s3.amazonaws.com`). Object keys hold `/`, so these rules use `regex`; a wildcard `*` stops at `/`.
 
 ```bash
 # PUT object: 200 upload success
 apxy mock add \
   --name "s3-put-object" \
-  --url "https://s3.amazonaws.com/my-bucket/*" \
-  --match wildcard --method PUT --status 200 \
+  --url '^https://s3\.amazonaws\.com/my-bucket/.+' \
+  --match regex --method PUT --status 200 \
   --body '<?xml version="1.0" encoding="UTF-8"?><CopyObjectResult><ETag>&quot;mock-etag-abc123&quot;</ETag></CopyObjectResult>'
 
 # GET object: 200 download
 apxy mock add \
   --name "s3-get-object" \
-  --url "https://s3.amazonaws.com/my-bucket/*" \
-  --match wildcard --method GET --status 200 \
-  --body '{"mock":"This stands in for object bytes; use raw text or base64 per your client tests."}'
+  --url '^https://s3\.amazonaws\.com/my-bucket/.+' \
+  --match regex --method GET --status 200 \
+  --body '{"mock":"This stands in for object bytes; use raw text or base64 per your client tests."}' \
+  --priority 50
 
 # NoSuchKey: 404 (use X-APXY-Scenario: missing_key)
 apxy mock add \
   --name "s3-nosuchkey" \
-  --url "https://s3.amazonaws.com/my-bucket/*" \
-  --match wildcard --method GET \
+  --url '^https://s3\.amazonaws\.com/my-bucket/.+' \
+  --match regex --method GET \
   --status 404 \
   --body '<?xml version="1.0" encoding="UTF-8"?><Error><Code>NoSuchKey</Code><Message>The specified key does not exist.</Message><Key>missing.bin</Key><RequestId>MOCKREQUESTID</RequestId><HostId>mockhostid</HostId></Error>' \
-  --priority 10
+  --header-conditions 'X-APXY-Scenario=missing_key' --priority 10
 
 # DELETE object: 204
 apxy mock add \
   --name "s3-delete-object" \
-  --url "https://s3.amazonaws.com/my-bucket/*" \
-  --match wildcard --method DELETE --status 204 --body ""
+  --url '^https://s3\.amazonaws\.com/my-bucket/.+' \
+  --match regex --method DELETE --status 204 --body ""
 
 # List all buckets: 200 XML
 apxy mock add \
@@ -301,7 +303,8 @@ apxy mock add \
   --name "shopify-products" \
   --url "https://your-store.myshopify.com/api/2024-01/graphql.json" \
   --match exact --method POST --status 200 \
-  --body '{"data":{"products":{"edges":[{"node":{"id":"gid://shopify/Product/100","title":"Mock Tee","handle":"mock-tee","priceRange":{"minVariantPrice":{"amount":"19.99","currencyCode":"USD"}}}}]}}}'
+  --body '{"data":{"products":{"edges":[{"node":{"id":"gid://shopify/Product/100","title":"Mock Tee","handle":"mock-tee","priceRange":{"minVariantPrice":{"amount":"19.99","currencyCode":"USD"}}}}]}}}' \
+  --priority 50
 
 # Cart create (use X-APXY-Scenario: cart_create)
 apxy mock add \
@@ -309,7 +312,7 @@ apxy mock add \
   --url "https://your-store.myshopify.com/api/2024-01/graphql.json" \
   --match exact --method POST --status 200 \
   --body '{"data":{"cartCreate":{"cart":{"id":"gid://shopify/Cart/mock-cart-id","checkoutUrl":"https://your-store.myshopify.com/cart/c/mock-cart-id","lines":{"edges":[]}},"userErrors":[]}}}' \
-  --priority 10
+  --header-conditions 'X-APXY-Scenario=cart_create' --priority 10
 
 # GraphQL throttled error (use X-APXY-Scenario: throttled)
 apxy mock add \
@@ -317,7 +320,7 @@ apxy mock add \
   --url "https://your-store.myshopify.com/api/2024-01/graphql.json" \
   --match exact --method POST --status 200 \
   --body '{"errors":[{"message":"Throttled","extensions":{"code":"THROTTLED"}}]}' \
-  --priority 10
+  --header-conditions 'X-APXY-Scenario=throttled' --priority 10
 
 # Cart mutation userErrors (use X-APXY-Scenario: cart_line_error)
 apxy mock add \
@@ -325,7 +328,7 @@ apxy mock add \
   --url "https://your-store.myshopify.com/api/2024-01/graphql.json" \
   --match exact --method POST --status 200 \
   --body '{"data":{"cartLinesAdd":{"cart":null,"userErrors":[{"field":["lines","0","quantity"],"message":"Quantity must be positive"}]}}}' \
-  --priority 10
+  --header-conditions 'X-APXY-Scenario=cart_line_error' --priority 10
 ```
 
 **Note:** Shopify Storefront API funnels all operations through a single GraphQL endpoint. Use `X-APXY-Scenario` headers or priorities to branch between query and mutation responses. For larger setups, maintain a `rules.json` file and import with `apxy mock import --file rules.json`.

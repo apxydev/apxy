@@ -35,7 +35,7 @@ MCP equivalent: `set_mark`, trigger the code, then `wait_for_request`. Its `outc
 `apxy wait` flags:
 - `--match "METHOD /path"` (exact path) or a match expression like `'host == api.stripe.com && path startswith /v1/'` ([dsl-reference.md](references/dsl-reference.md)).
 - `--expect` (repeatable): `status`, `header:<Name>`, `body.<gjson path>` (response), or `req.body.<gjson path>` (request) with `==`, `!=`, `contains`, `startswith`, `endswith`, `matches`, `>`, `>=`, `<`, `<=`, `exists`.
-- **Streams** (v1.8.0 or later): `--expect` also reads SSE events and WebSocket frames, as in `'sse.data == "[DONE]"'`, `'sse.text contains "Hello"'` (LLM deltas joined), or `'ws.server.data.type == order_created'`. While the stream is open, `wait` keeps checking until it passes, the stream ends, or the timeout. See [streams](references/dsl-reference.md#stream-fields).
+- **Streams**: `--expect` also reads SSE events and WebSocket frames, as in `'sse.data == "[DONE]"'`, `'sse.text contains "Hello"'` (LLM deltas joined), or `'ws.server.data.type == order_created'`. While the stream is open, `wait` keeps checking until it passes, the stream ends, or the timeout. See [streams](references/dsl-reference.md#stream-fields).
 - `--since <mark>` reads from a named mark. `--timeout` defaults to 30s; `--timeout 0` checks once, for a command that already ran.
 
 When nothing matches, run `apxy logs list --limit 20`, then:
@@ -60,13 +60,14 @@ Piped output is a JSON envelope: lists in `.items`, one record in `.data`, a nex
 | Record and replay LLM calls in tests, LLM token cost, hosts contacted | [llm-and-agent-traffic.md](references/llm-and-agent-traffic.md) |
 | Network simulation, DNS overrides, breakpoints, scripts, rewrites, filters, caching, TLS key log | [advanced-rules.md](references/advanced-rules.md) |
 | Which MCP tool does what | [mcp-tools.md](references/mcp-tools.md) |
+| Web UI, MCP over HTTP, `apxy setup mcp`, phones and devices, HTTP/2 and gRPC, project mode, upstream proxy, Free vs Pro | [setup-and-devices.md](references/setup-and-devices.md) |
 | Exact flags | [cli-overview.md](references/cli-overview.md) or `apxy <cmd> --help --help-format agent` |
 
 ## Gotchas
 
 - **A new proxy starts with empty logs.** Read what you need before starting another.
 - **`apxy start` runs in the foreground** and, on macOS, enables the system proxy and asks to trust the CA. In scripts: `apxy start --no-system-proxy --no-trust-ca --port P &`, then `until apxy status --quiet --port P; do sleep 0.2; done` (ready in about a second). Stop it with `apxy stop`.
-- **Always keep `--help` when reading help.** Before v1.8.0, `--help-format agent` only formatted it, so `apxy start --help-format agent` started the proxy and turned on the system proxy.
-- **Needs a running proxy:** `dns`, `filter`, `rewrite`, `breakpoint`, `script`, `network`, `caching`, `ssl`, `recording`, `mock import`, `logs replay`. Reading logs, `mock add`, and `schema` work without one.
+- **Needs a running proxy:** `network`, `recording`, `breakpoint pending` and `resolve`, `certs custom`, `mock import`, `logs replay`. Other rule commands (`mock`, `dns`, `filter`, `rewrite`, `script`, `breakpoint add`, `ssl`, `caching`) save the rule when no proxy runs (`apply_mode: persistent_offline`), and the next proxy applies it. For a proxy on a non-default port, pass `--control-url http://127.0.0.1:<port+1>`, or the rule only waits for the next start.
+- **Parallel agents** (worktrees) share one proxy, and without a project `.apxy/` one traffic database and marks file. Give each worktree its own mark (`apxy mark wt-auth`, then `apxy wait --since wt-auth`) and a specific `--match`. If each worktree has its own `.apxy/`, traffic lands in the database of the worktree whose proxy runs and the others' `wait` sees nothing; set `APXY_NO_PROJECT=1` in every worktree.
 - **Ports:** proxy 8080, control API 8081, web UI 8082 by default. "Address in use" means a proxy already runs.
 - **Browser capture:** `apxy browser <url>`. **Teach the repo's agents this loop:** `apxy setup agents` (edits `AGENTS.md`/`CLAUDE.md`, so only when asked).
