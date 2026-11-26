@@ -88,13 +88,14 @@ High-value ideas:
 
 ### 3. AI Agent Skills (medium barrier)
 
-Improvements to the APXY skill file that teaches AI agents how to use the tool.
+Improvements to the APXY skill that teaches AI agents how to use the tool.
+
+The skill under `skills/apxy/` and the `version` in `.claude-plugin/plugin.json` are release-managed: each APXY release overwrites them, and CI fails a pull request that changes them.
 
 **How to contribute:**
 
-1. Fork this repo
-2. Edit `skills/SKILL.md` with your improvements
-3. Open a pull request explaining what you changed and why
+1. Open an [issue](https://github.com/apxydev/apxy/issues) describing what you want changed and why
+2. Maintainers edit the skill in apxydev/apxy-core at `internal/adapter/mcp/skilldata/apxy/`; it syncs here on the next release
 
 Ideas for skill contributions:
 - Better workflow recipes for specific debugging scenarios
