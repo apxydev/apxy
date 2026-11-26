@@ -1,0 +1,43 @@
+name: Guard release-managed files
+
+# skills/apxy/ and the plugin version are written by the apxy-core release job,
+# which pushes to main directly, so a pull request should never change them.
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  guard:
+    if: github.event.pull_request.user.login != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Check release-managed files
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          base=$(git merge-base "$BASE_SHA" "$HEAD_SHA")
+          version() { git show "$1:.claude-plugin/plugin.json" 2>/dev/null | jq -r .version || true; }
+          changed=()
+          if [ -n "$(git diff --name-only "$base" "$HEAD_SHA" -- skills/apxy)" ]; then
+            changed+=("skills/apxy/")
+          fi
+          if [ "$(version "$base")" != "$(version "$HEAD_SHA")" ]; then
+            changed+=("the version in .claude-plugin/plugin.json")
+          fi
+          if [ ${#changed[@]} -gt 0 ]; then
+            for c in "${changed[@]}"; do
+              echo "::error::This PR changes $c, which the release job overwrites."
+            done
+            echo "Edit the skill in apxydev/apxy-core at internal/adapter/mcp/skilldata/apxy/; it syncs here on release."
+            exit 1
+          fi
+          echo "No release-managed files changed."

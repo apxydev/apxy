@@ -13,7 +13,7 @@
   "mcpServers": {
     "apxy": {
       "command": "apxy",
-      "args": ["mcp"]
+      "args": ["mcp", "--no-skills"]
     }
   }
 }
