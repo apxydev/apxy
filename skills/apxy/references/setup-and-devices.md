@@ -2,7 +2,7 @@
 
 ## Web UI
 
-`apxy start` serves a web UI at `http://127.0.0.1:8082` (proxy port + 2; `--web-port 0` turns it off). Pages: Traffic, Setup, Compose (build and send a request), Diff, Rules (mock, filters, redirects, SSL, network, scripts, breakpoints), Audit (what agents did), Protobuf, Schema, Settings, and Mobile. The temporary proxy from `apxy run` has no web UI.
+`apxy start` serves a web UI at `http://127.0.0.1:8082` (proxy port + 2; `--web-port 0` turns it off). Pages: Traffic, Setup, Compose (build and send a request), Diff, Rules (mock, filters, redirects, SSL, network, scripts, breakpoints), Audit (what agents did), Protobuf, Schema, Settings, and Mobile. The temporary proxy from `apxy run` has no web UI. `apxy ui` serves the web UI with no proxy, over the shared database and every rules file, with a workspace picker in the top bar.
 
 ## MCP
 
@@ -10,6 +10,8 @@
 - While `apxy start` runs with its web UI, the same tools are served over HTTP at `http://127.0.0.1:<web-port>/mcp` (default `http://127.0.0.1:8082/mcp`).
 
 ## Phones and other devices
+
+For an iOS simulator or Android emulator on this machine, use `apxy device setup`; see [workspaces.md](workspaces.md#simulators-and-emulators). For a physical device:
 
 1. Start on the computer: `apxy start --ssl-domains api.myapp.com`. The proxy port listens on every interface by default (`--proxy-listen-addr 127.0.0.1` keeps it local). `--listen-addr 0.0.0.0` also opens the web UI and control API to the LAN.
 2. On the device, set the Wi-Fi HTTP proxy to the computer's LAN IP and port 8080.
@@ -25,7 +27,7 @@ HTTP/1.1 and HTTP/2 work on both legs: a decrypted HTTP/2 client talks HTTP/2 to
 
 ## Project mode
 
-`apxy init` creates `.apxy/` in the repo: a committed `settings.json` (mocks, SSL domains, scripts, breakpoints, custom CAs) and project CA, plus an ignored `data/` database. Any `apxy` command run below that folder uses it instead of `~/.apxy`; the two never merge. `--no-project` or `APXY_NO_PROJECT=1` forces `~/.apxy`. Rule changes made while a project proxy runs are written back to `settings.json`.
+`apxy init` creates `.apxy/` in the repo: a `settings.json` marker, a project CA, and a `.gitignore` that keeps `rules.json`, the worktree's mocks and rules, out of git unless you pass `--commit-rules`. Traffic always goes to the shared `~/.apxy/data/apxy.db`. `--no-project` or `APXY_NO_PROJECT=1` uses `~/.apxy/certs` instead of the project CA.
 
 ## Other start flags
 
@@ -38,4 +40,4 @@ HTTP/1.1 and HTTP/2 work on both legs: a decrypted HTTP/2 client talks HTTP/2 to
 
 ## Free and Pro
 
-The Free plan stops each proxy session, `apxy start` or the temporary proxy of `apxy run`, after 10 minutes. A new proxy starts with empty traffic logs, so read what you need first. Pro removes the limit: `apxy license activate --key <KEY>`, check with `apxy license status`, and free the seat with `apxy license deactivate`.
+The Free plan stops each proxy session, `apxy start` or the temporary proxy of `apxy run`, after 10 minutes. A new proxy keeps the traffic captured before it, for 24 hours or the newest 50000 records. Pro removes the limit: `apxy license activate --key <KEY>`, check with `apxy license status`, and free the seat with `apxy license deactivate`.

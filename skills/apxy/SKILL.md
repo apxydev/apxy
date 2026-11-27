@@ -12,6 +12,7 @@ APXY is a local proxy that records every HTTP and HTTPS request passing through 
 - If `command -v apxy` prints nothing, ask the user before installing (it adds a binary and a CA certificate): `brew tap apxydev/apxy https://github.com/apxydev/apxy && brew install apxy`, then `/mcp` to reconnect the MCP server.
 - The Free plan stops each proxy session after 10 minutes. A proxy that vanishes, or an MCP `session_expired` result, means the session ended: start again and tell the user.
 - Trigger the code yourself (tests, scripts, curl)? Use the CLI with `apxy run`, which routes only that process. Triggered by someone else (a browser click, an incoming webhook)? Use a running proxy (`apxy start`) and the MCP tools or CLI. Both share data and marks.
+- In a git worktree, run every `apxy` command from inside it: agents in other worktrees share the proxy, and the worktree keeps your requests, marks, and mocks apart from theirs.
 
 ## Prove a change works
 
@@ -59,15 +60,15 @@ Piped output is a JSON envelope: lists in `.items`, one record in `.data`, a nex
 | Replay or diff requests, export curl or HAR | [replay-diff.md](references/replay-diff.md) |
 | Record and replay LLM calls in tests, LLM token cost, hosts contacted | [llm-and-agent-traffic.md](references/llm-and-agent-traffic.md) |
 | Network simulation, DNS overrides, breakpoints, scripts, rewrites, filters, caching, TLS key log | [advanced-rules.md](references/advanced-rules.md) |
+| Parallel agents in worktrees: whose traffic `wait` sees, `--global` rules, `mocked_by`, the shared proxy, `apxy browser`, simulators and emulators, `apxy ui` | [workspaces.md](references/workspaces.md) |
 | Which MCP tool does what | [mcp-tools.md](references/mcp-tools.md) |
 | Web UI, MCP over HTTP, `apxy setup mcp`, phones and devices, HTTP/2 and gRPC, project mode, upstream proxy, Free vs Pro | [setup-and-devices.md](references/setup-and-devices.md) |
 | Exact flags | [cli-overview.md](references/cli-overview.md) or `apxy <cmd> --help --help-format agent` |
 
 ## Gotchas
 
-- **A new proxy starts with empty logs.** Read what you need before starting another.
-- **`apxy start` runs in the foreground** and, on macOS, enables the system proxy and asks to trust the CA. In scripts: `apxy start --no-system-proxy --no-trust-ca --port P &`, then `until apxy status --quiet --port P; do sleep 0.2; done` (ready in about a second). Stop it with `apxy stop`.
-- **Needs a running proxy:** `network`, `recording`, `breakpoint pending` and `resolve`, `certs custom`, `mock import`, `logs replay`. Other rule commands (`mock`, `dns`, `filter`, `rewrite`, `script`, `breakpoint add`, `ssl`, `caching`) save the rule when no proxy runs (`apply_mode: persistent_offline`), and the next proxy applies it. For a proxy on a non-default port, pass `--control-url http://127.0.0.1:<port+1>`, or the rule only waits for the next start.
-- **Parallel agents** (worktrees) share one proxy, and without a project `.apxy/` one traffic database and marks file. Give each worktree its own mark (`apxy mark wt-auth`, then `apxy wait --since wt-auth`) and a specific `--match`. If each worktree has its own `.apxy/`, traffic lands in the database of the worktree whose proxy runs and the others' `wait` sees nothing; set `APXY_NO_PROJECT=1` in every worktree.
+- **`apxy start` runs in the foreground** and, on macOS, enables the system proxy and asks to trust the CA. In scripts: `apxy start --no-system-proxy --no-trust-ca --port P &`, then `until apxy status --quiet --port P; do sleep 0.2; done` (ready in about a second: it exits 0 once `apxy start` has written its PID file and the port answers, the proxy `apxy run` joins). Stop it with `apxy stop`. It stops only a proxy this workspace started that no other workspace uses. When it refuses (`stop_refused`), leave the proxy running. Never pass `--force`.
+- **Needs a running proxy:** `recording`, `breakpoint pending` and `resolve`, `certs custom`, `logs replay`. Rule commands (`mock`, `dns`, `filter`, `rewrite`, `script`, `breakpoint add`, `ssl`, `caching`, `network`) save the rule when no proxy runs (`apply_mode: persistent_offline`), and the next proxy applies it. For a proxy on a non-default port, pass `--control-url http://127.0.0.1:<port+1>`, or the rule only waits for the next start.
+- **Parallel agents** (worktrees): `wait` sees this worktree's requests and untagged ones. A subagent that uses the MCP tools from another worktree passes `workspace` (its worktree path). Mocks and rules go to the worktree's `.apxy/rules.json` and answer only its traffic. Make them with the CLI or MCP tools, run `apxy rules apply` after a hand edit, and add `--global` for untagged traffic: browsers on the system proxy, iOS simulators, and an Android emulator set up outside a workspace or before a proxy runs (`untagged_because` says why). `mocked_by` in the `wait` output means a mock answered, not the real API. See [workspaces.md](references/workspaces.md).
 - **Ports:** proxy 8080, control API 8081, web UI 8082 by default. "Address in use" means a proxy already runs.
-- **Browser capture:** `apxy browser <url>`. **Teach the repo's agents this loop:** `apxy setup agents` (edits `AGENTS.md`/`CLAUDE.md`, so only when asked).
+- **Browser capture:** `apxy browser <url>` (a profile and a tagged proxy port per worktree). **Simulators and emulators:** `apxy device setup` (an Android emulator set up in a worktree while a proxy runs gets the worktree's tagged port, held for 8 hours). **Teach the repo's agents this loop:** `apxy setup agents` (edits `AGENTS.md`/`CLAUDE.md`, so only when asked).

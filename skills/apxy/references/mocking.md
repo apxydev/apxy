@@ -102,7 +102,7 @@ apxy wait --match "POST /v1/charges" --expect "status == 200" --expect "body.sta
 apxy mock remove --id <RULE_ID>
 ```
 
-`apxy wait` exits with 0 when the mock served the request. The record in its output has `"mocked": true`.
+`apxy wait` exits with 0 when the mock served the request. The record in its output has `"mocked": true`, `data.mocked_by` names the rule and its rules file, and `data.warning` says the pass was on a mocked response. In a git worktree the mock answers only that worktree's traffic; see [workspaces.md](workspaces.md#mocks-and-rules).
 
 ## Agent workflow: unblock a frontend
 

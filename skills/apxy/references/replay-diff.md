@@ -1,6 +1,6 @@
 # Replay and diff: verify fixes, export, regression checks
 
-`apxy logs replay` sends a request through a running proxy. Start one with `apxy start` and keep it running from the first capture until the last replay. A new proxy clears the traffic logs, so the record you want to replay would be gone.
+`apxy logs replay` sends a request through a running proxy. Start one with `apxy start`. Captured records outlive the proxy for 24 hours, up to the newest 50000.
 
 ## Core loop
 

@@ -1,24 +1,26 @@
 # APXY CLI command reference
 
-This file lists all 105 APXY commands and their flags. It is generated from the CLI help text.
+This file lists all 113 APXY commands and their flags. It is generated from the CLI help text.
 
 Global flags work on every command: `--config`, `--error-format` (text|json, default text), `--help-format` (default|agent, default default; shows JSON help and never runs the command), `--no-project`, `--output` (agent|human), `--verbose`.
 
 `--control-url` points a command at the control API of a running proxy. The default is `http://127.0.0.1:8081`.
 
+In a git worktree, every rule command (`mock`, `rewrite`, `dns`, `filter`, `breakpoint`, `script`, `network`, `caching`, `ssl`, `config import`, `config export`) reads and writes the worktree's `.apxy/rules.json`. `--global` uses `~/.apxy/rules.json` instead.
+
 ## Capture and verify
 
 | Command | Description | Flags |
 |---------|-------------|-------|
-| `apxy start` | Start the local APXY proxy | `--auto-validate`, `--bypass-domains`, `--cert-dir` (default ~/.apxy/certs), `--control-port`, `--insecure-upstream`, `--listen-addr` (default 127.0.0.1), `--max-body` (default 10485760), `--mitm-all`, `--network-service`, `--no-block-quic`, `--no-mdns`, `--no-system-proxy`, `--no-trust-ca`, `--port` (default 8080), `--project-dir`, `--proxy-listen-addr`, `--ssl-domains`, `--tls-keylog`, `--upstream-proxy`, `--web-port` |
-| `apxy stop` | Stop the local APXY proxy and disable system proxy settings |  |
+| `apxy start` | Start the local APXY proxy | `--auto-validate`, `--bypass-domains`, `--cert-dir` (default ~/.apxy/certs), `--control-port`, `--insecure-upstream`, `--listen-addr` (default 127.0.0.1), `--max-body` (default 10485760), `--mitm-all`, `--network-service`, `--no-block-quic`, `--no-mdns`, `--no-system-proxy`, `--no-trust-ca`, `--port` (default 8080), `--project-dir`, `--log-max-records`, `--log-retention`, `--proxy-listen-addr`, `--ssl-domains`, `--tls-keylog`, `--upstream-proxy`, `--web-port`, `--workspace-ports` (default 20000-29999) |
+| `apxy stop` | Stop the local APXY proxy this workspace started; refuses a proxy a person or another workspace started, or one another workspace's `apxy run` uses | `--force` (for people only; agents never pass it) |
 | `apxy status` | Show whether the local APXY proxy is running | `--format` (json\|toon, default json), `--port` (default 8080), `--quiet` |
 | `apxy run` | Run a command with proxy + CA env vars routed through APXY | `apxy start` flags before `--`, such as `--port`, `--ssl-domains`, `--mitm-all` |
 | `apxy shell` | Start an interactive shell with proxy env vars set | `--lang` (default all) |
 | `apxy env` | Print proxy environment variables for shell sessions | `--bypass-domains`, `--cert-dir` (default ~/.apxy/certs), `--lang` (default all), `--no-cert`, `--port` (default 8080), `--script` |
-| `apxy browser` | Open a URL in a browser configured to route through APXY | `--arc`, `--brave`, `--chrome`, `--edge`, `--firefox`, `--safari` |
+| `apxy browser` | Open a URL in a browser configured to route through APXY | `--arc`, `--brave`, `--chrome`, `--edge`, `--firefox`, `--port` (default 8080), `--safari` |
 | `apxy mark` | Record a point in time for apxy wait --since |  |
-| `apxy wait` | Block until a matching request is captured, then check expectations | `--expect`, `--match`, `--since`, `--timeout` (default 30s) |
+| `apxy wait` | Block until a matching request is captured, then check expectations | `--all-workspaces`, `--expect`, `--from-workspace`, `--match`, `--since`, `--timeout` (default 30s) |
 | `apxy recording start` | Start capturing traffic on the running proxy |  |
 | `apxy recording stop` | Stop capturing traffic on the running proxy |  |
 
@@ -29,16 +31,16 @@ Global flags work on every command: `--config`, `--error-format` (text|json, def
 | `apxy logs ai-usage` | Show LLM token usage and estimated cost from captured AI traffic | `--since`, `--until` |
 | `apxy logs clear` | Delete all captured traffic records | `--dry-run` |
 | `apxy logs diff` | Compare two captured traffic records | `--id-a`, `--id-b`, `--scope` (request\|response\|both, default both) |
-| `apxy logs egress` | Summarize captured traffic by host and check it against an allowlist | `--allowlist`, `--quiet`, `--since` (default all) |
+| `apxy logs egress` | Summarize captured traffic by host and check it against an allowlist | `--all-workspaces`, `--allowlist`, `--from-workspace`, `--quiet`, `--since` (default all) |
 | `apxy logs export-curl` | Export one traffic record as a reusable client snippet | `--format` (curl\|fetch\|httpie\|python, default curl), `--id`, `--redact`, `--safe` |
 | `apxy logs export-har` | Export captured traffic as a HAR 1.2 file | `--file`, `--limit` (default 10000), `--redact`, `--safe` |
 | `apxy logs graphql` | Search captured GraphQL requests | `--format` (json\|markdown\|toon, default json), `--limit` (default 20), `--operation-name`, `--operation-type` (query\|mutation\|subscription) |
 | `apxy logs import-har` | Import traffic records from a HAR file | `--file` |
 | `apxy logs jsonpath` | Extract JSON fields from captured traffic bodies | `--id`, `--path`, `--scope` (request\|response, default response) |
 | `apxy logs label` | Add a label and comment to a traffic record | `--color`, `--comment`, `--id` |
-| `apxy logs list` | List captured traffic records | `--format` (json\|markdown\|toon, default json), `--limit` (default 50), `--offset`, `--quiet`, `--raw` |
+| `apxy logs list` | List captured traffic records | `--all-workspaces`, `--format` (json\|markdown\|toon, default json), `--from-workspace`, `--limit` (default 50), `--offset`, `--quiet`, `--raw` |
 | `apxy logs replay` | Replay one captured request against the live upstream | `--id`, `--port` (default 8080) |
-| `apxy logs search` | Search captured traffic records | `--format` (json\|markdown\|toon, default json), `--limit` (default 20), `--query`, `--quiet`, `--raw` |
+| `apxy logs search` | Search captured traffic records | `--all-workspaces`, `--format` (json\|markdown\|toon, default json), `--from-workspace`, `--limit` (default 20), `--query`, `--quiet`, `--raw` |
 | `apxy logs search-bodies` | Search request and response bodies in captured traffic | `--format` (json\|markdown\|toon, default json), `--limit` (default 20), `--pattern`, `--scope` (request\|response\|both, default both) |
 | `apxy logs show` | Show one captured traffic record by ID | `--format` (json\|markdown\|toon, default json), `--id`, `--raw` |
 | `apxy logs sse-events` | List parsed SSE events for a traffic record | `--format` (default text), `--id`, `--limit` (default 100) |
@@ -60,6 +62,21 @@ Global flags work on every command: `--config`, `--error-format` (text|json, def
 | `apxy mock import` | Import mock rules from a JSON template file | `--file` |
 | `apxy mock list` | List mock rules | `--format` (json\|toon, default json), `--quiet` |
 | `apxy mock remove` | Remove a mock rule by ID or all mock rules | `--all`, `--dry-run`, `--id` |
+
+## All rules of a workspace
+
+| Command | Description | Flags |
+|---------|-------------|-------|
+| `apxy rules list` | List the rules that apply to this workspace, with their files and whether the running proxy applies them | |
+| `apxy rules apply` | Validate this workspace's rules file (or the global one) and push it to the running proxy now | `--global` |
+| `apxy rules clear` | Delete every rule of this workspace (or the global rules) | `--dry-run`, `--global` |
+
+## This workspace
+
+| Command | Description | Flags |
+|---------|-------------|-------|
+| `apxy workspace label` | Say what this workspace is doing, such as `apxy workspace label "Fix checkout retries"`, for people watching the web UI (one line, at most 80 characters; `APXY_WORKSPACE_LABEL` sets it too). Flags and MCP `workspace` arguments never take a label. | `--clear` |
+| `apxy workspace show` | Print this workspace's ID, name, label, git branch, root and last activity | |
 
 ## Rewrite rules
 
@@ -160,10 +177,15 @@ Global flags work on every command: `--config`, `--error-format` (text|json, def
 
 | Command | Description | Flags |
 |---------|-------------|-------|
-| `apxy init` | Initialize a project-scoped APXY workspace |  |
+| `apxy init` | Initialize a project-scoped APXY workspace | `--commit-rules` |
 | `apxy setup agents` | Add the APXY verify section to AGENTS.md and CLAUDE.md | `--dir`, `--dry-run`, `--remove`, `--target`, `--yes` |
 | `apxy setup mcp` | Configure MCP clients to use APXY | `--all`, `--client`, `--scope`, `--write` |
-| `apxy mcp` | Run the APXY MCP server for AI clients |  |
+| `apxy mcp` | Run the APXY MCP server for AI clients | `--no-skills` |
+| `apxy setup skills` | Install the APXY agent skill as files for agents without MCP skills | `--all`, `--client`, `--refresh`, `--write` |
+| `apxy ui` | Open the web UI on every workspace's traffic and rules, with no proxy | `--listen-addr` (default 127.0.0.1), `--port` (default 8082) |
+| `apxy device list` | List booted iOS simulators and running Android emulators |  |
+| `apxy device setup` | Install the APXY CA on a simulator or emulator, and point an Android emulator at the proxy | `--android-emulator`, `--ios-simulator`, `--system-store` |
+| `apxy device teardown` | Clear the HTTP proxy apxy device setup set on an Android emulator | `--android-emulator` |
 | `apxy config export` | Export all configuration to a JSON file | `--file` (default apxy-config.json) |
 | `apxy config import` | Import configuration from a JSON file | `--file` |
 | `apxy config telemetry` | View or change telemetry consent |  |

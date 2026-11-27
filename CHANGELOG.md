@@ -2,6 +2,25 @@
 
 User-facing changes in each APXY release, newest first.
 
+## APXY 1.11.0: Run many agents in parallel worktrees on one APXY (2026-11-27)
+
+### ✨ New
+- **Workspaces.** Every request sent through `apxy run` is tagged with the git worktree that sent it. `apxy wait`, `apxy mark` and `apxy logs` see only that worktree's traffic plus untagged traffic, so one agent's check never passes on another agent's request. `--all-workspaces` and `--from-workspace` widen the view.
+- **Mocks and rules live in files.** A mock goes to the worktree's `.apxy/rules.json` and answers only that worktree's traffic. `--global` writes `~/.apxy/rules.json` for browsers and simulators. `apxy rules list`, `apxy rules clear` and `apxy rules apply` manage them, and hand edits reach the running proxy within a second.
+- **`apxy wait` says when a mock answered.** The result names the rule and its file, with a warning, so a check never passes on a fake response unnoticed.
+- **One web UI for every agent.** Pick a workspace in the top bar, see which agent sent each request, and name a workspace with `apxy workspace label`. `apxy ui` opens the web UI with no proxy running.
+- **`apxy browser`** gives each worktree its own Chromium profile and tagged proxy port, and keeps the proxy up while the browser is open.
+- **`apxy device list`, `setup` and `teardown`** prepare iOS simulators and Android emulators from the CLI and MCP. An emulator set up in a worktree is tagged with it.
+- Plain `http://` requests that Node's `fetch` sends through a proxy tunnel are now captured with their path and body.
+
+### ⚡ Improvements
+- An agent can only stop a proxy its own worktree started. A proxy you started with `apxy start` stops with Ctrl+C or `apxy stop --force`.
+- The MCP `start_proxy` tool never turns on the system proxy, and its proxy stops when the MCP session ends.
+- Traffic is kept across proxy restarts, up to 24 hours or 50,000 records.
+
+### 🐞 Bug Fixes
+- `apxy status --quiet` reports a proxy as ready only when `apxy run` can join it.
+
 ## APXY 1.10.0: Your agent knows APXY as soon as it connects (2026-11-26)
 
 ### ✨ New
